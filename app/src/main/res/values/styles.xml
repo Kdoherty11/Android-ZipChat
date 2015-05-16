@@ -1,0 +1,38 @@
+<resources>
+
+    <style name="AppTheme" parent="AppTheme.Base">
+
+    </style>
+
+    <style name="AppTheme.Base" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/zipchat_blue</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/app_bar_color_accent</item>
+        <item name="actionMenuTextAppearance">@style/AppTheme.MenuTextStyle</item>
+        <item name="actionMenuTextColor">@color/white</item>
+        <item name="actionBarTabBarStyle">@style/customTabBar</item>
+        <item name="actionBarTabStyle">@style/customTabStyle</item>
+        <item name="drawerArrowStyle">@style/MyDrawerArrowToggle</item>
+    </style>
+
+    <style name="customTabStyle" parent="@android:style/Widget.Holo.ActionBar.TabView">
+        <item name="android:showDividers">none</item>
+        <item name="android:measureWithLargestChild">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/home_screen_tabs_divider</item>
+    </style>
+
+    <style name="customTabBar" parent="@android:style/Widget.Holo.ActionBar.TabBar">
+        <item name="android:showDividers">middle</item>
+        <item name="android:divider">@drawable/home_screen_tabs_divider</item>
+        <item name="android:dividerPadding">0dp</item>
+        <item name="android:background">@drawable/home_screen_tab_bg_unselected</item>
+    </style>
+
+    <style name="MyDrawerArrowToggle" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="color">@color/white</item>
+    </style>
+
+
+
+</resources>

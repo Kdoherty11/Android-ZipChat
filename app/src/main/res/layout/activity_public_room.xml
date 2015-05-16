@@ -1,0 +1,34 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.kdoherty.zipchat.activities.PublicRoomActivity">
+
+    <include
+        android:id="@+id/chat_room_app_bar"
+        layout="@layout/app_bar_default" />
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/chat_room_drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/chat_room_fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <fragment
+            android:id="@+id/chat_room_drawer"
+            android:name="com.kdoherty.zipchat.fragments.PublicRoomDrawerFragment"
+            android:layout_width="@dimen/chat_room_drawer_width"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            app:layout="@layout/fragment_public_room_drawer"
+            tools:layout="@layout/fragment_public_room_drawer" />
+
+    </android.support.v4.widget.DrawerLayout>
+
+</LinearLayout>

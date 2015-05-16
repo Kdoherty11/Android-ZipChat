@@ -1,0 +1,92 @@
+<resources>
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!-- Action Bar -->
+    <dimen name="action_bar_title_text_size">24sp</dimen>
+
+    <!-- ***** Home screen ***** -->
+    <dimen name="home_screen_list_divider">1dp</dimen>
+
+    <!-- Home screen tabs -->
+    <dimen name="home_screen_tab_text">16sp</dimen>
+    <dimen name="home_screen_space_between_tab_text_and_dot">0dp</dimen>
+    <dimen name="home_screen_space_between_dot_and_bottom">4dp</dimen>
+    <dimen name="home_screen_bottom_tabs_dot_radius">6dp</dimen>
+
+    <dimen name="home_screen_bottom_tabs_text">15sp</dimen>
+    <dimen name="home_screen_bottom_tabs_padding">6dp</dimen>
+
+    <!-- Home screen cells -->
+    <dimen name="home_screen_cell_name_text_size">26sp</dimen>
+    <dimen name="home_screen_cell_last_activity_text_size">12sp</dimen>
+
+    <!-- ***** Home Screen Chat room cell ***** -->
+    <dimen name="chat_room_distance_text_size">18sp</dimen>
+    <dimen name="chat_room_margins">8dp</dimen>
+    <dimen name="chat_room_favorite_margins">6dp</dimen>
+    <dimen name="chat_room_divider_height">1dp</dimen>
+
+    <!-- Home screen private chat cell -->
+    <dimen name="private_chat_margins">8dp</dimen>
+    <dimen name="private_chat_favorite_margins">6dp</dimen>
+    <dimen name="private_chat_picture_margins">4dp</dimen>
+
+    <!-- Home screen chat request cell -->
+    <dimen name="chat_request_picture_margins">8dp</dimen>
+    <dimen name="chat_request_margins">8dp</dimen>
+    <dimen name="chat_request_buttons_width">75dp</dimen>
+    <dimen name="chat_request_buttons_height">35dp</dimen>
+    <dimen name="chat_request_buttons_text_size">14sp</dimen>
+    <dimen name="chat_request_buttons_margins">4dp</dimen>
+
+    <!-- ***** Create room Activity ***** -->
+    <dimen name="create_room_label_text_size">22sp</dimen>
+    <dimen name="create_room_top_margins">30dp</dimen>
+    <dimen name="create_room_name_left_margin">22dp</dimen>
+    <dimen name="create_room_radius_left_margin">14dp</dimen>
+    <dimen name="create_room_privacy_left_margin">10dp</dimen>
+    <dimen name="create_room_options_margin_bottom">64dp</dimen>
+    <dimen name="create_room_create_button_text">14sp</dimen>
+    <dimen name="create_room_create_button_padding">8dp</dimen>
+
+    <!-- ***** Chat room ***** -->
+    <dimen name="message_picture_margins">10dp</dimen>
+    <dimen name="message_sender_text_size">14sp</dimen>
+    <dimen name="message_content_text_size">16sp</dimen>
+    <dimen name="message_space_between_picture_and_text">6dp</dimen>
+    <dimen name="message_space_between_sender_and_content">6dp</dimen>
+    <dimen name="chat_room_message_box_left_margin">12dp</dimen>
+    <dimen name="chat_room_message_box_bottom_margin">8dp</dimen>
+    <dimen name="chat_room_message_box_height">48dp</dimen>
+    <dimen name="profile_picture_width">56dp</dimen>
+    <dimen name="profile_picture_height">56dp</dimen>
+
+    <!-- ***** Chat room drawer fragment ***** -->
+    <dimen name="chat_room_drawer_width">280dp</dimen>
+    <dimen name="chat_room_drawer_cell_text">14sp</dimen>
+    <dimen name="chat_room_drawer_margin_left">16dp</dimen>
+    <dimen name="chat_room_drawer_cell_padding">8dp</dimen>
+    <dimen name="chat_room_drawer_map_height">240dp</dimen>
+
+    <!-- ***** Chat Room Members ***** -->
+    <dimen name="chat_room_member_name">24sp</dimen>
+    <dimen name="chat_room_member_picture_margin_left">12dp</dimen>
+    <dimen name="chat_room_member_name_margin_left">16dp</dimen>
+    <dimen name="chat_room_member_padding">16dp</dimen>
+    <dimen name="chat_room_members_divider_height">1dp</dimen>
+    
+    <dimen name="chat_room_drawer_cell_height">48dp</dimen>
+    <dimen name="chat_room_drawer_cell_icon_horizontal_margins">16dp</dimen>
+    <dimen name="chat_room_drawer_text_left_margin">72dp</dimen>
+    <dimen name="drawer_margin_top">48dp</dimen>
+    <dimen name="chat_room_drawer_image_margin_bottom">16dp</dimen>
+
+    <dimen name="chat_request_top_margin">50dp</dimen>
+    <dimen name="private_chat_room_pic_side">48dp</dimen>
+    <dimen name="private_chat_room_pic_margins">6dp</dimen>
+
+
+</resources>

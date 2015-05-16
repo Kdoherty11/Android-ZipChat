@@ -1,0 +1,20 @@
+<resources>
+
+    <style name="AppTheme" parent="AppTheme.Base">
+
+        <item name="android:colorPrimary">@color/zipchat_blue</item>
+        <item name="android:colorPrimaryDark">@color/primary_dark</item>
+        <item name="android:colorAccent">@color/app_bar_color_accent</item>
+        <item name="android:actionMenuTextAppearance">@style/AppTheme.MenuTextStyle</item>
+        <item name="android:actionBarTabBarStyle">@style/customTabBar</item>
+        <item name="android:actionBarTabStyle">@style/customTabStyle</item>
+
+    </style>
+    
+    <style name="AppTheme.MenuTextStyle">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+
+
+</resources>

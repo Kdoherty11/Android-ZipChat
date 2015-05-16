@@ -1,0 +1,91 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context="com.kdoherty.zipchat.fragments.PublicRoomsFragment">
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
+
+        <com.kdoherty.zipchat.views.QuickReturnRecyclerView
+            android:id="@+id/chat_rooms"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:divider="@color/home_list_divider"
+            android:dividerHeight="@dimen/home_screen_list_divider"
+            android:isScrollContainer="false" />
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <com.getbase.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="50dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+        fab:fab_colorNormal="@color/orange"
+        fab:fab_colorPressed="@color/orange"
+        fab:fab_icon="@drawable/ic_add_white_24dp" />
+
+    <TabHost xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@android:id/tabhost"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentBottom="true">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:padding="0dp">
+
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="5dp" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="bottom"
+                android:gravity="bottom">
+
+                <LinearLayout
+                    android:id="@+id/quick_return_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TabWidget
+                        android:id="@android:id/tabs"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:layout_marginBottom="-4dp"
+                        android:layout_weight="0"
+                        android:gravity="bottom"
+                        android:showDividers="middle" />
+                </LinearLayout>
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+    </TabHost>
+
+    <View
+        android:id="@+id/sorting_tabs_placeholder"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_alignParentBottom="true" />
+
+</RelativeLayout>

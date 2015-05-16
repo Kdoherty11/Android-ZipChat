@@ -1,0 +1,20 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white"
+    tools:context="com.kdoherty.zipchat.activities.HomeActivity">
+
+    <include
+        android:id="@+id/home_screen_app_bar"
+        layout="@layout/app_bar_default" />
+
+    <fragment
+        android:id="@+id/home_screen_tabs_fragment"
+        class="com.kdoherty.zipchat.fragments.HomeTabsFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:layout="@layout/fragment_home_screen_tabs" />
+
+</LinearLayout>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:id="@+id/chat_request_accept_deny_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/chat_request_accept_button"
+            android:layout_width="@dimen/chat_request_buttons_width"
+            android:layout_height="@dimen/chat_request_buttons_height"
+            android:layout_margin="@dimen/chat_request_buttons_margins"
+            android:background="@drawable/chat_request_buttons_background"
+            android:text="@string/request_accept_button"
+            android:textSize="@dimen/chat_request_buttons_text_size" />
+
+        <Button
+            android:id="@+id/chat_request_deny_button"
+            android:layout_width="@dimen/chat_request_buttons_width"
+            android:layout_height="@dimen/chat_request_buttons_height"
+            android:layout_marginBottom="@dimen/chat_request_buttons_margins"
+            android:layout_marginLeft="@dimen/chat_request_buttons_margins"
+            android:layout_marginRight="@dimen/chat_request_buttons_margins"
+            android:background="@drawable/chat_request_buttons_background"
+            android:text="@string/request_deny_button"
+            android:textSize="@dimen/chat_request_buttons_text_size" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/chat_request_pic_and_time_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="@dimen/chat_request_margins"
+        android:orientation="vertical">
+
+        <com.kdoherty.zipchat.views.CircleProfilePictureView
+            android:id="@+id/chat_request_sender_picture"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_centerVertical="true"
+            android:layout_marginBottom="@dimen/chat_request_picture_margins"
+            android:layout_marginRight="@dimen/chat_request_picture_margins"
+            android:layout_marginTop="@dimen/chat_request_picture_margins"
+            android:src="@drawable/profile_pic" />
+
+        <TextView
+            android:id="@+id/chat_request_time_stamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/zipchat_blue"
+            android:textSize="@dimen/home_screen_cell_last_activity_text_size" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/chat_request_sender_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_toLeftOf="@id/chat_request_accept_deny_layout"
+        android:layout_toRightOf="@id/chat_request_pic_and_time_layout"
+        android:textColor="@color/black"
+        android:textSize="@dimen/home_screen_cell_name_text_size" />
+
+</RelativeLayout>

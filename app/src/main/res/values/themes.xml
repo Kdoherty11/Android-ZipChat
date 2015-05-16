@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- the theme applied to the application or activity -->
+    <style name="CustomActionBarTheme"
+        parent="@android:style/Theme.Holo.Light.DarkActionBar">
+        <item name="android:actionBarStyle">@style/HomeScreenActionBar</item>
+        <item name="android:actionBarTabStyle">@style/HomeScreenActionBarTabs</item>
+    </style>
+
+    <!-- ActionBar styles -->
+    <style name="HomeScreenActionBar"
+        parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
+        <item name="android:background">@color/zipchat_blue</item>
+    </style>
+
+    <!-- ActionBar tabs styles -->
+    <style name="HomeScreenActionBarTabs"
+        parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
+        <!-- tab indicator -->
+        <item name="android:background">@drawable/home_screen_tab_indicator</item>
+        <item name="android:gravity">center</item>
+
+    </style>
+
+</resources>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="black">#000000</color>
+    <color name="white">#ffffff</color>
+    <color name="zipchat_blue">#5DBCD2</color>
+    <color name="transparent">#00000000</color>
+    <color name="orange">#FB8C00</color>
+    <color name="light_reg">#ff7f7f</color>
+    <color name="primary_dark">#0097A7</color>
+    <color name="grey">#dbdbdb</color>
+
+    <!-- ***** Home Screen ***** -->
+
+    <color name="home_tab_selected">#ff9ecfbf</color>
+    <color name="home_tab_indicator">#C35DBCD2</color>
+    <color name="home_tab_background">#fafafa</color>
+    <color name="home_tab_unselected_text">#9A5DBCD2</color>
+
+    <color name="home_list_divider">#D3D3D3</color>
+
+    <color name="home_tab_selected_start_gradient">#E65DBCD2</color>
+    <color name="home_tab_selected_center_gradient">#E65DBCD2</color>
+    <color name="home_tab_selected_end_gradient">#E65DBCD2</color>
+
+    <color name="home_tab_unselected_start_gradient">#E65DBCD2</color>
+    <color name="home_tab_unselected_center_gradient">#E65DBCD2</color>
+    <color name="home_tab_unselected_end_gradient">#E65DBCD2</color>
+
+    <!-- Home Screen Chat Request -->
+    <color name="chat_request_button_start_gradient">#dbdbdb</color>
+    <color name="chat_request_button_center_gradient">#a8a8a8</color>
+    <color name="chat_request_button_end_gradient">#939393</color>
+
+    <!-- ***** Create Room ***** -->
+    <color name="create_room_map_circle_fill">#405DBCD2</color>
+
+    <!-- ***** Chat Room ***** -->
+    <color name="chat_room_messages_background">#f1f1f1</color>
+
+    <!-- Chat Room Drawer -->
+    <color name="chat_room_drawer_background">#DADADA</color>
+    <color name="chat_room_drawer_cell_text">#de000000</color>
+
+    <!-- App bar -->
+    <color name="app_bar_color_accent">#A9CEF4</color>
+
+</resources>

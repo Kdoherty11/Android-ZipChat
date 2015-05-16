@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/zipchat_blue">
+
+    <Button
+        android:id="@+id/create_room_create_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|center_vertical"
+        android:background="@android:color/transparent"
+        android:padding="@dimen/create_room_create_button_padding"
+        android:text="@string/create_room_create_button"
+        android:textColor="@color/white"
+        android:textSize="@dimen/create_room_create_button_text"
+        android:textStyle="bold" />
+
+</android.support.v7.widget.Toolbar>

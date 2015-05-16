@@ -1,0 +1,102 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    tools:context="com.kdoherty.zipchat.activities.CreateRoomActivity">
+
+    <include
+        android:id="@+id/create_room_app_bar"
+        layout="@layout/app_bar_create_room" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/create_room_top_margins"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/create_room_name"
+                android:textColor="@color/black"
+                android:textSize="@dimen/create_room_label_text_size" />
+
+            <EditText
+                android:id="@+id/create_room_name_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/create_room_name_left_margin"
+                android:background="@drawable/create_room_name_et_background"
+                android:hint="@string/create_room_name_hint"
+                android:padding="10dp"
+                android:textColor="@color/black" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/create_room_top_margins"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/create_room_radius"
+                android:textColor="@color/black"
+                android:textSize="@dimen/create_room_label_text_size" />
+
+            <info.hoang8f.android.segmented.SegmentedGroup
+                android:id="@+id/create_room_radius_options"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/create_room_radius_left_margin"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/create_room_small_radius_option"
+                    style="@style/RadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="@string/create_room_small_option" />
+
+                <RadioButton
+                    android:id="@+id/create_room_medium_radius_option"
+                    style="@style/RadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/create_room_medium_option" />
+
+                <RadioButton
+                    android:id="@+id/create_room_large_radius_option"
+                    style="@style/RadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/create_room_large_option" />
+            </info.hoang8f.android.segmented.SegmentedGroup>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.MapFragment"
+        android:layout_width="275dp"
+        android:layout_height="275dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="25dp" />
+
+
+</LinearLayout>

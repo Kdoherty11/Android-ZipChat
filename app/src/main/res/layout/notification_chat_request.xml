@@ -1,0 +1,98 @@
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+
+<!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:background="@color/black">-->
+
+    <!--<LinearLayout-->
+        <!--android:id="@+id/chat_request_accept_deny_layout"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:orientation="vertical">-->
+
+        <!--<Button-->
+            <!--android:id="@+id/chat_request_accept_button"-->
+            <!--android:layout_width="@dimen/chat_request_buttons_width"-->
+            <!--android:layout_height="@dimen/chat_request_buttons_height"-->
+            <!--android:layout_margin="@dimen/chat_request_buttons_margins"-->
+            <!--android:background="@drawable/chat_request_buttons_background"-->
+            <!--android:text="@string/request_accept_button"-->
+            <!--android:textSize="@dimen/chat_request_buttons_text_size" />-->
+
+        <!--<Button-->
+            <!--android:id="@+id/chat_request_deny_button"-->
+            <!--android:layout_width="@dimen/chat_request_buttons_width"-->
+            <!--android:layout_height="@dimen/chat_request_buttons_height"-->
+            <!--android:layout_marginBottom="@dimen/chat_request_buttons_margins"-->
+            <!--android:layout_marginLeft="@dimen/chat_request_buttons_margins"-->
+            <!--android:layout_marginRight="@dimen/chat_request_buttons_margins"-->
+            <!--android:background="@drawable/chat_request_buttons_background"-->
+            <!--android:text="@string/request_deny_button"-->
+            <!--android:textSize="@dimen/chat_request_buttons_text_size" />-->
+
+    <!--</LinearLayout>-->
+
+    <!--<LinearLayout-->
+        <!--android:id="@+id/chat_request_pic_and_time_layout"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_margin="@dimen/chat_request_margins"-->
+        <!--android:orientation="vertical">-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/chat_request_time_stamp"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textColor="@color/home_screen_cell_last_activity"-->
+            <!--android:textSize="@dimen/home_screen_cell_last_activity_text_size" />-->
+
+    <!--</LinearLayout>-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/chat_request_sender_name"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_centerInParent="true"-->
+        <!--android:layout_toLeftOf="@id/chat_request_accept_deny_layout"-->
+        <!--android:layout_toRightOf="@id/chat_request_pic_and_time_layout"-->
+        <!--android:textColor="@color/home_screen_cell_text"-->
+        <!--android:textSize="@dimen/home_screen_cell_name_text_size" />-->
+
+<!--</RelativeLayout>-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+android:gravity="center"
+android:orientation="horizontal"
+android:weightSum="100" >
+
+<ImageView
+    android:id="@+id/notifiation_image"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="30"
+    android:contentDescription="Image"
+    android:src="@drawable/ic_launcher" />
+
+<TextView
+    android:id="@+id/appName"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="50"
+    android:gravity="center"
+    android:text="This is a test"
+    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+<Button
+    android:id="@+id/closeOnFlash"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="20"
+    android:text="Close" />
+</LinearLayout>

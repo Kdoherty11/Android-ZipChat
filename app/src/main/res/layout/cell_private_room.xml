@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:id="@+id/private_chat_pic_and_time_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="@dimen/private_chat_margins"
+        android:orientation="vertical">
+
+        <com.kdoherty.zipchat.views.CircleProfilePictureView
+            android:id="@+id/private_chat_picture"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_centerVertical="true"
+            android:layout_marginBottom="@dimen/private_chat_picture_margins"
+            android:layout_marginRight="@dimen/private_chat_picture_margins"
+            android:layout_marginTop="@dimen/private_chat_picture_margins"
+            android:src="@drawable/profile_pic" />
+
+        <TextView
+            android:id="@+id/private_chat_last_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/zipchat_blue"
+            android:textSize="@dimen/home_screen_cell_last_activity_text_size" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/private_chat_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_toRightOf="@id/private_chat_pic_and_time_layout"
+        android:textColor="@color/black"
+        android:textSize="@dimen/home_screen_cell_name_text_size" />
+
+</RelativeLayout>

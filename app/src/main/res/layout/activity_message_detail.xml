@@ -1,0 +1,21 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/grey"
+    tools:context="com.kdoherty.zipchat.activities.MessageDetailActivity">
+
+    <include
+        android:id="@+id/message_detail_app_bar"
+        layout="@layout/app_bar_default" />
+
+    <!--<fragment xmlns:android="http://schemas.android.com/apk/res/android"-->
+        <!--xmlns:tools="http://schemas.android.com/tools"-->
+        <!--android:id="@+id/fragment"-->
+        <!--android:name="com.kdoherty.zipchat.fragments.MessageDetailFragment"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--tools:layout="@layout/fragment_message_detail" />-->
+
+</LinearLayout>
