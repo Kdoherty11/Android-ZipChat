@@ -1,5 +1,6 @@
 package com.kdoherty.zipchat.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -22,9 +23,17 @@ public class PrivateRoomActivity extends AppCompatActivity {
 
     private ChatRoomFragment mChatRoomFragment;
 
-    public static final String EXTRA_ROOM_ID = "PrivateChatActivityRoomId";
-    public static final String EXTRA_USER_NAME = "PrivateChatActivityUserName";
-    public static final String EXTRA_USER_FB_ID = "PrivateChatActivityUserFacebookId";
+    private static final String EXTRA_ROOM_ID = "PrivateChatActivityRoomId";
+    private static final String EXTRA_USER_NAME = "PrivateChatActivityUserName";
+    private static final String EXTRA_USER_FB_ID = "PrivateChatActivityUserFacebookId";
+
+    public static Intent getIntent(Context context, long roomId, String name, String facebookId) {
+        Intent privateRoomIntent = new Intent(context, PrivateRoomActivity.class);
+        privateRoomIntent.putExtra(EXTRA_ROOM_ID, roomId);
+        privateRoomIntent.putExtra(EXTRA_USER_NAME, name);
+        privateRoomIntent.putExtra(EXTRA_USER_FB_ID, facebookId);
+        return privateRoomIntent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

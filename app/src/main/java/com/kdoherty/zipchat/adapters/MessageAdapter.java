@@ -1,6 +1,7 @@
 package com.kdoherty.zipchat.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
@@ -13,7 +14,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.kdoherty.zipchat.R;
-import com.kdoherty.zipchat.activities.MessageDetailActivity;
 import com.kdoherty.zipchat.activities.UserDetailsActivity;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
@@ -99,7 +99,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
             @Override
             public void onClick(View v) {
                 //Log.d(TAG, "Sending message: " + getMessage(position) + " to the message details activity");
-                //MessageDetailActivity.startActivity(mContext, getMessage(position));
+                //Intent intent = MessageDetailsActivity.getIntent(mContext, getMessage(position));
+                //mContext.startActivity(intent);
             }
         });
         return new MessageCellViewHolder(view);
@@ -115,7 +116,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         messageCellViewHolder.profilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                UserDetailsActivity.startActivity(mContext, sender);
+                Intent intent = UserDetailsActivity.getIntent(mContext, sender);
+                mContext.startActivity(intent);
             }
         });
 

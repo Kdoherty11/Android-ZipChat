@@ -3,42 +3,36 @@ package com.kdoherty.zipchat.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Toast;
 
 import com.kdoherty.zipchat.R;
-import com.kdoherty.zipchat.fragments.LoginFragment;
-import com.kdoherty.zipchat.fragments.MessageDetailFragment;
+import com.kdoherty.zipchat.fragments.MessageDetailsFragment;
 import com.kdoherty.zipchat.models.Message;
 
-public class MessageDetailActivity extends AppCompatActivity {
+public class MessageDetailsActivity extends AppCompatActivity {
 
-    private static final String KEY_MESSAGE = "MessageDetailMessage";
+    private static final String EXTRA_MESSAGE = "MessageDetailMessage";
 
-    public static void startActivity(Context context, Message message) {
-        Intent messageDetail = new Intent(context, MessageDetailActivity.class);
-        messageDetail.putExtra(KEY_MESSAGE, message);
-        context.startActivity(messageDetail);
+    public static Intent getIntent(Context context, Message message) {
+        Intent messageDetail = new Intent(context, MessageDetailsActivity.class);
+        messageDetail.putExtra(EXTRA_MESSAGE, message);
+        return messageDetail;
     }
 
     private Message mMessage;
-    private MessageDetailFragment mMessageDetailFragment;
+    private MessageDetailsFragment mMessageDetailsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        setContentView(R.layout.activity_message_detail);
+        setContentView(R.layout.activity_message_details);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.message_detail_app_bar);
         setSupportActionBar(toolbar);
@@ -51,19 +45,19 @@ public class MessageDetailActivity extends AppCompatActivity {
 
 //        if (savedInstanceState == null) {
 //            // Add the fragment on initial activity setup
-//            mMessageDetailFragment = new MessageDetailFragment();
+//            mMessageDetailsFragment = new MessageDetailsFragment();
 //            getSupportFragmentManager()
 //                    .beginTransaction()
-//                    .add(android.R.id.content, mMessageDetailFragment)
+//                    .add(android.R.id.content, mMessageDetailsFragment)
 //                    .commit();
 //        } else {
 //            // Or set the fragment from restored state info
-//            mMessageDetailFragment = (MessageDetailFragment) getSupportFragmentManager()
+//            mMessageDetailsFragment = (MessageDetailsFragment) getSupportFragmentManager()
 //                    .findFragmentById(android.R.id.content);
 //        }
 
-        mMessage = getIntent().getParcelableExtra(KEY_MESSAGE);
-        //mMessageDetailFragment.displayMessage(mMessage);
+        mMessage = getIntent().getParcelableExtra(EXTRA_MESSAGE);
+        //mMessageDetailsFragment.displayMessage(mMessage);
     }
 
     @Override

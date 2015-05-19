@@ -18,7 +18,6 @@ import android.widget.Filterable;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.PrivateRoomActivity;
 import com.kdoherty.zipchat.adapters.PrivateRoomAdapter;
-import com.kdoherty.zipchat.events.FilterChangeEvent;
 import com.kdoherty.zipchat.events.RequestAcceptedEvent;
 import com.kdoherty.zipchat.models.PrivateRoom;
 import com.kdoherty.zipchat.models.PrivateRoomComparator;
@@ -83,22 +82,21 @@ public class PrivateRoomsFragment extends Fragment implements Filterable, SwipeR
                 new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        Intent privateChatActivity = new Intent(getActivity(), PrivateRoomActivity.class);
-
                         PrivateRoom privateRoom = mAdapter.getPrivateChat(position);
+                        long roomId = privateRoom.getId();
                         String userName = privateRoom.getOther().getName();
                         String facebookId = privateRoom.getOther().getFacebookId();
-                        long roomId = privateRoom.getId();
-
-                        privateChatActivity.putExtra(PrivateRoomActivity.EXTRA_USER_NAME, userName);
-                        privateChatActivity.putExtra(PrivateRoomActivity.EXTRA_USER_FB_ID, facebookId);
-                        privateChatActivity.putExtra(PrivateRoomActivity.EXTRA_ROOM_ID, roomId);
-                        startActivity(privateChatActivity);
+                        Intent intent = PrivateRoomActivity.getIntent(getActivity(), roomId, userName, facebookId);
+                        startActivity(intent);
                     }
                 }));
     }
 
     public void populateList() {
+        if (!Utils.checkOnline(getActivity())) {
+            return;
+        }
+
         final long userId = UserUtils.getId(getActivity());
 
         ZipChatApi.INSTANCE.getPrivateRooms(userId, new Callback<List<PrivateRoom>>() {
@@ -108,7 +106,6 @@ public class PrivateRoomsFragment extends Fragment implements Filterable, SwipeR
                 mPrivateRooms = privateRooms;
                 Collections.sort(mPrivateRooms, PrivateRoomComparator.INSTANCE);
                 mAdapter = new PrivateRoomAdapter(getActivity(), mPrivateRooms);
-                BusProvider.getInstance().post(new FilterChangeEvent(mAdapter.getFilter()));
                 mPrivateChatsRv.setAdapter(mAdapter);
             }
 

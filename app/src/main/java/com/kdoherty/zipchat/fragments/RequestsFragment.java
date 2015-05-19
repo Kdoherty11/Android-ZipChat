@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.adapters.RequestAdapter;
@@ -31,7 +33,7 @@ import retrofit.client.Response;
 /**
  * Created by kevindoherty on 1/31/15.
  */
-public class RequestsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class RequestsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, Filterable {
 
     private static final String TAG = RequestsFragment.class.getSimpleName();
 
@@ -70,6 +72,9 @@ public class RequestsFragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     public void populateList() {
+        if (!Utils.checkOnline(getActivity())) {
+            return;
+        }
 
         final long userId = UserUtils.getId(getActivity());
 
@@ -112,5 +117,13 @@ public class RequestsFragment extends Fragment implements SwipeRefreshLayout.OnR
     public void onPause() {
         super.onPause();
         BusProvider.getInstance().unregister(this);
+    }
+
+    @Override
+    public Filter getFilter() {
+        if (mAdapter != null) {
+            return mAdapter.getFilter();
+        }
+        return null;
     }
 }

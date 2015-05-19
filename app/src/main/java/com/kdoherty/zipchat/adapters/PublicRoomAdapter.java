@@ -102,7 +102,7 @@ public class PublicRoomAdapter extends RecyclerView.Adapter<PublicRoomAdapter.Ch
         }
     }
 
-    private class ChatRoomFilter extends Filter {
+    public class ChatRoomFilter extends Filter {
 
         @Override
         protected Filter.FilterResults performFiltering(CharSequence charSequence) {

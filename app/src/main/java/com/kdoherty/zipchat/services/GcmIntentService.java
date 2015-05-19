@@ -40,30 +40,30 @@ public class GcmIntentService extends IntentService {
     private static final int LIGHT_OFF_MS = 4000;
     private static final int LIGHT_COLOR = Color.argb(0, 93, 188, 210);
 
-    private static final class Key {
-        private static final String EVENT = "event";
-        private static final String FACEBOOK_NAME = "name";
-        private static final String CHAT_REQUEST_RESPONSE = "response";
-        private static final String FACEBOOK_ID = "facebookId";
-        private static final String MESSAGE = "message";
-        private static final String ROOM_NAME = "roomName";
-        private static final String ROOM_ID = "roomId";
-        private static final String ROOM_TYPE = "roomType";
-        private static final String ROOM_RADIUS = "roomRadius";
-        private static final String ROOM_LATITUDE = "roomLatitude";
-        private static final String ROOM_LONGITUDE = "roomLongitude";
+    public static final class Key {
+        public static final String EVENT = "event";
+        public static final String FACEBOOK_NAME = "name";
+        public static final String CHAT_REQUEST_RESPONSE = "response";
+        public static final String FACEBOOK_ID = "facebookId";
+        public static final String MESSAGE = "message";
+        public static final String ROOM_NAME = "roomName";
+        public static final String ROOM_ID = "roomId";
+        public static final String ROOM_TYPE = "roomType";
+        public static final String ROOM_RADIUS = "roomRadius";
+        public static final String ROOM_LATITUDE = "roomLatitude";
+        public static final String ROOM_LONGITUDE = "roomLongitude";
     }
 
-    private static final class Event {
-        private static final String CHAT_REQUEST = "Chat Request";
-        private static final String CHAT_REQUEST_RESPONSE = "Chat Request Response";
-        private static final String CHAT_MESSAGE = "Chat Message";
-        private static final String MESSAGE_FAVORITED = "Message Favorited";
+    public static final class Event {
+        public static final String CHAT_REQUEST = "Chat Request";
+        public static final String CHAT_REQUEST_RESPONSE = "Chat Request Response";
+        public static final String CHAT_MESSAGE = "Chat Message";
+        public static final String MESSAGE_FAVORITED = "Message Favorited";
     }
 
     private static class Value {
-        private static final String PRIVATE_ROOM_TYPE = "PrivateRoom";
-        private static final String PUBLIC_ROOM_TYPE = "PublicRoom";
+        public static final String PRIVATE_ROOM_TYPE = "PrivateRoom";
+        public static final String PUBLIC_ROOM_TYPE = "PublicRoom";
     }
 
     private NotificationManager mNotificationManager;
@@ -151,7 +151,7 @@ public class GcmIntentService extends IntentService {
             return;
         }
 
-        PendingIntent contentIntent = getPublicRoomIntent(roomId, roomName, roomRadius, roomLat, roomLon);
+        PendingIntent contentIntent = getPublicRoomPendingIntent(roomId, roomName, roomRadius, roomLat, roomLon);
         notifyMessageFavorited(contentIntent, userName, message);
     }
 
@@ -170,25 +170,17 @@ public class GcmIntentService extends IntentService {
         notify(builder.build());
     }
 
-    private PendingIntent getPublicRoomIntent(long roomId, String roomName, int roomRadius, double roomLat, double roomLon) {
-        Intent intent = new Intent(this, PublicRoomActivity.class);
-        intent.putExtra(PublicRoomActivity.EXTRA_ROOM_ID, roomId);
-        intent.putExtra(PublicRoomActivity.EXTRA_ROOM_NAME, roomName);
-        intent.putExtra(PublicRoomActivity.EXTRA_ROOM_RADIUS, roomRadius);
-        intent.putExtra(PublicRoomActivity.EXTRA_ROOM_LATITUDE, roomLat);
-        intent.putExtra(PublicRoomActivity.EXTRA_ROOM_LONGITUDE, roomLon);
+    private PendingIntent getPublicRoomPendingIntent(long roomId, String roomName, int roomRadius, double roomLat, double roomLon) {
+        Intent publicRoomIntent = PublicRoomActivity.getIntent(this, roomId, roomName, roomLat, roomLon, roomRadius);
 
         return TaskStackBuilder.create(this)
                 .addParentStack(HomeActivity.class)
-                .addNextIntentWithParentStack(intent)
+                .addNextIntentWithParentStack(publicRoomIntent)
                 .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     private PendingIntent getPrivateRoomIntent(long roomId, String otherUserName, String otherUserFacebookId) {
-        Intent intent = new Intent(this, PrivateRoomActivity.class);
-        intent.putExtra(PrivateRoomActivity.EXTRA_ROOM_ID, roomId);
-        intent.putExtra(PrivateRoomActivity.EXTRA_USER_NAME, otherUserName);
-        intent.putExtra(PrivateRoomActivity.EXTRA_USER_FB_ID, otherUserFacebookId);
+        Intent intent = PrivateRoomActivity.getIntent(this, roomId, otherUserName, otherUserFacebookId);
 
         return TaskStackBuilder.create(this)
                 .addParentStack(HomeActivity.class)
@@ -246,7 +238,7 @@ public class GcmIntentService extends IntentService {
             return;
         }
 
-        PendingIntent contentIntent = getPublicRoomIntent(roomId, roomName, roomRadius, roomLat, roomLon);
+        PendingIntent contentIntent = getPublicRoomPendingIntent(roomId, roomName, roomRadius, roomLat, roomLon);
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)

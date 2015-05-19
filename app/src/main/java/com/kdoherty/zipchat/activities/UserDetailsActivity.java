@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.facebook.widget.ProfilePictureView;
 import com.kdoherty.zipchat.R;
@@ -32,32 +31,31 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
     private static final String TAG = UserDetailsActivity.class.getSimpleName();
 
-    private static final String RECEIVER_FB_ID_KEY = "ChatRequestActivityFacebookIdKey";
-    private static final String RECEIVER_USER_ID_KEY = "ChatRequestActivityReceiverIdKey";
-    private static final String RECEIVER_NAME_KEY = "ChatRequestActivityReceiverNameKey";
+    private static final String EXTRA_RECEIVER_FB_ID = "ChatRequestActivityFacebookIdKey";
+    private static final String EXTRA_RECEIVER_USER_ID = "ChatRequestActivityReceiverIdKey";
+    private static final String EXTRA_RECEIVER_NAME = "ChatRequestActivityReceiverNameKey";
 
     private long mReceiverUserId;
 
     private Button mRequestButton;
 
-    public static void startActivity(Context context, User user) {
-        Intent requestIntent = new Intent(context, UserDetailsActivity.class);
-        requestIntent.putExtra(RECEIVER_USER_ID_KEY, user.getUserId());
-        requestIntent.putExtra(RECEIVER_NAME_KEY, user.getName());
-        requestIntent.putExtra(RECEIVER_FB_ID_KEY, user.getFacebookId());
-
-        context.startActivity(requestIntent);
+    public static Intent getIntent(Context context, User user) {
+        Intent userDetailsIntent = new Intent(context, UserDetailsActivity.class);
+        userDetailsIntent.putExtra(EXTRA_RECEIVER_USER_ID, user.getUserId());
+        userDetailsIntent.putExtra(EXTRA_RECEIVER_NAME, user.getName());
+        userDetailsIntent.putExtra(EXTRA_RECEIVER_FB_ID, user.getFacebookId());
+        return userDetailsIntent;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_request);
+        setContentView(R.layout.activity_user_details);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         final Intent intent = getIntent();
-        mReceiverUserId = intent.getExtras().getLong(RECEIVER_USER_ID_KEY);
-        final String profileId = intent.getStringExtra(RECEIVER_FB_ID_KEY);
+        mReceiverUserId = intent.getExtras().getLong(EXTRA_RECEIVER_USER_ID);
+        final String profileId = intent.getStringExtra(EXTRA_RECEIVER_FB_ID);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.request_activity_app_bar);
         setSupportActionBar(toolbar);
@@ -66,7 +64,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
-        actionBar.setTitle(intent.getStringExtra(RECEIVER_NAME_KEY));
+        actionBar.setTitle(intent.getStringExtra(EXTRA_RECEIVER_NAME));
 
         mRequestButton = (Button) findViewById(R.id.chat_request_button);
         mRequestButton.setOnClickListener(this);
@@ -99,7 +97,9 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void setButtonText() {
-
+        if (!Utils.checkOnline(this)) {
+            return;
+        }
         ZipChatApi.INSTANCE.getStatus(UserUtils.getId(this), mReceiverUserId, new Callback<Response>() {
             @Override
             public void success(Response result, Response response) {
@@ -146,8 +146,11 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void sendChatRequest() {
-        long userId = UserUtils.getId(this);
+        if (!Utils.checkOnline(this)) {
+            return;
+        }
         Log.d(TAG, "Sending chat request to user " + mReceiverUserId);
+        long userId = UserUtils.getId(this);
         ZipChatApi.INSTANCE.sendChatRequest(userId, mReceiverUserId, new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {

@@ -156,6 +156,9 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     }
 
     private void populateMessageList() {
+        if (!Utils.checkOnline(getActivity())) {
+            return;
+        }
         ZipChatApi.INSTANCE.getRoomMessages(mRoomId, MESSAGE_LIMIT, mMessageOffset, new Callback<List<Message>>() {
             @Override
             public void success(List<Message> messages, Response response) {

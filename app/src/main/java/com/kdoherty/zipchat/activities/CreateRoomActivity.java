@@ -172,7 +172,8 @@ public class CreateRoomActivity extends AbstractLocationActivity implements View
             if (location == null) {
                 Toast.makeText(getApplicationContext(), "Could not find location", Toast.LENGTH_SHORT).show();
                 Log.w(TAG, "Null location found in create room. Not creating room");
-            } else {
+            } else if (Utils.checkOnline(CreateRoomActivity.this)) {
+
                 ZipChatApi.INSTANCE.createPublicRoom(name, getRadius(), location.getLatitude(), location.getLongitude(), new Callback<Response>() {
                     @Override
                     public void success(Response response, Response response2) {

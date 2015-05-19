@@ -120,7 +120,7 @@
             android:label="@string/title_activity_request" >
         </activity>
         <activity
-            android:name=".activities.MessageDetailActivity"
+            android:name=".activities.MessageDetailsActivity"
             android:label="@string/title_activity_message_detail" >
         </activity>
         <meta-data

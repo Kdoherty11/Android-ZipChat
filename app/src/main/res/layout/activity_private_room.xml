@@ -8,7 +8,7 @@
 
     <include
         android:id="@+id/private_chat_room_app_bar"
-        layout="@layout/app_bar_private_chat_room" />
+        layout="@layout/app_bar_private_room" />
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/chat_room_fragment_container"

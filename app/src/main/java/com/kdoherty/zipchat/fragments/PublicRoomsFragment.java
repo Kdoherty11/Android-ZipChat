@@ -30,14 +30,12 @@ import com.kdoherty.zipchat.activities.AbstractLocationActivity;
 import com.kdoherty.zipchat.activities.CreateRoomActivity;
 import com.kdoherty.zipchat.activities.PublicRoomActivity;
 import com.kdoherty.zipchat.adapters.PublicRoomAdapter;
-import com.kdoherty.zipchat.events.FilterChangeEvent;
 import com.kdoherty.zipchat.events.LocationAvailableEvent;
 import com.kdoherty.zipchat.events.RoomCreatedEvent;
 import com.kdoherty.zipchat.models.PublicRoom;
 import com.kdoherty.zipchat.models.SortingTabs;
 import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
-import com.kdoherty.zipchat.utils.PrefsUtils;
 import com.kdoherty.zipchat.utils.Utils;
 import com.kdoherty.zipchat.views.DividerItemDecoration;
 import com.kdoherty.zipchat.views.QuickReturnRecyclerView;
@@ -62,7 +60,6 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
 
     private static final String PREFS_FILE_NAME = "PublicRoomsFragmentPrefs";
     private static final String PREFS_LIST_STATE_KEY = "PublicRoomsFragmentListState";
-
 
     private PublicRoomAdapter mAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -95,7 +92,7 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
             mLocationCallback = (AbstractLocationActivity) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnHeadlineSelectedListener and AbstractLocationActivity");
+                    + " must be an AbstractLocationActivity");
         }
     }
 
@@ -167,8 +164,6 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
 
         mChatRoomsRv.setReturningView(mQuickReturnView);
 
-        BusProvider.getInstance().post(new FilterChangeEvent(mAdapter.getFilter()));
-
         mSwipeRefreshLayout.setRefreshing(false);
 
         sortRooms();
@@ -212,7 +207,9 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
 
     private void sortRooms() {
         SortingTabs tab = SortingTabs.valueOf(mCurrentTabTitle.toUpperCase());
-        mAdapter.sortRooms(tab);
+        if (mAdapter != null) {
+            mAdapter.sortRooms(tab);
+        }
     }
 
     private void setCurrentTab(final String tabTitle) {
@@ -335,6 +332,10 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
         if (location != null) {
             Log.d(TAG, "Sending location with accuracy " + location.getAccuracy() + " to server in getPublicRooms request");
 
+            if (!Utils.checkOnline(getActivity())) {
+                return;
+            }
+
             ZipChatApi.INSTANCE.getPublicRooms(location.getLatitude(), location.getLongitude(), new Callback<List<PublicRoom>>() {
                 @Override
                 public void success(List<PublicRoom> publicRooms, Response response) {
@@ -362,13 +363,9 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
 
     @Override
     public void onItemClick(View view, int position) {
-        Intent chatRoomIntent = new Intent(getActivity(), PublicRoomActivity.class);
         PublicRoom room = mAdapter.getPublicRoom(position);
-        chatRoomIntent.putExtra(PublicRoomActivity.EXTRA_ROOM_NAME, room.getName());
-        chatRoomIntent.putExtra(PublicRoomActivity.EXTRA_ROOM_ID, room.getRoomId());
-        chatRoomIntent.putExtra(PublicRoomActivity.EXTRA_ROOM_RADIUS, room.getRadius());
-        chatRoomIntent.putExtra(PublicRoomActivity.EXTRA_ROOM_LATITUDE, room.getLatitude());
-        chatRoomIntent.putExtra(PublicRoomActivity.EXTRA_ROOM_LONGITUDE, room.getLongitude());
-        startActivity(chatRoomIntent);
+        Intent publicRoomIntent = PublicRoomActivity.getIntent(getActivity(), room.getRoomId(), room.getName(),
+                room.getLatitude(), room.getLongitude(), room.getRadius());
+        startActivity(publicRoomIntent);
     }
 }

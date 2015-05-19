@@ -114,6 +114,8 @@ public class UserUtils {
             }
         };
 
-        new Thread(attemptCreateUser).start();
+        if (Utils.checkOnline(context)) {
+            new Thread(attemptCreateUser).start();
+        }
     }
 }

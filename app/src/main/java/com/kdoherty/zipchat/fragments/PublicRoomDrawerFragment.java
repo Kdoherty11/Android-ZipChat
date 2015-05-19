@@ -1,6 +1,7 @@
 package com.kdoherty.zipchat.fragments;
 
 
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -88,7 +89,8 @@ public class PublicRoomDrawerFragment extends Fragment {
         mRoomMembersRv.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        UserDetailsActivity.startActivity(getActivity(), mRoomMembersAdapter.getUser(position));
+                        Intent intent = UserDetailsActivity.getIntent(getActivity(), mRoomMembersAdapter.getUser(position));
+                        startActivity(intent);
                     }
                 })
         );

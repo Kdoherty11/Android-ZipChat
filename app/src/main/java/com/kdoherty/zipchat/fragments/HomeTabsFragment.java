@@ -1,6 +1,5 @@
 package com.kdoherty.zipchat.fragments;
 
-import android.app.Activity;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,6 +12,7 @@ import android.widget.Filter;
 
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.adapters.HomeTabsAdapter;
+import com.kdoherty.zipchat.events.TabChangeEvent;
 import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.utils.PrefsUtils;
 import com.kdoherty.zipchat.views.SlidingTabLayout;
@@ -30,30 +30,8 @@ public class HomeTabsFragment extends Fragment implements ViewPager.OnPageChange
     private String[] mTabTitles;
     private int mTabPosition;
 
-    public static final int PUBLIC_ROOMS_TAB_INDEX = 0;
     public static final int PRIVATE_ROOMS_TAB_INDEX = 1;
     public static final int REQUESTS_TAB_INDEX = 2;
-
-
-    private OnTabChangeListener mTabChangeCallback;
-
-    public interface OnTabChangeListener {
-        void onTabChanged(String title, Filter filter, int tabPosition);
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        // This makes sure that the container activity has implemented
-        // the callback interface. If not, it throws an exception
-        try {
-            mTabChangeCallback = (OnTabChangeListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnTabChangeCallback");
-        }
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -112,15 +90,13 @@ public class HomeTabsFragment extends Fragment implements ViewPager.OnPageChange
 
     @Override
     public void onPageSelected(int position) {
-
         Resources res = getResources();
         mSlidingTabLayout.setActiveTabTextColor(position, mTabPosition,
                 res.getColor(R.color.zipchat_blue),
                 res.getColor(R.color.home_tab_unselected_text));
 
         mTabPosition = position;
-
-        mTabChangeCallback.onTabChanged(getTabTitle(), getFilter(), mTabPosition);
+        BusProvider.getInstance().post(new TabChangeEvent(getTabTitle()));
     }
 
     @Override
@@ -131,10 +107,10 @@ public class HomeTabsFragment extends Fragment implements ViewPager.OnPageChange
     @Override
     public void onResume() {
         super.onResume();
+        BusProvider.getInstance().register(this);
         mTabPosition = PrefsUtils.readFromPreferences(getActivity(), PREFS_FILE_NAME, PREFS_TAB_POSITION, 0);
         Log.d(TAG, "Using stored tab position: " + mTabPosition);
         mViewPager.setCurrentItem(mTabPosition);
-        BusProvider.getInstance().register(this);
     }
 
     @Override

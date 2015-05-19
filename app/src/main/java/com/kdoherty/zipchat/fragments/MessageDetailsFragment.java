@@ -1,5 +1,9 @@
 package com.kdoherty.zipchat.fragments;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,6 +17,8 @@ import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.adapters.MessageFavoritorAdapter;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
+import com.kdoherty.zipchat.receivers.GcmBroadcastReceiver;
+import com.kdoherty.zipchat.services.GcmIntentService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,20 +26,36 @@ import java.util.List;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MessageDetailFragment extends Fragment {
+public class MessageDetailsFragment extends Fragment {
 
-    private static final String TAG = MessageDetailFragment.class.getSimpleName();
+    private static final String GCM_RECEIVER_NAME = "MessageDetailsFragmentGcmReceiver";
+
+    private static final String TAG = MessageDetailsFragment.class.getSimpleName();
     private RecyclerView mMessageFavorites;
     private List<User> mMessageFavoritors = new ArrayList<>();
     private MessageFavoritorAdapter mFavoriteAdapter;
 
-    public MessageDetailFragment() {
+    //This is the handler that will manager to process the broadcast intent
+    private BroadcastReceiver mGcmFavoriteReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String event = intent.getStringExtra(GcmIntentService.Key.EVENT);
+
+            if (GcmIntentService.Event.MESSAGE_FAVORITED.equals(event)) {
+                // TODO
+            } else {
+                // Let GCM intent service deal with it
+            }
+        }
+    };
+
+    public MessageDetailsFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_message_detail, container, false);
+        return inflater.inflate(R.layout.fragment_message_details, container, false);
     }
 
     @Override
@@ -55,5 +77,18 @@ public class MessageDetailFragment extends Fragment {
 
             mFavoriteAdapter.notifyDataSetChanged();
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().registerReceiver(mGcmFavoriteReceiver, new IntentFilter(GCM_RECEIVER_NAME));
+    }
+
+    //Must unregister onPause()
+    @Override
+    public void onPause() {
+        super.onPause();
+        getActivity().unregisterReceiver(mGcmFavoriteReceiver);
     }
 }

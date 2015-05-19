@@ -1,5 +1,6 @@
 package com.kdoherty.zipchat.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.location.Location;
@@ -23,6 +24,7 @@ import com.kdoherty.zipchat.events.MemberLeaveEvent;
 import com.kdoherty.zipchat.events.ReceivedRoomMembersEvent;
 import com.kdoherty.zipchat.fragments.ChatRoomFragment;
 import com.kdoherty.zipchat.fragments.PublicRoomDrawerFragment;
+import com.kdoherty.zipchat.models.PublicRoom;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
@@ -42,12 +44,12 @@ public class PublicRoomActivity extends AbstractLocationActivity {
 
     private static final String TAG = PublicRoomActivity.class.getSimpleName();
 
-    public static final String EXTRA_ROOM_NAME = "ChatRoomNameExtra";
-    public static final String EXTRA_ROOM_ID = "ChatRoomIdExtra";
+    private static final String EXTRA_ROOM_NAME = "ChatRoomNameExtra";
+    private static final String EXTRA_ROOM_ID = "ChatRoomIdExtra";
 
-    public static final String EXTRA_ROOM_RADIUS = "ChatRoomDrawerFragmentArgRoomRadius";
-    public static final String EXTRA_ROOM_LATITUDE = "ChatRoomDrawerFragmentArgRoomLatitude";
-    public static final String EXTRA_ROOM_LONGITUDE = "ChatRoomDrawerFragmentArgRoomLongitude";
+    private static final String EXTRA_ROOM_RADIUS = "ChatRoomDrawerFragmentArgRoomRadius";
+    private static final String EXTRA_ROOM_LATITUDE = "ChatRoomDrawerFragmentArgRoomLatitude";
+    private static final String EXTRA_ROOM_LONGITUDE = "ChatRoomDrawerFragmentArgRoomLongitude";
 
     public static final int DEFAULT_ROOM_RADIUS = -1;
     public static final double DEFAULT_ROOM_LATITUDE = -1;
@@ -59,6 +61,16 @@ public class PublicRoomActivity extends AbstractLocationActivity {
 
     private MenuItem mNotificationsToggle;
     private boolean mNotificationsOn;
+
+    public static Intent getIntent(Context context, long roomId, String name, double lat, double lon, int radius) {
+        Intent publicRoomIntent = new Intent(context, PublicRoomActivity.class);
+        publicRoomIntent.putExtra(EXTRA_ROOM_ID, roomId);
+        publicRoomIntent.putExtra(EXTRA_ROOM_NAME, name);
+        publicRoomIntent.putExtra(EXTRA_ROOM_LATITUDE, lat);
+        publicRoomIntent.putExtra(EXTRA_ROOM_LONGITUDE, lon);
+        publicRoomIntent.putExtra(EXTRA_ROOM_RADIUS, radius);
+        return publicRoomIntent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,30 +120,6 @@ public class PublicRoomActivity extends AbstractLocationActivity {
                 fragmentTransaction.commit();
             }
         }
-    }
-
-    private void setIsSubscribed() {
-        ZipChatApi.INSTANCE.isSubscribed(mRoomId, UserUtils.getId(this), new Callback<Response>() {
-            @Override
-            public void success(Response result, Response response) {
-                boolean isSubscribed = Boolean.parseBoolean(Utils.responseToString(result));
-                if (isSubscribed) {
-                    mNotificationsToggle.setIcon(R.drawable.ic_notifications_on_white_24dp);
-                    mNotificationsOn = true;
-                } else {
-                    mNotificationsToggle.setIcon(R.drawable.ic_notifications_white_24dp);
-                    mNotificationsOn = false;
-                }
-                if (!mNotificationsToggle.isVisible()) {
-                    mNotificationsToggle.setVisible(true);
-                }
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                Utils.logErrorResponse(TAG, "Checking if the user is subscribed to room " + mRoomId, error);
-            }
-        });
     }
 
     @Override
@@ -191,6 +179,9 @@ public class PublicRoomActivity extends AbstractLocationActivity {
     }
 
     private void subscribe() {
+        if (!Utils.checkOnline(this)) {
+            return;
+        }
         ZipChatApi.INSTANCE.subscribe(mRoomId, UserUtils.getId(this), new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
@@ -205,6 +196,9 @@ public class PublicRoomActivity extends AbstractLocationActivity {
     }
 
     private void removeSubscription() {
+        if (!Utils.checkOnline(this)) {
+            return;
+        }
         ZipChatApi.INSTANCE.removeSubscription(mRoomId, UserUtils.getId(this), new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {

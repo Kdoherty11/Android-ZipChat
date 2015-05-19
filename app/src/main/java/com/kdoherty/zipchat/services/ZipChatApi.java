@@ -1,10 +1,7 @@
 package com.kdoherty.zipchat.services;
 
-import android.util.Log;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -12,15 +9,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.PrivateRoom;
-import com.kdoherty.zipchat.models.Request;
 import com.kdoherty.zipchat.models.PublicRoom;
-import com.kdoherty.zipchat.models.User;
-import com.kdoherty.zipchat.utils.UserUtils;
-
-import org.json.JSONObject;
+import com.kdoherty.zipchat.models.Request;
 
 import java.lang.reflect.Type;
-import java.util.Date;
 import java.util.List;
 
 import retrofit.Callback;
@@ -95,9 +87,6 @@ public interface ZipChatApi {
 
     @DELETE("/publicRooms/{roomId}/subscriptions/{userId}")
     void removeSubscription(@Path("roomId") long roomId, @Path("userId") long userId, Callback<Response> response);
-
-    @GET("/publicRooms/{roomId}/subscriptions/exists")
-    void isSubscribed(@Path("roomId") long roomId, @Query("userId") long userId, Callback<Response> response);
 
     @GET("/rooms/{roomId}/messages")
     void getRoomMessages(@Path("roomId") long roomId,

@@ -22,6 +22,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.kdoherty.zipchat.R;
@@ -264,6 +265,8 @@ public class Utils {
             sb.append(error.getMessage());
         }
 
-        Log.e(tag, sb.toString());
+        String errorMessage = sb.toString();
+
+        Crashlytics.log(Log.ERROR, tag, errorMessage);
     }
 }
