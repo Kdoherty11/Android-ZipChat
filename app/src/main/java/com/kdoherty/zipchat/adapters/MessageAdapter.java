@@ -178,10 +178,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         return mMessages.size();
     }
 
-    public void addMessage(Message message) {
+    public void addMessageToEnd(Message message) {
         int position = mMessages.size();
         mMessages.add(message);
         notifyItemInserted(position);
+    }
+
+    public void addMessagesToStart(List<Message> messageList) {
+        mMessages.addAll(0, messageList);
+        notifyItemRangeInserted(0, messageList.size());
     }
 
     private static int getMessageDrawableId(Message.FavoriteState state) {

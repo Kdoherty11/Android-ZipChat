@@ -26,9 +26,9 @@
             android:layout_marginLeft="@dimen/chat_room_message_box_left_margin"
             android:layout_toLeftOf="@id/chat_room_activity_send_button"
             android:hint="@string/chat_room_activity_message_box_hint"
-            android:textColorHint="@color/grey"
             android:imeOptions="actionSend"
-            android:textColor="@color/black" />
+            android:textColor="@color/black"
+            android:textColorHint="@color/grey" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/chat_room_activity_messages"
@@ -41,6 +41,15 @@
             android:dividerHeight="@dimen/chat_room_divider_height"
             android:stackFromBottom="true"
             android:transcriptMode="normal" />
+
+        <ProgressBar
+            android:id="@+id/messages_loading_pb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="24dp"
+            android:layout_alignParentTop="true"
+            android:visibility="gone"/>
 
     </RelativeLayout>
 

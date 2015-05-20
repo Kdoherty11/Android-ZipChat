@@ -1,7 +1,6 @@
 package com.kdoherty.zipchat.fragments;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,7 +54,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
 
     private static final String HEARTBEAT_MESSAGE = "Beat";
 
-    private static final int MESSAGE_LIMIT = 20;
+    private static final int MESSAGE_LIMIT = 10;
     private static final int ITEM_VIEW_CACHE_SIZE = 20;
 
     public static final String ARG_ROOM_ID = "ChatRoomFragmentRoomIdArg";
@@ -69,6 +69,9 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
 
     private int mMessageOffset = 0;
     private long mSelfId;
+
+    private boolean mMessagesLoading = true;
+    private ProgressBar mMessagesLoadingPb;
 
     public static ChatRoomFragment newInstance(long roomId) {
         Bundle args = new Bundle();
@@ -99,6 +102,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
 
         mMessagesRv = (RecyclerView) rootView.findViewById(R.id.chat_room_activity_messages);
         mMessageBoxEt = (EditText) rootView.findViewById(R.id.chat_room_activity_message_box);
+        mMessagesLoadingPb = (ProgressBar) rootView.findViewById(R.id.messages_loading_pb);
 
         return rootView;
     }
@@ -109,7 +113,9 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         mMessagesRv.setItemViewCacheSize(ITEM_VIEW_CACHE_SIZE);
         mMessagesRv.setItemAnimator(new DefaultItemAnimator());
         mMessagesRv.addItemDecoration(new DividerItemDecoration(getResources().getDrawable(R.drawable.message_list_divider), true, true));
-        mMessagesRv.setLayoutManager(new LinearLayoutManager(getActivity()));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        mMessagesRv.setLayoutManager(layoutManager);
+        mMessagesRv.setOnScrollListener(new MessagesScrollListener(layoutManager));
 
         populateMessageList();
 
@@ -156,26 +162,67 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     }
 
     private void populateMessageList(List<Message> messageList) {
-        mMessageAdapter = new MessageAdapter(getActivity(), messageList, this);
-        mMessagesRv.setAdapter(mMessageAdapter);
-        mMessagesRv.scrollToPosition(mMessageAdapter.getItemCount() - 1);
+        if (mMessageAdapter == null) {
+            mMessageAdapter = new MessageAdapter(getActivity(), messageList, this);
+            mMessagesRv.setAdapter(mMessageAdapter);
+            mMessagesRv.scrollToPosition(mMessageAdapter.getItemCount() - 1);
+        } else {
+            mMessageAdapter.addMessagesToStart(messageList);
+        }
     }
 
     private void populateMessageList() {
         if (!Utils.checkOnline(getActivity())) {
             return;
         }
+
         ZipChatApi.INSTANCE.getRoomMessages(mRoomId, MESSAGE_LIMIT, mMessageOffset, new Callback<List<Message>>() {
             @Override
             public void success(List<Message> messages, Response response) {
                 populateMessageList(messages);
+                mMessageOffset += messages.size();
+                mMessagesLoading = true;
+                mMessagesLoadingPb.setVisibility(View.GONE);
+                Toast.makeText(getActivity(), "Get messages success", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void failure(RetrofitError error) {
                 Utils.logErrorResponse(TAG, "Getting chat messages", error);
+                mMessagesLoading = true;
+                mMessagesLoadingPb.setVisibility(View.GONE);
             }
         });
+    }
+
+    private class MessagesScrollListener extends RecyclerView.OnScrollListener {
+
+        private LinearLayoutManager mLayoutManager;
+        private int pastVisiblesItems;
+        private int visibleItemCount;
+        private int totalItemCount;
+
+        private MessagesScrollListener(LinearLayoutManager mLayoutManager) {
+            this.mLayoutManager = mLayoutManager;
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+
+            visibleItemCount = mLayoutManager.getChildCount();
+            totalItemCount = mLayoutManager.getItemCount();
+            pastVisiblesItems = mLayoutManager.findFirstVisibleItemPosition();
+
+            if (mMessagesLoading) {
+                if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
+                    mMessagesLoading = false;
+                    Toast.makeText(getActivity(), "Requesting more messages", Toast.LENGTH_SHORT).show();
+                    populateMessageList();
+                    mMessagesLoadingPb.setVisibility(View.VISIBLE);
+
+                }
+            }
+        }
     }
 
     private void sendMessage() {
@@ -192,7 +239,11 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mMessageAdapter.favoriteMessage(user, messageId, mSelfId);
+                if (mMessageAdapter != null) {
+                    mMessageAdapter.favoriteMessage(user, messageId, mSelfId);
+                } else {
+                    Log.w(TAG, "mMessageAdapter was null in favoriteMessage");
+                }
             }
         });
     }
@@ -202,7 +253,11 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mMessageAdapter.removeFavorite(user, messageId, mSelfId);
+                if (mMessageAdapter != null) {
+                    mMessageAdapter.removeFavorite(user, messageId, mSelfId);
+                } else {
+                    Log.w(TAG, "mMessageAdapter was null in removeFavorite");
+                }
             }
         });
     }
@@ -211,8 +266,13 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mMessageAdapter.addMessage(message);
-                mMessagesRv.scrollToPosition(mMessageAdapter.getItemCount() - 1);
+                if (mMessageAdapter != null) {
+                    mMessageAdapter.addMessageToEnd(message);
+                    mMessagesRv.scrollToPosition(mMessageAdapter.getItemCount() - 1);
+                } else {
+                    Log.w(TAG, "mMessageAdapter was null in addMessage");
+                }
+
             }
         });
     }
