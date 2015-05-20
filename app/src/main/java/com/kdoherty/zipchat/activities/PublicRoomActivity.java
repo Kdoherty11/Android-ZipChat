@@ -30,6 +30,7 @@ import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.UserUtils;
 import com.kdoherty.zipchat.utils.Utils;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;

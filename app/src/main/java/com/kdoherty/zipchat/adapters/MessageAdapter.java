@@ -2,6 +2,7 @@ package com.kdoherty.zipchat.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
@@ -15,11 +16,19 @@ import android.widget.TextView;
 
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.UserDetailsActivity;
+import com.kdoherty.zipchat.activities.ZipChatApplication;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.UserUtils;
-import com.kdoherty.zipchat.views.CircleProfilePictureView;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
+import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -46,6 +55,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
     private static final Semaphore sendFavoriteLock = new Semaphore(1);
     private static final int SEND_FAVORITE_LOCK_TIMEOUT_SECONDS = 1;
 
+    private DisplayImageOptions options;
+
+    private ImageLoadingListener mAnimateFirstListener = new AnimateFirstDisplayListener();
 
     private class SendFavoriteEventRunnable implements Runnable {
 
@@ -90,6 +102,16 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         mMessages = messages;
         mContext = context;
         mMessageFavListener = messageFavoriteListener;
+        ZipChatApplication.initImageLoader(mContext);
+
+        options = new DisplayImageOptions.Builder()
+                .showImageOnLoading(R.drawable.com_facebook_profile_picture_blank_portrait)
+                .showImageForEmptyUri(R.drawable.com_facebook_profile_picture_blank_portrait)
+                .showImageOnFail(R.drawable.com_facebook_profile_picture_blank_portrait)
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .considerExifParams(true)
+                .build();
     }
 
     @Override
@@ -112,7 +134,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         final User sender = message.getSender();
 
         messageCellViewHolder.name.setText(sender.getName());
-        messageCellViewHolder.profilePicture.setProfileId(sender.getFacebookId());
+        //messageCellViewHolder.profilePicture.setProfileId(sender.getFacebookId());
+
+        String profilePicUrl = "http://graph.facebook.com/" + sender.getFacebookId() + "/picture?type=square";
+        ImageLoader.getInstance().displayImage(profilePicUrl, messageCellViewHolder.profilePicture,
+                options, mAnimateFirstListener);
+
         messageCellViewHolder.profilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -259,7 +286,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
 
     public class MessageCellViewHolder extends RecyclerView.ViewHolder {
 
-        private CircleProfilePictureView profilePicture;
+        private ImageView profilePicture;
         private TextView name;
         private TextView message;
         private ImageView favorite;
@@ -268,12 +295,33 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
 
         public MessageCellViewHolder(View itemView) {
             super(itemView);
-            profilePicture = (CircleProfilePictureView) itemView.findViewById(R.id.message_picture);
+            profilePicture = (ImageView) itemView.findViewById(R.id.message_picture);
             name = (TextView) itemView.findViewById(R.id.message_sender);
             message = (TextView) itemView.findViewById(R.id.message_text);
             favorite = (ImageView) itemView.findViewById(R.id.message_favorite);
             favoriteCount = (TextView) itemView.findViewById(R.id.message_favorite_count);
             timestamp = (TextView) itemView.findViewById(R.id.message_timestamp);
+        }
+    }
+
+    public static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
+
+        static final List<String> displayedImages = Collections.synchronizedList(new LinkedList<String>());
+
+        @Override
+        public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+            if (loadedImage != null) {
+                ImageView imageView = (ImageView) view;
+                boolean firstDisplay = !displayedImages.contains(imageUri);
+                if (firstDisplay) {
+                    FadeInBitmapDisplayer.animate(imageView, 500);
+                    displayedImages.add(imageUri);
+                }
+            }
+        }
+
+        public static void clearImages() {
+            displayedImages.clear();
         }
     }
 }

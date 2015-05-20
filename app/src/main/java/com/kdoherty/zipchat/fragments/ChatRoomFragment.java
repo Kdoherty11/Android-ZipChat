@@ -140,6 +140,12 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        MessageAdapter.AnimateFirstDisplayListener.clearImages();
+    }
+
+    @Override
     public void onClick(View view) {
         int id = view.getId();
         switch (id) {
