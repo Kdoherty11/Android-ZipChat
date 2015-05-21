@@ -36,8 +36,10 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     private static final String EXTRA_RECEIVER_NAME = "ChatRequestActivityReceiverNameKey";
 
     private long mReceiverUserId;
+    private String mReceiverFbId;
 
     private Button mRequestButton;
+    private String mReceiverName;
 
     public static Intent getIntent(Context context, User user) {
         Intent userDetailsIntent = new Intent(context, UserDetailsActivity.class);
@@ -55,7 +57,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
         final Intent intent = getIntent();
         mReceiverUserId = intent.getExtras().getLong(EXTRA_RECEIVER_USER_ID);
-        final String profileId = intent.getStringExtra(EXTRA_RECEIVER_FB_ID);
+        mReceiverFbId = intent.getStringExtra(EXTRA_RECEIVER_FB_ID);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.request_activity_app_bar);
         setSupportActionBar(toolbar);
@@ -64,13 +66,14 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
-        actionBar.setTitle(intent.getStringExtra(EXTRA_RECEIVER_NAME));
+        mReceiverName = intent.getStringExtra(EXTRA_RECEIVER_NAME);
+        actionBar.setTitle(mReceiverName);
 
         mRequestButton = (Button) findViewById(R.id.chat_request_button);
         mRequestButton.setOnClickListener(this);
 
         final ProfilePictureView profilePictureView = (ProfilePictureView) findViewById(R.id.chat_request_profile_picture);
-        profilePictureView.setProfileId(profileId);
+        profilePictureView.setProfileId(mReceiverFbId);
 
         setButtonText();
 
@@ -104,10 +107,23 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void success(Response result, Response response) {
                 String status = Utils.responseToString(result);
-                if (!"\"none\"".equals(status)) {
+
+                final Long privateRoomId = Utils.tryParse(status);
+
+                if (privateRoomId != null) {
+                    mRequestButton.setText("Already chatting");
+                    mRequestButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = PrivateRoomActivity.getIntent(UserDetailsActivity.this, privateRoomId, mReceiverName, mReceiverFbId);
+                            startActivity(intent);
+                        }
+                    });
+                } else if (!"none".equals(status)) {
                     mRequestButton.setText(status);
                     mRequestButton.setEnabled(false);
                 }
+
                 mRequestButton.setVisibility(View.VISIBLE);
             }
 

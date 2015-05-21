@@ -208,6 +208,41 @@ public class Utils {
         }
     }
 
+    public static Long tryParse(String string) {
+        if (TextUtils.isEmpty(string)) {
+            return null;
+        }
+        boolean negative = string.charAt(0) == '-';
+        int index = negative ? 1 : 0;
+        if (index == string.length()) {
+            return null;
+        }
+        int digit = string.charAt(index++) - '0';
+        if (digit < 0 || digit > 9) {
+            return null;
+        }
+        long accum = -digit;
+        while (index < string.length()) {
+            digit = string.charAt(index++) - '0';
+            if (digit < 0 || digit > 9 || accum < Long.MIN_VALUE / 10) {
+                return null;
+            }
+            accum *= 10;
+            if (accum < Long.MIN_VALUE + digit) {
+                return null;
+            }
+            accum -= digit;
+        }
+
+        if (negative) {
+            return accum;
+        } else if (accum == Long.MIN_VALUE) {
+            return null;
+        } else {
+            return -accum;
+        }
+    }
+
     private static boolean isLocationEnabled(Activity activity) {
         LocationManager lm = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
         boolean isGpsEnabled = false;
@@ -215,12 +250,12 @@ public class Utils {
         try {
             isGpsEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
         } catch (Exception ex) {
-            // gps_enabled is false
+            // isGpsEnabled is still false
         }
         try {
             isNetworkEnabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         } catch (Exception ex) {
-            // network
+            // isNetworkEnabled is still false
         }
         return isGpsEnabled || isNetworkEnabled;
     }

@@ -24,13 +24,11 @@ import com.kdoherty.zipchat.events.MemberLeaveEvent;
 import com.kdoherty.zipchat.events.ReceivedRoomMembersEvent;
 import com.kdoherty.zipchat.fragments.ChatRoomFragment;
 import com.kdoherty.zipchat.fragments.PublicRoomDrawerFragment;
-import com.kdoherty.zipchat.models.PublicRoom;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.UserUtils;
 import com.kdoherty.zipchat.utils.Utils;
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
@@ -86,10 +84,11 @@ public class PublicRoomActivity extends AbstractLocationActivity {
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
-
-        actionBar.setTitle(roomName);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setTitle(roomName);
+        }
 
         if (savedInstanceState == null) {
 
@@ -106,6 +105,8 @@ public class PublicRoomActivity extends AbstractLocationActivity {
                 double latitude = intent.getDoubleExtra(EXTRA_ROOM_LATITUDE, DEFAULT_ROOM_LATITUDE);
                 double longitude = intent.getDoubleExtra(EXTRA_ROOM_LONGITUDE, DEFAULT_ROOM_LONGITUDE);
                 mDrawerFragment.setUpMap(roomName, radius, latitude, longitude);
+                Location location = getLastLocation();
+                mDrawerFragment.addUserMarker(location);
             }
 
             if (mChatRoomFragment == null) {
@@ -216,7 +217,11 @@ public class PublicRoomActivity extends AbstractLocationActivity {
     @Override
     public void onConnected(Bundle bundle) {
         Location location = getLastLocation();
-        mDrawerFragment.addUserMarker(location);
+        if (mDrawerFragment != null) {
+            mDrawerFragment.addUserMarker(location);
+        } else {
+            Log.e(TAG, "TODO Fix this. onConnected cb before mDrawerFragment is initialized");
+        }
     }
 
     @Subscribe

@@ -54,8 +54,8 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
 
     private static final String HEARTBEAT_MESSAGE = "Beat";
 
-    private static final int MESSAGE_LIMIT = 10;
-    private static final int ITEM_VIEW_CACHE_SIZE = 20;
+    private static final int MESSAGE_LIMIT = 25;
+    private static final int ITEM_VIEW_CACHE_SIZE = 25;
 
     public static final String ARG_ROOM_ID = "ChatRoomFragmentRoomIdArg";
 
@@ -183,7 +183,6 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
                 mMessageOffset += messages.size();
                 mMessagesLoading = true;
                 mMessagesLoadingPb.setVisibility(View.GONE);
-                Toast.makeText(getActivity(), "Get messages success", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -216,7 +215,6 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
             if (mMessagesLoading) {
                 if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
                     mMessagesLoading = false;
-                    Toast.makeText(getActivity(), "Requesting more messages", Toast.LENGTH_SHORT).show();
                     populateMessageList();
                     mMessagesLoadingPb.setVisibility(View.VISIBLE);
 
@@ -269,6 +267,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
                 if (mMessageAdapter != null) {
                     mMessageAdapter.addMessageToEnd(message);
                     mMessagesRv.scrollToPosition(mMessageAdapter.getItemCount() - 1);
+                    mMessageOffset++;
                 } else {
                     Log.w(TAG, "mMessageAdapter was null in addMessage");
                 }
