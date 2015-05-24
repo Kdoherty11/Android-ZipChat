@@ -25,6 +25,12 @@ import android.widget.Toast;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.kdoherty.zipchat.R;
 
 import java.io.BufferedReader;
@@ -93,31 +99,6 @@ public class Utils {
         } else {
             GooglePlayServicesUtil.getErrorDialog(resultCode, activity, 0).show();
             return false;
-        }
-    }
-
-    public static void checkLocation(final Context context) {
-        boolean locationEnabled = isLocationEnabled(context);
-        if (!locationEnabled) {
-            Resources res = context.getResources();
-            AlertDialog.Builder dialog = new AlertDialog.Builder(context);
-            dialog.setMessage(res.getString(R.string.location_not_enabled));
-            dialog.setPositiveButton(res.getString(R.string.open_location_settings), new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                    Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    context.startActivity(myIntent);
-                }
-            });
-            dialog.setNegativeButton(context.getString(R.string.cancel_location_dialog), new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-
-                }
-            });
-            dialog.show();
         }
     }
 
@@ -260,18 +241,6 @@ public class Utils {
         return isGpsEnabled || isNetworkEnabled;
     }
 
-    // Gets distance between two points in meters
-    public static double getDistance(Location thisLoc, Location otherLoc) {
-
-        final double thisLat = thisLoc.getLatitude();
-        final double thisLong = thisLoc.getLongitude();
-
-        final double otherLat = otherLoc.getLatitude();
-        final double otherLong = otherLoc.getLongitude();
-
-        return getDistance(thisLat, thisLong, otherLat, otherLong);
-    }
-
     public static double getDistance(double thisLat, double thisLong, double otherLat, double otherLong) {
         final int earthRadius = 6371;
         return Math.acos(Math.sin(Math.toRadians(thisLat)) * Math.sin(Math.toRadians(otherLat)) + Math.cos(Math.toRadians(thisLat)) * Math.cos(Math.toRadians(otherLat)) * Math.cos(Math.toRadians(thisLong) - Math.toRadians(otherLong))) * earthRadius * 1000;
@@ -304,4 +273,43 @@ public class Utils {
 
         Crashlytics.log(Log.ERROR, tag, errorMessage);
     }
+
+    public static LatLng computeOffset(LatLng from, double distance, double heading) {
+        distance /= 6371009.0D;
+        heading = Math.toRadians(heading);
+        double fromLat = Math.toRadians(from.latitude);
+        double fromLng = Math.toRadians(from.longitude);
+        double cosDistance = Math.cos(distance);
+        double sinDistance = Math.sin(distance);
+        double sinFromLat = Math.sin(fromLat);
+        double cosFromLat = Math.cos(fromLat);
+        double sinLat = cosDistance * sinFromLat + sinDistance * cosFromLat * Math.cos(heading);
+        double dLng = Math.atan2(sinDistance * cosFromLat * Math.sin(heading), cosDistance - sinFromLat * sinLat);
+        return new LatLng(Math.toDegrees(Math.asin(sinLat)), Math.toDegrees(fromLng + dLng));
+    }
+
+    public static Circle setRoomCircle(Context context, GoogleMap map, LatLng center, int radius) {
+        Resources res = context.getResources();
+        CircleOptions circleOptions = new CircleOptions()
+                .center(center)
+                .radius(radius)
+                .fillColor(res.getColor(R.color.create_room_map_circle_fill))
+                .strokeColor(res.getColor(R.color.zipchat_blue))
+                .strokeWidth(6f);
+
+        Circle circle = map.addCircle(circleOptions);
+
+        int minRadius = 100;
+        radius = Math.max(radius, minRadius);
+        LatLngBounds bounds = new LatLngBounds.Builder().
+                include(computeOffset(center, radius, 0)).
+                include(computeOffset(center, radius, 90)).
+                include(computeOffset(center, radius, 180)).
+                include(computeOffset(center, radius, 270)).build();
+        int paddingPx = 50;
+        map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, paddingPx));
+
+        return circle;
+    }
+
 }

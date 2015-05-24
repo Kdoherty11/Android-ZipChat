@@ -31,6 +31,7 @@ import com.kdoherty.zipchat.adapters.PublicRoomDrawerAdapter;
 import com.kdoherty.zipchat.models.PublicRoom;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.PrefsUtils;
+import com.kdoherty.zipchat.utils.Utils;
 import com.kdoherty.zipchat.views.RecyclerItemClickListener;
 
 import java.util.Collections;
@@ -39,18 +40,12 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PublicRoomDrawerFragment extends Fragment {
+public class PublicRoomDrawerFragment extends Fragment implements GoogleMap.OnMapLoadedCallback{
 
     private static final String TAG = PublicRoomDrawerFragment.class.getSimpleName();
 
     private static final String PREFS_FILE_NAME = "chat_room_shared_preferences";
     public static final String KEY_USER_LEARNED_DRAWER = "chat_room_user_learned_drawer";
-
-    private static final int SMALL_ZOOM = 17;
-    private static final int MEDIUM_ZOOM = 16;
-    private static final int LARGE_ZOOM = 15;
-
-    private static final int DEFAULT_ZOOM = 15;
 
     private DrawerLayout mDrawerLayout;
     private View mContainerView;
@@ -63,6 +58,13 @@ public class PublicRoomDrawerFragment extends Fragment {
 
     private RecyclerView mRoomMembersRv;
     PublicRoomDrawerAdapter mRoomMembersAdapter;
+
+    private boolean mMapLoaded = false;
+    private int mRadius;
+    private double mLat;
+    private double mLon;
+    private boolean isMapSetup;
+    private String mRoomName;
 
     public PublicRoomDrawerFragment() {
         // Required empty public constructor
@@ -86,6 +88,7 @@ public class PublicRoomDrawerFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         mRoomMembersRv = (RecyclerView) view.findViewById(R.id.chat_room_drawer_list);
         mGoogleMap = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMap();
+        mGoogleMap.setOnMapLoadedCallback(this);
         mRoomMembersRv.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
@@ -114,52 +117,37 @@ public class PublicRoomDrawerFragment extends Fragment {
         }
     }
 
-    private static int getZoom(int radius) {
-        switch (radius) {
-            case PublicRoom.SMALL_RADIUS:
-                return SMALL_ZOOM;
-            case PublicRoom.MEDIUM_RADIUS:
-                return MEDIUM_ZOOM;
-            case PublicRoom.LARGE_RADIUS:
-                return LARGE_ZOOM;
-            default:
-                return DEFAULT_ZOOM;
-        }
-    }
+
 
     public void setUpMap(String roomName, int radius, double latitude, double longitude) {
-
-        if (radius != PublicRoomActivity.DEFAULT_ROOM_RADIUS &&
-                latitude != PublicRoomActivity.DEFAULT_ROOM_LATITUDE &&
-                longitude != PublicRoomActivity.DEFAULT_ROOM_LONGITUDE) {
-
-            LatLng roomCenter = new LatLng(latitude, longitude);
-
-            int zoom = getZoom(radius);
-
-            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(roomCenter, zoom));
-
-            if (mMapMarker != null) {
-                mMapMarker.remove();
-            }
-
-            mMapMarker = mGoogleMap.addMarker(new MarkerOptions().position(roomCenter)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                    .title(roomName));
-
-            CircleOptions circleOptions = new CircleOptions()
-                    .center(roomCenter)
-                    .radius(radius)
-                    .fillColor(getResources().getColor(R.color.create_room_map_circle_fill))
-                    .strokeColor(getResources().getColor(R.color.zipchat_blue))
-                    .strokeWidth(CreateRoomActivity.CIRCLE_STROKE_WIDTH);
-
-            mGoogleMap.addCircle(circleOptions);
+        if (!mMapLoaded) {
+            mRoomName = roomName;
+            mRadius = radius;
+            mLat = latitude;
+            mLon = longitude;
+            return;
         }
+
+        if (radius == PublicRoomActivity.DEFAULT_ROOM_RADIUS
+                && latitude == PublicRoomActivity.DEFAULT_ROOM_LATITUDE
+                && longitude == PublicRoomActivity.DEFAULT_ROOM_LONGITUDE) {
+            return;
+        }
+
+        if (mMapMarker != null) {
+            mMapMarker.remove();
+        }
+
+        LatLng roomCenter = new LatLng(latitude, longitude);
+        mMapMarker = mGoogleMap.addMarker(new MarkerOptions().position(roomCenter)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                .title(roomName));
+
+        Utils.setRoomCircle(getActivity(), mGoogleMap, roomCenter, radius);
+        isMapSetup = true;
     }
 
     public void setUp(DrawerLayout drawerLayout, final Toolbar toolbar, int drawerFragmentId) {
-
         mContainerView = getActivity().findViewById(drawerFragmentId);
 
         mDrawerLayout = drawerLayout;
@@ -220,4 +208,11 @@ public class PublicRoomDrawerFragment extends Fragment {
     }
 
 
+    @Override
+    public void onMapLoaded() {
+        mMapLoaded = true;
+        if (!isMapSetup) {
+            setUpMap(mRoomName, mRadius, mLat, mLon);
+        }
+    }
 }
