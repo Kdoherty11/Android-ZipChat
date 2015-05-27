@@ -1,40 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white">
 
-        <ImageView
-            android:id="@+id/chat_room_activity_send_button"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/chat_box_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:src="@drawable/ic_action_send_now" />
+            android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/chat_room_activity_message_box"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_marginBottom="@dimen/chat_room_message_box_bottom_margin"
-            android:layout_marginLeft="@dimen/chat_room_message_box_left_margin"
-            android:layout_toLeftOf="@id/chat_room_activity_send_button"
-            android:hint="@string/chat_room_activity_message_box_hint"
-            android:imeOptions="actionSend"
-            android:textColor="@color/black"
-            android:textColorHint="@color/grey" />
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/anon_toggle"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="6dp"
+                android:paddingRight="8dp"
+                android:layout_marginBottom="8dp"
+                app:border_width="1dp"
+                app:border_color="@color/zipchat_blue"/>
+
+            <EditText
+                android:id="@+id/chat_room_activity_message_box"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:layout_gravity="bottom"
+                android:padding="12dp"
+                android:hint="@string/chat_room_activity_message_box_hint"
+                android:imeOptions="actionSend"
+                android:textColor="@color/black"
+                android:textColorHint="@color/grey"/>
+
+            <ImageView
+                android:id="@+id/chat_room_activity_send_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_action_send_now"
+                android:contentDescription="Send Message" />
+
+        </LinearLayout>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/chat_room_activity_messages"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@id/chat_room_activity_send_button"
+            android:layout_above="@id/chat_box_layout"
             android:layout_alignParentTop="true"
             android:background="@color/chat_room_messages_background"
             android:divider="@color/black"
@@ -46,10 +66,10 @@
             android:id="@+id/messages_loading_pb"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_margin="24dp"
-            android:layout_alignParentTop="true"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
     </RelativeLayout>
 

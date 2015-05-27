@@ -73,6 +73,7 @@
     <string name="action_toggle_notifications_on">Notifications On</string>
     <string name="title_activity_message_detail">MessageDetailActivity</string>
     <string name="hello_world">Hello world!</string>
+    <string name="drawer_user_location_pin_title">My Location</string>
 
 
 </resources>

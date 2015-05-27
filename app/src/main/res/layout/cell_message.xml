@@ -7,16 +7,6 @@
     android:background="@color/chat_room_messages_background"
     android:minHeight="72dp">
 
-    <!--<com.kdoherty.zipchat.views.CircleProfilePictureView-->
-        <!--android:id="@+id/message_picture"-->
-        <!--android:layout_width="46dp"-->
-        <!--android:layout_height="46dp"-->
-        <!--android:layout_alignParentLeft="true"-->
-        <!--android:layout_alignParentTop="true"-->
-        <!--android:layout_centerVertical="true"-->
-        <!--android:layout_marginLeft="16dp"-->
-        <!--android:layout_marginTop="16dp" />-->
-
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/message_picture"
         android:layout_width="48dp"

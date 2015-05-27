@@ -17,6 +17,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.model.LatLng;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.events.IsSubscribedEvent;
 import com.kdoherty.zipchat.events.MemberJoinEvent;
@@ -90,32 +92,37 @@ public class PublicRoomActivity extends AbstractLocationActivity {
             actionBar.setTitle(roomName);
         }
 
+        MapsInitializer.initialize(this);
+
         if (savedInstanceState == null) {
 
             if (mDrawerFragment == null) {
-
-                mDrawerFragment = (PublicRoomDrawerFragment)
-                        getSupportFragmentManager().findFragmentById(R.id.chat_room_drawer);
-
-                DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.chat_room_drawer_layout);
-
-                mDrawerFragment.setUp(drawerLayout, toolbar, R.id.chat_room_drawer);
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
                 int radius = intent.getIntExtra(EXTRA_ROOM_RADIUS, DEFAULT_ROOM_RADIUS);
                 double latitude = intent.getDoubleExtra(EXTRA_ROOM_LATITUDE, DEFAULT_ROOM_LATITUDE);
                 double longitude = intent.getDoubleExtra(EXTRA_ROOM_LONGITUDE, DEFAULT_ROOM_LONGITUDE);
-                mDrawerFragment.setUpMap(roomName, radius, latitude, longitude);
-                Location location = getLastLocation();
-                mDrawerFragment.addUserMarker(location);
+
+                mDrawerFragment = PublicRoomDrawerFragment.newInstance(
+                        roomName,
+                        new LatLng(latitude, longitude),
+                        radius);
+
+                fragmentTransaction.add(R.id.chat_room_drawer_fragment_container, mDrawerFragment);
+                fragmentTransaction.commit();
+
+                DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.chat_room_drawer_layout);
+                mDrawerFragment.setUp(this, drawerLayout, toolbar, R.id.chat_room_drawer_fragment_container);
+
+                mDrawerFragment.addUserMarker(getLastLocation());
             }
 
             if (mChatRoomFragment == null) {
-
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
                 mRoomId = intent.getExtras().getLong(EXTRA_ROOM_ID);
-
                 mChatRoomFragment = ChatRoomFragment.newInstance(mRoomId);
 
                 fragmentTransaction.add(R.id.chat_room_fragment_container, mChatRoomFragment);

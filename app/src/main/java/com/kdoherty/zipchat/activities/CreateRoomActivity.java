@@ -16,6 +16,8 @@ import android.widget.Toast;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -32,7 +34,7 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 
-public class CreateRoomActivity extends AbstractLocationActivity implements SeekBar.OnSeekBarChangeListener, View.OnClickListener {
+public class CreateRoomActivity extends AbstractLocationActivity implements SeekBar.OnSeekBarChangeListener, View.OnClickListener, OnMapReadyCallback, GoogleMap.OnMapLoadedCallback {
 
     private static final String TAG = CreateRoomActivity.class.getSimpleName();
 
@@ -51,14 +53,35 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
     private Marker mMarker;
     private int mRadius;
 
+    private boolean mMapLoaded = false;
+
+    private SeekBar mRadiusSeekBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_room);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        mGoogleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
-                .getMap();
+        ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
+                .getMapAsync(this);
+
+        // Fixing Later Map loading Delay
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    MapView mv = new MapView(getApplicationContext());
+                    mv.onCreate(null);
+                    mv.onPause();
+                    mv.onDestroy();
+                }catch (Exception ignored){
+
+                }
+            }
+        }).start();
+
+        mRadius = 50;
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.create_room_app_bar);
         setSupportActionBar(toolbar);
@@ -69,8 +92,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
             getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
         }
 
-        SeekBar radiusSeekBar = (SeekBar) findViewById(R.id.radius_seek_bar);
-        radiusSeekBar.setOnSeekBarChangeListener(this);
+        mRadiusSeekBar = (SeekBar) findViewById(R.id.radius_seek_bar);
 
         toolbar.findViewById(R.id.create_room_create_button).setOnClickListener(this);
 
@@ -119,7 +141,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        mRadius = progress * 2;
+        mRadius = (progress * 2) + 50;
         showRoom();
     }
 
@@ -131,6 +153,19 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
 
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mGoogleMap = googleMap;
+        mGoogleMap.setOnMapLoadedCallback(this);
+    }
+
+    @Override
+    public void onMapLoaded() {
+        mRadiusSeekBar.setOnSeekBarChangeListener(this);
+        mMapLoaded = true;
+        showRoom();
     }
 
     private class CreateRoomTask extends AsyncTask<Void, Void, Location> {
@@ -190,6 +225,10 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
 
     private void showRoom() {
         if (mLocation == null) {
+            return;
+        }
+
+        if (!mMapLoaded) {
             return;
         }
 

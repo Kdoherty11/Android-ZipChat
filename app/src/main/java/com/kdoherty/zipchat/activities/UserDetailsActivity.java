@@ -41,11 +41,11 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     private Button mRequestButton;
     private String mReceiverName;
 
-    public static Intent getIntent(Context context, User user) {
+    public static Intent getIntent(Context context, long userId, String userName, String facebookId) {
         Intent userDetailsIntent = new Intent(context, UserDetailsActivity.class);
-        userDetailsIntent.putExtra(EXTRA_RECEIVER_USER_ID, user.getUserId());
-        userDetailsIntent.putExtra(EXTRA_RECEIVER_NAME, user.getName());
-        userDetailsIntent.putExtra(EXTRA_RECEIVER_FB_ID, user.getFacebookId());
+        userDetailsIntent.putExtra(EXTRA_RECEIVER_USER_ID, userId);
+        userDetailsIntent.putExtra(EXTRA_RECEIVER_NAME, userName);
+        userDetailsIntent.putExtra(EXTRA_RECEIVER_FB_ID, facebookId);
         return userDetailsIntent;
     }
 
@@ -57,17 +57,18 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
         final Intent intent = getIntent();
         mReceiverUserId = intent.getExtras().getLong(EXTRA_RECEIVER_USER_ID);
+        mReceiverName = intent.getStringExtra(EXTRA_RECEIVER_NAME);
         mReceiverFbId = intent.getStringExtra(EXTRA_RECEIVER_FB_ID);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.request_activity_app_bar);
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
-
-        mReceiverName = intent.getStringExtra(EXTRA_RECEIVER_NAME);
-        actionBar.setTitle(mReceiverName);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setTitle(mReceiverName);
+        }
 
         mRequestButton = (Button) findViewById(R.id.chat_request_button);
         mRequestButton.setOnClickListener(this);

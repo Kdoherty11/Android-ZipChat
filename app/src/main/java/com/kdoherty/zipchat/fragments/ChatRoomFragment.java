@@ -1,5 +1,6 @@
 package com.kdoherty.zipchat.fragments;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.kdoherty.zipchat.R;
+import com.kdoherty.zipchat.activities.ZipChatApplication;
 import com.kdoherty.zipchat.adapters.MessageAdapter;
 import com.kdoherty.zipchat.events.IsSubscribedEvent;
 import com.kdoherty.zipchat.events.MemberJoinEvent;
@@ -28,11 +30,16 @@ import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ChatService;
 import com.kdoherty.zipchat.services.ZipChatApi;
+import com.kdoherty.zipchat.utils.FacebookUtils;
 import com.kdoherty.zipchat.utils.UserUtils;
 import com.kdoherty.zipchat.utils.Utils;
+import com.kdoherty.zipchat.views.AnimateFirstDisplayListener;
 import com.kdoherty.zipchat.views.DividerItemDecoration;
 import com.koushikdutta.async.http.AsyncHttpClient;
 import com.koushikdutta.async.http.WebSocket;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,6 +48,7 @@ import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Queue;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -73,6 +81,13 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     private boolean mMessagesLoading = true;
     private ProgressBar mMessagesLoadingPb;
 
+    private CircleImageView anonToggleCiv;
+    private ImageLoadingListener mAnimateFirstListener = new AnimateFirstDisplayListener();
+    private DisplayImageOptions options;
+
+    private boolean mIsAnon;
+    private String mProfilePicUrl;
+
     public static ChatRoomFragment newInstance(long roomId) {
         Bundle args = new Bundle();
         args.putLong(ARG_ROOM_ID, roomId);
@@ -86,12 +101,28 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mProfilePicUrl = "http://graph.facebook.com/" + FacebookUtils.getFacebookId(getActivity()) + "/picture?type=square";
+        ZipChatApplication.initImageLoader(getActivity());
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSelfId = UserUtils.getId(getActivity());
         mRoomId = getArguments().getLong(ARG_ROOM_ID);
 
         new ChatService(mSelfId, mRoomId, this);
+
+        options = new DisplayImageOptions.Builder()
+                .showImageOnLoading(R.drawable.com_facebook_profile_picture_blank_portrait)
+                .showImageForEmptyUri(R.drawable.com_facebook_profile_picture_blank_portrait)
+                .showImageOnFail(R.drawable.com_facebook_profile_picture_blank_portrait)
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .considerExifParams(true)
+                .build();
     }
 
     @Override
@@ -132,8 +163,11 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
             }
         });
 
-        ImageView mSendIv = (ImageView) view.findViewById(R.id.chat_room_activity_send_button);
-        mSendIv.setOnClickListener(this);
+        view.findViewById(R.id.chat_room_activity_send_button).setOnClickListener(this);
+        anonToggleCiv = (CircleImageView) view.findViewById(R.id.anon_toggle);
+        anonToggleCiv.setOnClickListener(this);
+        ImageLoader.getInstance().displayImage(mProfilePicUrl, anonToggleCiv,
+                options, mAnimateFirstListener);
     }
 
     @Override
@@ -148,7 +182,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     @Override
     public void onDestroy() {
         super.onDestroy();
-        MessageAdapter.AnimateFirstDisplayListener.clearImages();
+        AnimateFirstDisplayListener.clearImages();
     }
 
     @Override
@@ -157,6 +191,15 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         switch (id) {
             case R.id.chat_room_activity_send_button:
                 sendMessage();
+                break;
+            case R.id.anon_toggle:
+                mIsAnon = !mIsAnon;
+                if (mIsAnon) {
+                    anonToggleCiv.setImageDrawable(getResources().getDrawable(R.drawable.com_facebook_profile_default_icon));
+                } else {
+                    ImageLoader.getInstance().displayImage(mProfilePicUrl, anonToggleCiv,
+                            options, mAnimateFirstListener);
+                }
                 break;
         }
     }
@@ -315,6 +358,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         try {
             json.put("event", "talk");
             json.put("message", message);
+            json.put("isAnon", mIsAnon);
         } catch (JSONException e) {
             Log.e(TAG, "Problem creating the chat message JSON: " + e.getMessage());
             return;

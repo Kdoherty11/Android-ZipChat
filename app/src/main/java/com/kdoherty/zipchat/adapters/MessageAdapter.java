@@ -20,6 +20,7 @@ import com.kdoherty.zipchat.activities.ZipChatApplication;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.UserUtils;
+import com.kdoherty.zipchat.views.AnimateFirstDisplayListener;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
@@ -120,7 +121,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Log.d(TAG, "Sending message: " + getMessage(position) + " to the message details activity");
                 //Intent intent = MessageDetailsActivity.getIntent(mContext, getMessage(position));
                 //mContext.startActivity(intent);
             }
@@ -131,19 +131,21 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
     @Override
     public void onBindViewHolder(final MessageCellViewHolder messageCellViewHolder, int i) {
         final Message message = mMessages.get(i);
-        final User sender = message.getSender();
 
-        messageCellViewHolder.name.setText(sender.getName());
-        //messageCellViewHolder.profilePicture.setProfileId(sender.getFacebookId());
+        if (message.isAnon()) {
+            messageCellViewHolder.profilePicture.setImageDrawable(mContext.getResources().getDrawable(R.drawable.com_facebook_profile_default_icon));
+        } else {
+            String profilePicUrl = "http://graph.facebook.com/" + message.getSenderFbId() + "/picture?type=square";
+            ImageLoader.getInstance().displayImage(profilePicUrl, messageCellViewHolder.profilePicture,
+                    options, mAnimateFirstListener);
+        }
 
-        String profilePicUrl = "http://graph.facebook.com/" + sender.getFacebookId() + "/picture?type=square";
-        ImageLoader.getInstance().displayImage(profilePicUrl, messageCellViewHolder.profilePicture,
-                options, mAnimateFirstListener);
+        messageCellViewHolder.name.setText(message.getSenderName());
 
         messageCellViewHolder.profilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = UserDetailsActivity.getIntent(mContext, sender);
+                Intent intent = UserDetailsActivity.getIntent(mContext, message.getSenderId(), message.getSenderName(), message.getSenderFbId());
                 mContext.startActivity(intent);
             }
         });
@@ -306,27 +308,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
             favorite = (ImageView) itemView.findViewById(R.id.message_favorite);
             favoriteCount = (TextView) itemView.findViewById(R.id.message_favorite_count);
             timestamp = (TextView) itemView.findViewById(R.id.message_timestamp);
-        }
-    }
-
-    public static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
-
-        static final List<String> displayedImages = Collections.synchronizedList(new LinkedList<String>());
-
-        @Override
-        public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-            if (loadedImage != null) {
-                ImageView imageView = (ImageView) view;
-                boolean firstDisplay = !displayedImages.contains(imageUri);
-                if (firstDisplay) {
-                    FadeInBitmapDisplayer.animate(imageView, 500);
-                    displayedImages.add(imageUri);
-                }
-            }
-        }
-
-        public static void clearImages() {
-            displayedImages.clear();
         }
     }
 }

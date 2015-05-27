@@ -1,6 +1,7 @@
 package com.kdoherty.zipchat.fragments;
 
 
+import android.app.Activity;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -14,21 +15,18 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.kdoherty.zipchat.R;
-import com.kdoherty.zipchat.activities.CreateRoomActivity;
-import com.kdoherty.zipchat.activities.PublicRoomActivity;
 import com.kdoherty.zipchat.activities.UserDetailsActivity;
 import com.kdoherty.zipchat.adapters.PublicRoomDrawerAdapter;
-import com.kdoherty.zipchat.models.PublicRoom;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.PrefsUtils;
 import com.kdoherty.zipchat.utils.Utils;
@@ -40,7 +38,7 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PublicRoomDrawerFragment extends Fragment implements GoogleMap.OnMapLoadedCallback{
+public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMapLoadedCallback {
 
     private static final String TAG = PublicRoomDrawerFragment.class.getSimpleName();
 
@@ -54,17 +52,30 @@ public class PublicRoomDrawerFragment extends Fragment implements GoogleMap.OnMa
 
     private GoogleMap mGoogleMap;
     private Marker mUserMarker;
-    private Marker mMapMarker;
+    private Marker mRoomCenterMarker;
 
     private RecyclerView mRoomMembersRv;
     PublicRoomDrawerAdapter mRoomMembersAdapter;
 
-    private boolean mMapLoaded = false;
-    private int mRadius;
-    private double mLat;
-    private double mLon;
-    private boolean isMapSetup;
+    private int mRoomRadius;
+    private LatLng mRoomCenter;
+
     private String mRoomName;
+
+    private static final String ARG_ROOM_NAME = "RoomName";
+    private static final String ARG_ROOM_CENTER = "RoomCenterLocation";
+    private static final String ARG_ROOM_RADIUS = "RoomRadius";
+
+    public static PublicRoomDrawerFragment newInstance(String roomName, LatLng roomCenter, int roomRadius) {
+        Bundle args = new Bundle();
+        args.putString(ARG_ROOM_NAME, roomName);
+        args.putParcelable(ARG_ROOM_CENTER, roomCenter);
+        args.putInt(ARG_ROOM_RADIUS, roomRadius);
+
+        PublicRoomDrawerFragment fragment = new PublicRoomDrawerFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     public PublicRoomDrawerFragment() {
         // Required empty public constructor
@@ -73,31 +84,42 @@ public class PublicRoomDrawerFragment extends Fragment implements GoogleMap.OnMa
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Toast.makeText(getActivity(), "OnCreate", Toast.LENGTH_SHORT).show();
 
         mUserLearnedDrawer = PrefsUtils.readFromPreferences(getActivity(),
                 PREFS_FILE_NAME, KEY_USER_LEARNED_DRAWER, false);
+
+        Bundle args = getArguments();
+        mRoomName = args.getString(ARG_ROOM_NAME);
+        mRoomCenter = args.getParcelable(ARG_ROOM_CENTER);
+        mRoomRadius = args.getInt(ARG_ROOM_RADIUS);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Toast.makeText(getActivity(), "OnCreateView", Toast.LENGTH_SHORT).show();
+
         return inflater.inflate(R.layout.fragment_public_room_drawer, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        Toast.makeText(getActivity(), "OnViewCreated", Toast.LENGTH_SHORT).show();
+
         mRoomMembersRv = (RecyclerView) view.findViewById(R.id.chat_room_drawer_list);
-        mGoogleMap = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMap();
-        mGoogleMap.setOnMapLoadedCallback(this);
         mRoomMembersRv.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        Intent intent = UserDetailsActivity.getIntent(getActivity(), mRoomMembersAdapter.getUser(position));
+                        User user = mRoomMembersAdapter.getUser(position);
+                        Intent intent = UserDetailsActivity.getIntent(getActivity(), user.getUserId(),
+                                user.getName(), user.getFacebookId());
                         startActivity(intent);
                     }
                 })
         );
         mRoomMembersRv.setLayoutManager(new LinearLayoutManager(getActivity()));
+        ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
     }
 
 
@@ -117,38 +139,20 @@ public class PublicRoomDrawerFragment extends Fragment implements GoogleMap.OnMa
         }
     }
 
-
-
-    public void setUpMap(String roomName, int radius, double latitude, double longitude) {
-        if (!mMapLoaded) {
-            mRoomName = roomName;
-            mRadius = radius;
-            mLat = latitude;
-            mLon = longitude;
-            return;
+    private void displayRoom() {
+        if (mRoomCenterMarker != null) {
+            mRoomCenterMarker.remove();
         }
 
-        if (radius == PublicRoomActivity.DEFAULT_ROOM_RADIUS
-                && latitude == PublicRoomActivity.DEFAULT_ROOM_LATITUDE
-                && longitude == PublicRoomActivity.DEFAULT_ROOM_LONGITUDE) {
-            return;
-        }
-
-        if (mMapMarker != null) {
-            mMapMarker.remove();
-        }
-
-        LatLng roomCenter = new LatLng(latitude, longitude);
-        mMapMarker = mGoogleMap.addMarker(new MarkerOptions().position(roomCenter)
+        mRoomCenterMarker = mGoogleMap.addMarker(new MarkerOptions().position(mRoomCenter)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                .title(roomName));
+                .title(mRoomName));
 
-        Utils.setRoomCircle(getActivity(), mGoogleMap, roomCenter, radius);
-        isMapSetup = true;
+        Utils.setRoomCircle(getActivity(), mGoogleMap, mRoomCenter, mRoomRadius);
     }
 
-    public void setUp(DrawerLayout drawerLayout, final Toolbar toolbar, int drawerFragmentId) {
-        mContainerView = getActivity().findViewById(drawerFragmentId);
+    public void setUp(final Activity context, DrawerLayout drawerLayout, final Toolbar toolbar, int drawerFragmentId) {
+        mContainerView = context.findViewById(drawerFragmentId);
 
         mDrawerLayout = drawerLayout;
 
@@ -167,12 +171,12 @@ public class PublicRoomDrawerFragment extends Fragment implements GoogleMap.OnMa
                     PrefsUtils.saveToPreferences(getActivity(), PREFS_FILE_NAME,
                             KEY_USER_LEARNED_DRAWER, true);
                 }
-                getActivity().invalidateOptionsMenu();
+                context.invalidateOptionsMenu();
             }
 
             @Override
             public void onDrawerClosed(View drawerView) {
-                getActivity().invalidateOptionsMenu();
+                context.invalidateOptionsMenu();
             }
 
             @Override
@@ -183,13 +187,10 @@ public class PublicRoomDrawerFragment extends Fragment implements GoogleMap.OnMa
     }
 
     public void addUserMarker(Location location) {
-        if (location != null) {
-            if (mUserMarker != null) {
-                mUserMarker.remove();
-            }
+        if (mUserMarker != null && location != null) {
             LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
             mUserMarker = mGoogleMap.addMarker(new MarkerOptions().position(userLocation)
-                    .title("My Location"));
+                    .title(getResources().getString(R.string.drawer_user_location_pin_title)));
         }
     }
 
@@ -207,12 +208,16 @@ public class PublicRoomDrawerFragment extends Fragment implements GoogleMap.OnMa
         }
     }
 
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        Toast.makeText(getActivity(), "onMapReady", Toast.LENGTH_SHORT).show();
+        mGoogleMap = googleMap;
+        mGoogleMap.setOnMapLoadedCallback(this);
+    }
 
     @Override
     public void onMapLoaded() {
-        mMapLoaded = true;
-        if (!isMapSetup) {
-            setUpMap(mRoomName, mRadius, mLat, mLon);
-        }
+        Toast.makeText(getActivity(), "onMapLoaded", Toast.LENGTH_SHORT).show();
+        displayRoom();
     }
 }

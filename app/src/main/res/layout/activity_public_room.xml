@@ -20,14 +20,20 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <fragment
-            android:id="@+id/chat_room_drawer"
-            android:name="com.kdoherty.zipchat.fragments.PublicRoomDrawerFragment"
+        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/chat_room_drawer_fragment_container"
             android:layout_width="@dimen/chat_room_drawer_width"
             android:layout_height="match_parent"
-            android:layout_gravity="end"
-            app:layout="@layout/fragment_public_room_drawer"
-            tools:layout="@layout/fragment_public_room_drawer" />
+            android:layout_gravity="end"/>
+
+        <!--<fragment-->
+            <!--android:id="@+id/chat_room_drawer"-->
+            <!--android:name="com.kdoherty.zipchat.fragments.PublicRoomDrawerFragment"-->
+            <!--android:layout_width="@dimen/chat_room_drawer_width"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_gravity="end"-->
+            <!--app:layout="@layout/fragment_public_room_drawer"-->
+            <!--tools:layout="@layout/fragment_public_room_drawer" />-->
 
     </android.support.v4.widget.DrawerLayout>
 
