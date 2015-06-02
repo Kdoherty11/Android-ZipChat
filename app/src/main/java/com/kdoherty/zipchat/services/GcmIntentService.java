@@ -12,6 +12,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -28,6 +29,8 @@ import com.kdoherty.zipchat.models.Request;
 import com.kdoherty.zipchat.receivers.GcmBroadcastReceiver;
 import com.kdoherty.zipchat.utils.FacebookUtils;
 import com.kdoherty.zipchat.utils.Utils;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import java.util.concurrent.TimeUnit;
 
@@ -80,7 +83,8 @@ public class GcmIntentService extends IntentService {
         String messageType = gcm.getMessageType(intent);
 
         if (!extras.isEmpty()) {  // has effect of unparcelling Bundle
-            if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
+            if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)
+                    && !TextUtils.isEmpty(extras.getString(Key.EVENT))) {
                 String event = extras.getString(Key.EVENT);
 
                 switch (event) {

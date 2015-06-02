@@ -35,6 +35,10 @@ public class MessageDetailsFragment extends Fragment {
     private List<User> mMessageFavoritors = new ArrayList<>();
     private MessageFavoritorAdapter mFavoriteAdapter;
 
+    private Message mMessage;
+
+    private static final String ARG_MESSAGE = "MessageDetailFragmentMessage";
+
     //This is the handler that will manager to process the broadcast intent
     private BroadcastReceiver mGcmFavoriteReceiver = new BroadcastReceiver() {
         @Override
@@ -49,7 +53,24 @@ public class MessageDetailsFragment extends Fragment {
         }
     };
 
+
+    public static MessageDetailsFragment newInstance(Message message) {
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_MESSAGE, message);
+
+        MessageDetailsFragment fragment = new MessageDetailsFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     public MessageDetailsFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mMessage = getArguments().getParcelable(ARG_MESSAGE);
+        Log.d(TAG, "Displaying message: " + mMessage);
     }
 
     @Override
@@ -63,20 +84,9 @@ public class MessageDetailsFragment extends Fragment {
         mMessageFavorites = (RecyclerView) view.findViewById(R.id.message_favoritor_list);
         mMessageFavorites.setLayoutManager(new LinearLayoutManager(getActivity()));
         Log.d(TAG, "In onViewCreated and messageFavorites are " + mMessageFavoritors);
+        mMessageFavoritors = mMessage.getFavorites();
         mFavoriteAdapter = new MessageFavoritorAdapter(getActivity(), mMessageFavoritors);
         mMessageFavorites.setAdapter(mFavoriteAdapter);
-    }
-
-    public void displayMessage(Message message) {
-        Log.d(TAG, "Displaying message: " + message);
-        mMessageFavoritors = message.getFavorites();
-        Log.d(TAG, "In displayMessage and messageFavorites are " + mMessageFavoritors);
-
-        if (mFavoriteAdapter != null) {
-            Log.d(TAG, "In displayMessage and data set is notified");
-
-            mFavoriteAdapter.notifyDataSetChanged();
-        }
     }
 
     @Override
@@ -85,7 +95,6 @@ public class MessageDetailsFragment extends Fragment {
         getActivity().registerReceiver(mGcmFavoriteReceiver, new IntentFilter(GCM_RECEIVER_NAME));
     }
 
-    //Must unregister onPause()
     @Override
     public void onPause() {
         super.onPause();

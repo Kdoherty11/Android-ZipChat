@@ -4,12 +4,15 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.models.PrivateRoom;
@@ -78,7 +81,7 @@ public class PrivateRoomAdapter extends RecyclerView.Adapter<PrivateRoomAdapter.
         return mFilter;
     }
 
-    class PrivateChatViewHolder extends RecyclerView.ViewHolder {
+    static class PrivateChatViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
 
         private CircleProfilePictureView circleProfilePictureView;
         private TextView title;
@@ -89,7 +92,14 @@ public class PrivateRoomAdapter extends RecyclerView.Adapter<PrivateRoomAdapter.
             title = (TextView) itemView.findViewById(R.id.private_chat_title);
             lastActivity = (TextView) itemView.findViewById(R.id.private_chat_last_activity);
             circleProfilePictureView = (CircleProfilePictureView) itemView.findViewById(R.id.private_chat_picture);
+            itemView.setOnCreateContextMenuListener(this);
         }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            menu.add(Menu.NONE, v.getId(), Menu.NONE, "Leave");
+        }
+
     }
 
     private class PrivateChatFilter extends Filter {

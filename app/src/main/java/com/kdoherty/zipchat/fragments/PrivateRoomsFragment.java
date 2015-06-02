@@ -64,7 +64,7 @@ public class PrivateRoomsFragment extends Fragment implements Filterable, SwipeR
         mPrivateChatsRv.addItemDecoration(new DividerItemDecoration(getResources().getDrawable(R.drawable.message_list_divider), true, true));
         mPrivateChatsRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         mPrivateChatsRv.setItemAnimator(new DefaultItemAnimator());
-
+        registerForContextMenu(mPrivateChatsRv);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.orange);

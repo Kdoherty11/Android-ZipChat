@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/tools"
-    xmlns:facebook="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/zipchat_blue">
@@ -11,7 +9,16 @@
         android:id="@+id/other_user_pic"
         android:layout_width="@dimen/private_chat_room_pic_side"
         android:layout_height="@dimen/private_chat_room_pic_side"
+        android:visibility="gone"
         android:layout_gravity="end|center_vertical"
         android:layout_margin="@dimen/private_chat_room_pic_margins" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/active_user_circle"
+        android:src="@drawable/active_user_circle"
+        android:visibility="gone"
+        android:layout_gravity="end|center_vertical"
+        android:layout_width="32dp"
+        android:layout_height="32dp" />
 
 </android.support.v7.widget.Toolbar>

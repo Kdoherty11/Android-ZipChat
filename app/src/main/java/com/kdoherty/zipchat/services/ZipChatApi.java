@@ -35,9 +35,7 @@ public interface ZipChatApi {
 
     String ENDPOINT = "http://zipchatapp.herokuapp.com/";
 
-    Gson GSON = new GsonBuilder()
-            .registerTypeAdapter(PublicRoom.class, new PublicRoomDeserializer())
-            .create();
+    Gson GSON = new GsonBuilder().create();
 
     RestAdapter ADAPTER = new RestAdapter.Builder()
             .setEndpoint(ENDPOINT)
@@ -46,27 +44,13 @@ public interface ZipChatApi {
 
     ZipChatApi INSTANCE = ADAPTER.create(ZipChatApi.class);
 
-    class PublicRoomDeserializer implements JsonDeserializer<PublicRoom> {
-        public PublicRoomDeserializer() {
-        }
+    // *************** Rooms ***************
 
-        @Override
-        public PublicRoom deserialize(JsonElement jsonElement, Type typeOF,
-                                      JsonDeserializationContext context) throws JsonParseException {
-
-            JsonObject jsonRoom = jsonElement.getAsJsonObject();
-
-            final long roomId = jsonRoom.get("roomId").getAsLong();
-            final String name = jsonRoom.get("name").getAsString();
-            final int radius = jsonRoom.get("radius").getAsInt();
-            final double latitude = jsonRoom.get("latitude").getAsDouble();
-            final double longitude = jsonRoom.get("longitude").getAsDouble();
-            final long timeStamp = jsonRoom.get("timeStamp").getAsLong();
-            final long lastActivity = jsonRoom.get("lastActivity").getAsLong();
-
-            return new PublicRoom(roomId, name, radius, latitude, longitude, timeStamp, lastActivity) ;
-        }
-    }
+    @GET("/rooms/{roomId}/messages")
+    void getRoomMessages(@Path("roomId") long roomId,
+                         @Query("limit") int limit,
+                         @Query("offset") int offset,
+                         Callback<List<Message>> response);
 
     // *************** Public Rooms ***************
 
@@ -88,23 +72,29 @@ public interface ZipChatApi {
     @DELETE("/publicRooms/{roomId}/subscriptions/{userId}")
     void removeSubscription(@Path("roomId") long roomId, @Path("userId") long userId, Callback<Response> response);
 
-    @GET("/rooms/{roomId}/messages")
-    void getRoomMessages(@Path("roomId") long roomId,
-                         @Query("limit") int limit,
-                         @Query("offset") int offset,
-                         Callback<List<Message>> response);
+    // *************** Private Rooms ***************
 
-    // *************** Users ***************
-
-    @FormUrlEncoded
-    @POST("/users")
-    void createUser(@Field("name") String name, @Field("facebookId") String facebookId,
-                    @Field("registrationId") String regId, @Field("platform") String platform, Callback<Response> response);
+    @PUT("/privateRooms/{roomId}/leave")
+    void leaveRoom(@Path("roomId") long roomId, @Query("userId") long userId, Callback<Response> response);
 
     // *************** Private Rooms ***************
 
     @GET("/privateRooms")
     void getPrivateRooms(@Query("userId") long userId, Callback<List<PrivateRoom>> response);
+
+    // *************** Messages ***************
+
+    @PUT("/messages/{messageId}/favorite")
+    void favoriteMessage(@Path("messageId") long messageId, @Query("userId") long userId, Callback<Response> response);
+
+    @DELETE("/messages/{messageId}/favorite")
+    void removeFavorite(@Path("messageId") long messageId, @Query("userId") long userId, Callback<Response> response);
+
+    @PUT("/messages/{messageId}/favorite")
+    void flagMessage(@Path("messageId") long messageId, @Query("userId") long userId, Callback<Response> response);
+
+    @DELETE("/messages/{messageId}/favorite")
+    void removeFlag(@Path("messageId") long messageId, @Query("userId") long userId, Callback<Response> response);
 
     // *************** Requests ***************
 
@@ -122,7 +112,11 @@ public interface ZipChatApi {
     @GET("/requests/status")
     void getStatus(@Query("senderId") long senderId, @Query("receiverId") long receiverId, Callback<Response> response);
 
-    @PUT("/privateRooms/{roomId}/leave")
-    void leaveRoom(@Path("roomId") long roomId, @Query("userId") long userId, Callback<Response> response);
+    // *************** Users ***************
+
+    @FormUrlEncoded
+    @POST("/users")
+    void createUser(@Field("name") String name, @Field("facebookId") String facebookId,
+                    @Field("registrationId") String regId, @Field("platform") String platform, Callback<Response> response);
 
 }

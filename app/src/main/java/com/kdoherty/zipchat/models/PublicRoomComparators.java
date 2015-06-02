@@ -10,7 +10,7 @@ public class PublicRoomComparators {
     private PublicRoomComparators() {
     }
 
-    public static enum DistanceComparator implements Comparator<PublicRoom> {
+    public enum DistanceComparator implements Comparator<PublicRoom> {
 
         ASCENDING;
 
@@ -24,7 +24,7 @@ public class PublicRoomComparators {
         }
     }
 
-    public static enum ActivityComparator implements Comparator<PublicRoom> {
+    public enum ActivityComparator implements Comparator<PublicRoom> {
 
         DESCENDING;
 
@@ -41,7 +41,7 @@ public class PublicRoomComparators {
         }
     }
 
-    public static enum VotesComparator implements Comparator<PublicRoom> {
+    public enum VotesComparator implements Comparator<PublicRoom> {
 
         DESCENDING;
 

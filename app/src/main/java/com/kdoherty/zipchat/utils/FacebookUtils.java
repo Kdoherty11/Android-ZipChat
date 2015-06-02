@@ -60,6 +60,8 @@ public class FacebookUtils {
                     if (session == Session.getActiveSession()) {
                         if (user != null) {
 
+                            Log.d(TAG, "FACEBOOK INFO: " + user);
+
                             String id = user.getId();
                             String name = user.getName();
 

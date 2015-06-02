@@ -4,7 +4,9 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
@@ -89,7 +91,7 @@ public class PublicRoomAdapter extends RecyclerView.Adapter<PublicRoomAdapter.Ch
         return mFilter;
     }
 
-    class ChatRoomViewHolder extends RecyclerView.ViewHolder {
+    class ChatRoomViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
         TextView nameTv;
         TextView distanceTv;
         TextView lastActivityTv;
@@ -99,6 +101,12 @@ public class PublicRoomAdapter extends RecyclerView.Adapter<PublicRoomAdapter.Ch
             nameTv = (TextView) itemView.findViewById(R.id.chat_room_name);
             distanceTv = (TextView) itemView.findViewById(R.id.chat_room_distance);
             lastActivityTv = (TextView) itemView.findViewById(R.id.chat_room_last_activity);
+        }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            menu.add(Menu.NONE, v.getId(), Menu.NONE, "Subscribe");
+            menu.add(Menu.NONE, v.getId(), Menu.NONE, "Unsubscribe");
         }
     }
 

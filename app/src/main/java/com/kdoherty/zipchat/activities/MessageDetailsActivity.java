@@ -38,10 +38,12 @@ public class MessageDetailsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setTitle("Message");
+        }
 
-        actionBar.setTitle("Message");
 
 //        if (savedInstanceState == null) {
 //            // Add the fragment on initial activity setup

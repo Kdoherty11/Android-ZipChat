@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -63,7 +64,7 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
 
     private PublicRoomAdapter mAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private QuickReturnRecyclerView mChatRoomsRv;
+    private RecyclerView mChatRoomsRv;
     private TabHost mTabHost;
     private TabWidget mSortingTabs;
 
@@ -123,6 +124,7 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
         mChatRoomsRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         mChatRoomsRv.addItemDecoration(new DividerItemDecoration(getResources().getDrawable(R.drawable.message_list_divider), true, true));
         mChatRoomsRv.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), this));
+        registerForContextMenu(mChatRoomsRv);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.orange);
@@ -162,7 +164,7 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
         mAdapter = new PublicRoomAdapter(getActivity(), publicRooms);
         mChatRoomsRv.setAdapter(mAdapter);
 
-        mChatRoomsRv.setReturningView(mQuickReturnView);
+        //mChatRoomsRv.setReturningView(mQuickReturnView);
 
         mSwipeRefreshLayout.setRefreshing(false);
 
@@ -251,7 +253,6 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
 
         if (location == null) {
             Log.w(TAG, "Null location when refreshing public rooms");
-            //Toast.makeText(getActivity(), "Null location", Toast.LENGTH_SHORT).show();
             mSwipeRefreshLayout.setRefreshing(false);
             return;
         }

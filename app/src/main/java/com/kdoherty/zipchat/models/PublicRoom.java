@@ -8,10 +8,6 @@ import java.util.Set;
  */
 public class PublicRoom {
 
-    public static final int SMALL_RADIUS = 100;
-    public static final int MEDIUM_RADIUS = 200;
-    public static final int LARGE_RADIUS = 300;
-
     private int position;
     private List<Message> messages;
 

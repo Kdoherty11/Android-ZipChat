@@ -84,7 +84,6 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Toast.makeText(getActivity(), "OnCreate", Toast.LENGTH_SHORT).show();
 
         mUserLearnedDrawer = PrefsUtils.readFromPreferences(getActivity(),
                 PREFS_FILE_NAME, KEY_USER_LEARNED_DRAWER, false);
@@ -98,14 +97,11 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Toast.makeText(getActivity(), "OnCreateView", Toast.LENGTH_SHORT).show();
-
         return inflater.inflate(R.layout.fragment_public_room_drawer, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        Toast.makeText(getActivity(), "OnViewCreated", Toast.LENGTH_SHORT).show();
 
         mRoomMembersRv = (RecyclerView) view.findViewById(R.id.chat_room_drawer_list);
         mRoomMembersRv.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
@@ -210,14 +206,12 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Toast.makeText(getActivity(), "onMapReady", Toast.LENGTH_SHORT).show();
         mGoogleMap = googleMap;
         mGoogleMap.setOnMapLoadedCallback(this);
     }
 
     @Override
     public void onMapLoaded() {
-        Toast.makeText(getActivity(), "onMapLoaded", Toast.LENGTH_SHORT).show();
         displayRoom();
     }
 }

@@ -12,8 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,7 +63,8 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     private static final int MESSAGE_LIMIT = 25;
     private static final int ITEM_VIEW_CACHE_SIZE = 25;
 
-    public static final String ARG_ROOM_ID = "ChatRoomFragmentRoomIdArg";
+    private static final String ARG_ROOM_ID = "ChatRoomFragmentRoomIdArg";
+    private static final String ARG_ALLOW_ANON = "ChatRoomFragmentAllowAnonMessaging";
 
     private MessageAdapter mMessageAdapter;
     private RecyclerView mMessagesRv;
@@ -79,18 +78,21 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     private long mSelfId;
 
     private boolean mMessagesLoading = true;
-    private ProgressBar mMessagesLoadingPb;
+    private boolean mLoadedAllMessages = false;
 
-    private CircleImageView anonToggleCiv;
+    private CircleImageView mAnonToggleCv;
     private ImageLoadingListener mAnimateFirstListener = new AnimateFirstDisplayListener();
     private DisplayImageOptions options;
 
     private boolean mIsAnon;
     private String mProfilePicUrl;
 
-    public static ChatRoomFragment newInstance(long roomId) {
+    private boolean mAllowAnon;
+
+    public static ChatRoomFragment newInstance(long roomId, boolean allowAnon) {
         Bundle args = new Bundle();
         args.putLong(ARG_ROOM_ID, roomId);
+        args.putBoolean(ARG_ALLOW_ANON, allowAnon);
 
         ChatRoomFragment fragment = new ChatRoomFragment();
         fragment.setArguments(args);
@@ -111,7 +113,9 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSelfId = UserUtils.getId(getActivity());
-        mRoomId = getArguments().getLong(ARG_ROOM_ID);
+        Bundle args = getArguments();
+        mRoomId = args.getLong(ARG_ROOM_ID);
+        mAllowAnon = args.getBoolean(ARG_ALLOW_ANON);
 
         new ChatService(mSelfId, mRoomId, this);
 
@@ -133,7 +137,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
 
         mMessagesRv = (RecyclerView) rootView.findViewById(R.id.chat_room_activity_messages);
         mMessageBoxEt = (EditText) rootView.findViewById(R.id.chat_room_activity_message_box);
-        mMessagesLoadingPb = (ProgressBar) rootView.findViewById(R.id.messages_loading_pb);
+        mAnonToggleCv = (CircleImageView) rootView.findViewById(R.id.anon_toggle);
 
         return rootView;
     }
@@ -164,10 +168,13 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         });
 
         view.findViewById(R.id.chat_room_activity_send_button).setOnClickListener(this);
-        anonToggleCiv = (CircleImageView) view.findViewById(R.id.anon_toggle);
-        anonToggleCiv.setOnClickListener(this);
-        ImageLoader.getInstance().displayImage(mProfilePicUrl, anonToggleCiv,
-                options, mAnimateFirstListener);
+        if (mAllowAnon) {
+            mAnonToggleCv.setOnClickListener(this);
+            ImageLoader.getInstance().displayImage(mProfilePicUrl, mAnonToggleCv,
+                    options, mAnimateFirstListener);
+        } else {
+            mAnonToggleCv.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -195,9 +202,9 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
             case R.id.anon_toggle:
                 mIsAnon = !mIsAnon;
                 if (mIsAnon) {
-                    anonToggleCiv.setImageDrawable(getResources().getDrawable(R.drawable.com_facebook_profile_default_icon));
+                    mAnonToggleCv.setImageDrawable(getResources().getDrawable(R.drawable.com_facebook_profile_default_icon));
                 } else {
-                    ImageLoader.getInstance().displayImage(mProfilePicUrl, anonToggleCiv,
+                    ImageLoader.getInstance().displayImage(mProfilePicUrl, mAnonToggleCv,
                             options, mAnimateFirstListener);
                 }
                 break;
@@ -223,16 +230,19 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
             @Override
             public void success(List<Message> messages, Response response) {
                 populateMessageList(messages);
+                int numMessagesLoaded = messages.size();
                 mMessageOffset += messages.size();
                 mMessagesLoading = true;
-                mMessagesLoadingPb.setVisibility(View.GONE);
+
+                if (numMessagesLoaded < MESSAGE_LIMIT) {
+                    mLoadedAllMessages = true;
+                }
             }
 
             @Override
             public void failure(RetrofitError error) {
                 Utils.logErrorResponse(TAG, "Getting chat messages", error);
                 mMessagesLoading = true;
-                mMessagesLoadingPb.setVisibility(View.GONE);
             }
         });
     }
@@ -250,17 +260,14 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
 
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-
             visibleItemCount = mLayoutManager.getChildCount();
             totalItemCount = mLayoutManager.getItemCount();
             pastVisiblesItems = mLayoutManager.findFirstVisibleItemPosition();
 
             if (mMessagesLoading) {
-                if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
+                if (!mLoadedAllMessages && (visibleItemCount + pastVisiblesItems) >= totalItemCount) {
                     mMessagesLoading = false;
                     populateMessageList();
-                    mMessagesLoadingPb.setVisibility(View.VISIBLE);
-
                 }
             }
         }
@@ -358,7 +365,9 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         try {
             json.put("event", "talk");
             json.put("message", message);
-            json.put("isAnon", mIsAnon);
+            if (mAllowAnon) {
+                json.put("isAnon", mIsAnon);
+            }
         } catch (JSONException e) {
             Log.e(TAG, "Problem creating the chat message JSON: " + e.getMessage());
             return;
