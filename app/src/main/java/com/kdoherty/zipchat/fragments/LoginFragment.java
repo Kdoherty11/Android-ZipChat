@@ -55,6 +55,7 @@ public class LoginFragment extends Fragment {
         final Activity activity = getActivity();
         if (state.isOpened()) {
             Log.i(TAG, "Logged in with facebook");
+            Log.i(TAG, "Got access token: " + session.getAccessToken());
             Intent homeScreen = new Intent(activity, HomeActivity.class);
             startActivity(homeScreen);
 

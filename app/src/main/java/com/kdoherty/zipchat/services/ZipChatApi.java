@@ -7,15 +7,18 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.kdoherty.zipchat.activities.ZipChatApplication;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.PrivateRoom;
 import com.kdoherty.zipchat.models.PublicRoom;
 import com.kdoherty.zipchat.models.Request;
+import com.kdoherty.zipchat.utils.UserUtils;
 
 import java.lang.reflect.Type;
 import java.util.List;
 
 import retrofit.Callback;
+import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.client.Response;
 import retrofit.converter.GsonConverter;
@@ -37,9 +40,17 @@ public interface ZipChatApi {
 
     Gson GSON = new GsonBuilder().create();
 
+    RequestInterceptor requestInterceptor = new RequestInterceptor() {
+        @Override
+        public void intercept(RequestFacade request) {
+            request.addHeader("X-AUTH-TOKEN", UserUtils.getAuthToken(ZipChatApplication.getAppContext()));
+        }
+    };
+
     RestAdapter ADAPTER = new RestAdapter.Builder()
             .setEndpoint(ENDPOINT)
             .setConverter(new GsonConverter(GSON))
+            .setRequestInterceptor(requestInterceptor);
             .build();
 
     ZipChatApi INSTANCE = ADAPTER.create(ZipChatApi.class);

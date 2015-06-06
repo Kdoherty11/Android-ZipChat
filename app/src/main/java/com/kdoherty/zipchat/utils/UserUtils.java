@@ -23,6 +23,8 @@ public class UserUtils {
 
     private static final String PREFS_FILE = "UserUtilsPrefsFile";
     private static final String PREFS_USER_ID = "UtilsUserIdKey";
+    private static final String PREFS_AUTH_TOKEN = "UtilsUserAuthTokenKey";
+    private static final String DEFAULT_AUTH_TOKEN = "";
     private static final long DEFAULT_USER_ID = -1;
 
     private static final int CREATE_USER_LOCK_TIMEOUT_SECONDS = 9;
@@ -38,6 +40,14 @@ public class UserUtils {
 
     public static long getId(Context context) {
         return PrefsUtils.readFromPreferences(context, PREFS_FILE, PREFS_USER_ID, DEFAULT_USER_ID);
+    }
+
+    public static void storeAuthToken(Context context, String authToken) {
+        PrefsUtils.saveToPreferences(context, PREFS_FILE, PREFS_AUTH_TOKEN, authToken);
+    }
+
+    public static String getAuthToken(Context context) {
+        return PrefsUtils.readFromPreferences(context, PREFS_FILE, PREFS_AUTH_TOKEN, DEFAULT_AUTH_TOKEN);
     }
 
     public static User getSelf(Context context) {

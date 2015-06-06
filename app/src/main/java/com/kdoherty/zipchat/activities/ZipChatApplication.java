@@ -11,10 +11,13 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
  */
 public class ZipChatApplication extends Application {
 
+    private static Context context;
+
     @Override
     public void onCreate() {
         super.onCreate();
         initImageLoader(getApplicationContext());
+        context = getApplicationContext();
     }
 
     public static void initImageLoader(Context context) {
@@ -24,5 +27,7 @@ public class ZipChatApplication extends Application {
         }
     }
 
-
+    public static Context getAppContext() {
+        return context;
+    }
 }
