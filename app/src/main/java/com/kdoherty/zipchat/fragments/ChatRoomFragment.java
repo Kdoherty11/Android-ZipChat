@@ -64,7 +64,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     private static final int ITEM_VIEW_CACHE_SIZE = 25;
 
     private static final String ARG_ROOM_ID = "ChatRoomFragmentRoomIdArg";
-    private static final String ARG_ALLOW_ANON = "ChatRoomFragmentAllowAnonMessaging";
+    private static final String ARG_IS_PUBLIC_ROOM = "ChatRoomFragmentIsPublicRoom";
 
     private MessageAdapter mMessageAdapter;
     private RecyclerView mMessagesRv;
@@ -87,12 +87,12 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     private boolean mIsAnon;
     private String mProfilePicUrl;
 
-    private boolean mAllowAnon;
+    private boolean mIsPublicRoom;
 
-    public static ChatRoomFragment newInstance(long roomId, boolean allowAnon) {
+    public static ChatRoomFragment newInstance(long roomId, boolean isPublicRoom) {
         Bundle args = new Bundle();
         args.putLong(ARG_ROOM_ID, roomId);
-        args.putBoolean(ARG_ALLOW_ANON, allowAnon);
+        args.putBoolean(ARG_IS_PUBLIC_ROOM, isPublicRoom);
 
         ChatRoomFragment fragment = new ChatRoomFragment();
         fragment.setArguments(args);
@@ -115,9 +115,9 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         mSelfId = UserUtils.getId(getActivity());
         Bundle args = getArguments();
         mRoomId = args.getLong(ARG_ROOM_ID);
-        mAllowAnon = args.getBoolean(ARG_ALLOW_ANON);
+        mIsPublicRoom = args.getBoolean(ARG_IS_PUBLIC_ROOM);
 
-        new ChatService(mSelfId, mRoomId, this);
+        new ChatService(mSelfId, mRoomId, mIsPublicRoom, UserUtils.getAuthToken(getActivity()), this);
 
         options = new DisplayImageOptions.Builder()
                 .showImageOnLoading(R.drawable.com_facebook_profile_picture_blank_portrait)
@@ -168,7 +168,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         });
 
         view.findViewById(R.id.chat_room_activity_send_button).setOnClickListener(this);
-        if (mAllowAnon) {
+        if (mIsPublicRoom) {
             mAnonToggleCv.setOnClickListener(this);
             ImageLoader.getInstance().displayImage(mProfilePicUrl, mAnonToggleCv,
                     options, mAnimateFirstListener);
@@ -181,6 +181,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     public void onPause() {
         super.onPause();
         if (socketIsAvailable()) {
+            mMessageAdapter.sendPendingEvents();
             Log.i(TAG, "Closing socket!");
             mWebSocket.close();
         }
@@ -202,7 +203,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
             case R.id.anon_toggle:
                 mIsAnon = !mIsAnon;
                 if (mIsAnon) {
-                    mAnonToggleCv.setImageDrawable(getResources().getDrawable(R.drawable.com_facebook_profile_default_icon));
+                    mAnonToggleCv.setImageDrawable(getResources().getDrawable(R.drawable.com_facebook_profile_picture_blank_square));
                 } else {
                     ImageLoader.getInstance().displayImage(mProfilePicUrl, mAnonToggleCv,
                             options, mAnimateFirstListener);
@@ -226,7 +227,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
             return;
         }
 
-        ZipChatApi.INSTANCE.getRoomMessages(mRoomId, MESSAGE_LIMIT, mMessageOffset, new Callback<List<Message>>() {
+        ZipChatApi.INSTANCE.getRoomMessages(UserUtils.getAuthToken(getActivity()), mRoomId, MESSAGE_LIMIT, mMessageOffset, new Callback<List<Message>>() {
             @Override
             public void success(List<Message> messages, Response response) {
                 populateMessageList(messages);
@@ -365,7 +366,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         try {
             json.put("event", "talk");
             json.put("message", message);
-            if (mAllowAnon) {
+            if (mIsPublicRoom) {
                 json.put("isAnon", mIsAnon);
             }
         } catch (JSONException e) {

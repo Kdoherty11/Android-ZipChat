@@ -3,6 +3,7 @@ package com.kdoherty.zipchat.activities;
 import android.app.Application;
 import android.content.Context;
 
+import com.facebook.FacebookSdk;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
@@ -11,13 +12,14 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
  */
 public class ZipChatApplication extends Application {
 
-    private static Context context;
+    private static Context sContext;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        initImageLoader(getApplicationContext());
-        context = getApplicationContext();
+        sContext = getApplicationContext();
+        initImageLoader(sContext);
+        FacebookSdk.sdkInitialize(sContext);
     }
 
     public static void initImageLoader(Context context) {
@@ -28,6 +30,6 @@ public class ZipChatApplication extends Application {
     }
 
     public static Context getAppContext() {
-        return context;
+        return sContext;
     }
 }

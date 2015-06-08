@@ -11,9 +11,10 @@ import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.FacebookUtils;
 import com.kdoherty.zipchat.utils.UserUtils;
-import com.kdoherty.zipchat.views.CircleProfilePictureView;
 
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by kdoherty on 12/26/14.
@@ -43,7 +44,7 @@ public class PublicRoomDrawerAdapter extends RecyclerView.Adapter<PublicRoomDraw
         User user = mRoomMembers.get(i);
 
         drawerCellViewHolder.text.setText(user.getName());
-        drawerCellViewHolder.profilePicture.setProfileId(user.getFacebookId());
+        FacebookUtils.displayProfilePicture(user.getFacebookId(), drawerCellViewHolder.profilePicture);
     }
 
     @Override
@@ -77,12 +78,12 @@ public class PublicRoomDrawerAdapter extends RecyclerView.Adapter<PublicRoomDraw
 
     class UserCellViewHolder extends RecyclerView.ViewHolder {
 
-        private CircleProfilePictureView profilePicture;
+        private CircleImageView profilePicture;
         private RobotoTextView text;
 
         public UserCellViewHolder(View itemView) {
             super(itemView);
-            profilePicture = (CircleProfilePictureView) itemView.findViewById(R.id.drawer_cell_icon);
+            profilePicture = (CircleImageView) itemView.findViewById(R.id.drawer_cell_icon);
             text = (RobotoTextView) itemView.findViewById(R.id.drawer_cell_text);
         }
     }

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/chat_room_drawer_cell_height">
 
-    <com.kdoherty.zipchat.views.CircleProfilePictureView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/drawer_cell_icon"
         android:layout_width="56dp"
         android:layout_height="56dp"

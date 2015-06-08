@@ -10,10 +10,10 @@ import com.devspark.robototextview.widget.RobotoTextView;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.FacebookUtils;
-import com.kdoherty.zipchat.utils.UserUtils;
-import com.kdoherty.zipchat.views.CircleProfilePictureView;
 
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by kevin on 5/16/15.
@@ -41,7 +41,7 @@ public class MessageFavoritorAdapter extends RecyclerView.Adapter<MessageFavorit
         User user = mMessageFavoritors.get(i);
 
         messageFavoritorViewHolder.text.setText(user.getName());
-        messageFavoritorViewHolder.profilePicture.setProfileId(user.getFacebookId());
+        FacebookUtils.displayProfilePicture(user.getFacebookId(), messageFavoritorViewHolder.profilePicture);
     }
 
     @Override
@@ -75,12 +75,12 @@ public class MessageFavoritorAdapter extends RecyclerView.Adapter<MessageFavorit
 
     class UserCellViewHolder extends RecyclerView.ViewHolder {
 
-        private CircleProfilePictureView profilePicture;
+        private CircleImageView profilePicture;
         private RobotoTextView text;
 
         public UserCellViewHolder(View itemView) {
             super(itemView);
-            profilePicture = (CircleProfilePictureView) itemView.findViewById(R.id.drawer_cell_icon);
+            profilePicture = (CircleImageView) itemView.findViewById(R.id.drawer_cell_icon);
             text = (RobotoTextView) itemView.findViewById(R.id.drawer_cell_text);
         }
     }

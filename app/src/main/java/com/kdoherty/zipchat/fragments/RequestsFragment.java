@@ -78,7 +78,7 @@ public class RequestsFragment extends Fragment implements SwipeRefreshLayout.OnR
 
         final long userId = UserUtils.getId(getActivity());
 
-        ZipChatApi.INSTANCE.getRequests(userId, new Callback<List<Request>>() {
+        ZipChatApi.INSTANCE.getRequests(UserUtils.getAuthToken(getActivity()), userId, new Callback<List<Request>>() {
 
             @Override
             public void success(List<Request> requests, Response response) {

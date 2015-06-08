@@ -14,11 +14,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.UserDetailsActivity;
 import com.kdoherty.zipchat.activities.ZipChatApplication;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
+import com.kdoherty.zipchat.utils.FacebookUtils;
 import com.kdoherty.zipchat.utils.UserUtils;
 import com.kdoherty.zipchat.views.AnimateFirstDisplayListener;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -55,8 +57,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
 
     private static final Semaphore sendFavoriteLock = new Semaphore(1);
     private static final int SEND_FAVORITE_LOCK_TIMEOUT_SECONDS = 1;
-
-    private DisplayImageOptions options;
 
     private ImageLoadingListener mAnimateFirstListener = new AnimateFirstDisplayListener();
 
@@ -104,15 +104,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         mContext = context;
         mMessageFavListener = messageFavoriteListener;
         ZipChatApplication.initImageLoader(mContext);
-
-        options = new DisplayImageOptions.Builder()
-                .showImageOnLoading(R.drawable.com_facebook_profile_picture_blank_portrait)
-                .showImageForEmptyUri(R.drawable.com_facebook_profile_picture_blank_portrait)
-                .showImageOnFail(R.drawable.com_facebook_profile_picture_blank_portrait)
-                .cacheInMemory(true)
-                .cacheOnDisk(true)
-                .considerExifParams(true)
-                .build();
     }
 
     @Override
@@ -133,11 +124,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         final Message message = mMessages.get(i);
 
         if (message.isAnon()) {
-            messageCellViewHolder.profilePicture.setImageDrawable(mContext.getResources().getDrawable(R.drawable.com_facebook_profile_default_icon));
+            messageCellViewHolder.profilePicture.setImageDrawable(mContext.getResources().getDrawable(R.drawable.com_facebook_profile_picture_blank_square));
         } else {
-            String profilePicUrl = "http://graph.facebook.com/" + message.getSenderFbId() + "/picture?type=square";
-            ImageLoader.getInstance().displayImage(profilePicUrl, messageCellViewHolder.profilePicture,
-                    options, mAnimateFirstListener);
+            ImageLoader.getInstance().displayImage(FacebookUtils.getProfilePicUrl(message.getSenderFbId()), messageCellViewHolder.profilePicture,
+                    FacebookUtils.displayProfPicOpts, mAnimateFirstListener);
         }
 
         messageCellViewHolder.name.setText(message.getSenderName());
@@ -145,7 +135,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         messageCellViewHolder.profilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = UserDetailsActivity.getIntent(mContext, message.getSenderId(), message.getSenderName(), message.getSenderFbId());
+                Intent intent = UserDetailsActivity.getIntent(mContext, message.getSenderId(), message.getSenderName(), message.getSenderFbId(), message.isAnon());
                 mContext.startActivity(intent);
             }
         });
@@ -288,6 +278,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
             }
 
             sendFavoriteLock.release();
+        }
+    }
+
+    public void sendPendingEvents() {
+        if (mHasPendingFavorite) {
+            mFavoriteEventHandler.removeCallbacks(mSendFavoriteEvent);
+            mSendFavoriteEvent.run();
         }
     }
 

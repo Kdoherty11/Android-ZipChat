@@ -4,107 +4,154 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.facebook.Session;
-import com.facebook.SessionState;
-import com.facebook.UiLifecycleHelper;
-import com.facebook.widget.LoginButton;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.HomeActivity;
+import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.FacebookUtils;
+import com.kdoherty.zipchat.utils.PrefsUtils;
+import com.kdoherty.zipchat.utils.UserUtils;
+import com.kdoherty.zipchat.utils.Utils;
+import com.koushikdutta.async.Util;
 
-import java.util.Collections;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-public class LoginFragment extends Fragment {
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+
+public class LoginFragment extends Fragment implements FacebookCallback<LoginResult> {
 
     private static final String TAG = LoginFragment.class.getSimpleName();
 
-    private Session.StatusCallback callback = new Session.StatusCallback() {
-        @Override
-        public void call(Session session, SessionState state, Exception exception) {
-            onSessionStateChange(session, state, exception);
-        }
-    };
-
-    private UiLifecycleHelper uiHelper;
+    private CallbackManager mCallbackManager;
+    private LoginButton mLoginButton;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        uiHelper = new UiLifecycleHelper(getActivity(), callback);
-        uiHelper.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(
+            LayoutInflater inflater,
+            ViewGroup container,
+            Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
-        LoginButton authButton = (LoginButton) view.findViewById(R.id.authButton);
-        authButton.setFragment(this);
-        authButton.setReadPermissions(Collections.singletonList("user_friends"));
+        mCallbackManager = CallbackManager.Factory.create();
+        final LoginButton mLoginButton = (LoginButton) view.findViewById(R.id.login_button);
+        mLoginButton.setReadPermissions("user_friends");
+        mLoginButton.setFragment(this);
 
         return view;
     }
 
-    private void onSessionStateChange(Session session, SessionState state, Exception exception) {
-        final Activity activity = getActivity();
-        if (state.isOpened()) {
-            Log.i(TAG, "Logged in with facebook");
-            Log.i(TAG, "Got access token: " + session.getAccessToken());
-            Intent homeScreen = new Intent(activity, HomeActivity.class);
-            startActivity(homeScreen);
-
-            // Do not remove
-            activity.finish();
-
-            FacebookUtils.storeFacebookInformation(activity);
-        } else if (state.isClosed()) {
-            Log.i(TAG, "Logged out of facebook");
-            FacebookUtils.clearStoredFacebookInformation(activity);
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        AccessToken currentAccessToken = AccessToken.getCurrentAccessToken();
+        if (!TextUtils.isEmpty(currentAccessToken.getToken()) && !currentAccessToken.isExpired()) {
+            authUser(currentAccessToken.getToken());
+        } else {
+            mLoginButton.registerCallback(mCallbackManager, this);
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        // For scenarios where the main activity is launched and user
-        // session is not null, the session state change notification
-        // may not be triggered. Trigger it if it's open/closed.
-        Session session = Session.getActiveSession();
-        if (session != null &&
-                (session.isOpened() || session.isClosed()) ) {
-            onSessionStateChange(session, session.getState(), null);
-        }
+    private void authUser(String accessToken) {
+        ZipChatApi.INSTANCE.auth(accessToken, new Callback<Response>() {
+            @Override
+            public void success(Response response, Response response2) {
+                try {
+                    JSONObject respJson = new JSONObject(Utils.responseToString(response));
+                    String authToken = respJson.getString("authToken");
+                    UserUtils.storeAuthToken(getActivity(), authToken);
+                } catch (JSONException e) {
+                    Log.e(TAG, "Problem parsing the auth json response");
+                    return;
+                }
 
-        uiHelper.onResume();
+                continueToApp();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Utils.logErrorResponse(TAG, "Sending fb access token", error);
+            }
+        });
+    }
+
+    private void continueToApp() {
+        Intent homeScreen = new Intent(getActivity(), HomeActivity.class);
+        startActivity(homeScreen);
+        // Do not remove
+        getActivity().finish();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        uiHelper.onActivityResult(requestCode, resultCode, data);
+        mCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        uiHelper.onPause();
+    public void onSuccess(LoginResult loginResult) {
+        if (UserUtils.didCreateUser(getActivity())) {
+            authUser(loginResult.getAccessToken().getToken());
+        } else {
+            Log.i(TAG, "Creating user");
+
+            ZipChatApi.INSTANCE.createUser(loginResult.getAccessToken().getToken(), null, "android", new Callback<Response>() {
+                @Override
+                public void success(Response response, Response response2) {
+                    try {
+                        JSONObject respJson = new JSONObject(Utils.responseToString(response));
+                        long userId = respJson.getLong("userId");
+                        String authToken = respJson.getString("authToken");
+                        String fbId = respJson.getString("facebookId");
+                        String fbName = respJson.getString("name");
+
+                        Log.i(TAG, "onCreate userId: " + userId);
+                        Log.i(TAG, "OnCreate auth: " + authToken);
+                        Log.i(TAG, "OnCreate fbId: " + fbId);
+                        Log.i(TAG, "OnCreate fbName: " + fbName);
+
+                        Activity activity = getActivity();
+                        UserUtils.saveId(activity, userId);
+                        UserUtils.storeAuthToken(activity, authToken);
+                        FacebookUtils.saveFacebookInformation(activity, fbName, fbId);
+                    } catch (JSONException e) {
+                        Log.e(TAG, "Problem parsing the createUser json response " + e.getMessage());
+                        return;
+                    }
+
+                    continueToApp();
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    Utils.logErrorResponse(TAG, "Creating a user", error);
+                }
+            });
+        }
+
+
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        uiHelper.onDestroy();
+    public void onCancel() {
+        Log.w(TAG, "onCancel called in facebook login");
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        uiHelper.onSaveInstanceState(outState);
+    public void onError(FacebookException e) {
+        Log.e(TAG, "Error logging into facebook " + e.getMessage());
     }
 }

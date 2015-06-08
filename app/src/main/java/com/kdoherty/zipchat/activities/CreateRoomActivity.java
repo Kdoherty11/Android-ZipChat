@@ -27,6 +27,7 @@ import com.kdoherty.zipchat.events.RoomCreatedEvent;
 import com.kdoherty.zipchat.fragments.PublicRoomsFragment;
 import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
+import com.kdoherty.zipchat.utils.UserUtils;
 import com.kdoherty.zipchat.utils.Utils;
 
 import retrofit.Callback;
@@ -199,7 +200,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
                 Log.w(TAG, "Null location found in create room. Not creating room");
             } else if (Utils.checkOnline(CreateRoomActivity.this)) {
 
-                ZipChatApi.INSTANCE.createPublicRoom(name, mRadius, location.getLatitude(), location.getLongitude(), new Callback<Response>() {
+                ZipChatApi.INSTANCE.createPublicRoom(UserUtils.getAuthToken(CreateRoomActivity.this), name, mRadius, location.getLatitude(), location.getLongitude(), new Callback<Response>() {
                     @Override
                     public void success(Response response, Response response2) {
                         Log.i(TAG, "Successfully created chat room");

@@ -99,7 +99,7 @@ public class PrivateRoomsFragment extends Fragment implements Filterable, SwipeR
 
         final long userId = UserUtils.getId(getActivity());
 
-        ZipChatApi.INSTANCE.getPrivateRooms(userId, new Callback<List<PrivateRoom>>() {
+        ZipChatApi.INSTANCE.getPrivateRooms(UserUtils.getAuthToken(getActivity()), userId, new Callback<List<PrivateRoom>>() {
             @Override
             public void success(List<PrivateRoom> privateRooms, Response response) {
                 mSwipeRefreshLayout.setRefreshing(false);

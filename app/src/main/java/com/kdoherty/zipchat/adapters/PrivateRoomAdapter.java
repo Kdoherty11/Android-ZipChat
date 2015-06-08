@@ -12,16 +12,17 @@ import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.models.PrivateRoom;
 import com.kdoherty.zipchat.models.User;
+import com.kdoherty.zipchat.utils.FacebookUtils;
 import com.kdoherty.zipchat.utils.UserUtils;
-import com.kdoherty.zipchat.views.CircleProfilePictureView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by kdoherty on 12/26/14.
@@ -59,7 +60,7 @@ public class PrivateRoomAdapter extends RecyclerView.Adapter<PrivateRoomAdapter.
             other = privateRoom.getAndSetOther(UserUtils.getId(mContext));
         }
 
-        roomCellViewHolder.circleProfilePictureView.setProfileId(other.getFacebookId());
+        FacebookUtils.displayProfilePicture(other.getFacebookId(), roomCellViewHolder.circleProfilePictureView);
         roomCellViewHolder.title.setText(other.getName());
 
         CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(
@@ -83,7 +84,7 @@ public class PrivateRoomAdapter extends RecyclerView.Adapter<PrivateRoomAdapter.
 
     static class PrivateChatViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
 
-        private CircleProfilePictureView circleProfilePictureView;
+        private CircleImageView circleProfilePictureView;
         private TextView title;
         private TextView lastActivity;
 
@@ -91,7 +92,7 @@ public class PrivateRoomAdapter extends RecyclerView.Adapter<PrivateRoomAdapter.
             super(itemView);
             title = (TextView) itemView.findViewById(R.id.private_chat_title);
             lastActivity = (TextView) itemView.findViewById(R.id.private_chat_last_activity);
-            circleProfilePictureView = (CircleProfilePictureView) itemView.findViewById(R.id.private_chat_picture);
+            circleProfilePictureView = (CircleImageView) itemView.findViewById(R.id.private_chat_picture);
             itemView.setOnCreateContextMenuListener(this);
         }
 

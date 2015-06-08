@@ -191,7 +191,7 @@ public class PublicRoomActivity extends AbstractLocationActivity {
         if (!Utils.checkOnline(this)) {
             return;
         }
-        ZipChatApi.INSTANCE.subscribe(mRoomId, UserUtils.getId(this), new Callback<Response>() {
+        ZipChatApi.INSTANCE.subscribe(UserUtils.getAuthToken(this), mRoomId, UserUtils.getId(this), new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
                 Log.d(TAG, "Subscribed to room " + mRoomId);
@@ -208,7 +208,7 @@ public class PublicRoomActivity extends AbstractLocationActivity {
         if (!Utils.checkOnline(this)) {
             return;
         }
-        ZipChatApi.INSTANCE.removeSubscription(mRoomId, UserUtils.getId(this), new Callback<Response>() {
+        ZipChatApi.INSTANCE.removeSubscription(UserUtils.getAuthToken(this), mRoomId, UserUtils.getId(this), new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
                 Log.d(TAG, "Removed subscription from room " + mRoomId);

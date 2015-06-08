@@ -14,17 +14,18 @@ import android.widget.TextView;
 
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.events.RequestAcceptedEvent;
-import com.kdoherty.zipchat.models.PrivateRoom;
 import com.kdoherty.zipchat.models.Request;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
+import com.kdoherty.zipchat.utils.FacebookUtils;
+import com.kdoherty.zipchat.utils.UserUtils;
 import com.kdoherty.zipchat.utils.Utils;
-import com.kdoherty.zipchat.views.CircleProfilePictureView;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -73,7 +74,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
         final User sender = request.getSender();
         holder.senderTv.setText(sender.getName());
-        holder.senderPicture.setProfileId(sender.getFacebookId());
+        FacebookUtils.displayProfilePicture(sender.getFacebookId(), holder.senderPicture);
         holder.acceptButton.setOnClickListener(new ResponseClickListener(Request.Status.accepted, position));
         holder.denyButton.setOnClickListener(new ResponseClickListener(Request.Status.denied, position));
     }
@@ -86,7 +87,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     class RequestViewHolder extends RecyclerView.ViewHolder {
         TextView senderTv;
         TextView timeStamp;
-        CircleProfilePictureView senderPicture;
+        CircleImageView senderPicture;
         Button acceptButton;
         Button denyButton;
 
@@ -94,7 +95,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             super(itemView);
             senderTv = (TextView) itemView.findViewById(R.id.chat_request_sender_name);
             timeStamp = (TextView) itemView.findViewById(R.id.chat_request_time_stamp);
-            senderPicture = (CircleProfilePictureView) itemView.findViewById(R.id.chat_request_sender_picture);
+            senderPicture = (CircleImageView) itemView.findViewById(R.id.chat_request_sender_picture);
             acceptButton = (Button) itemView.findViewById(R.id.chat_request_accept_button);
             denyButton = (Button) itemView.findViewById(R.id.chat_request_deny_button);
         }
@@ -117,7 +118,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             }
 
             final long requestId = getRequest(position).getRequestId();
-            ZipChatApi.INSTANCE.respondToRequest(requestId, status.toString(), new Callback<Response>() {
+            ZipChatApi.INSTANCE.respondToRequest(UserUtils.getAuthToken(mContext), requestId, status.toString(), new Callback<Response>() {
                 @Override
                 public void success(Response result, Response response) {
                     if (status == Request.Status.accepted) {

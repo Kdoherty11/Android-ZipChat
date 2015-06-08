@@ -97,7 +97,7 @@ public class GcmUtils {
                     String facebookId = FacebookUtils.getFacebookId(context);
 
                     Log.d(TAG, "Attempting to create user from GcmUtils.registerInBackground");
-                    UserUtils.attemptCreateUser(context, facebookName, facebookId, regId);
+                    // TODO UserUtils.attemptCreateUser(context, facebookName, facebookId, regId);
 
                     // Persist the regID - no need to register again.
                     GcmUtils.storeRegistrationId(context, regId);

@@ -44,7 +44,7 @@
         android:layout_margin="@dimen/chat_request_margins"
         android:orientation="vertical">
 
-        <com.kdoherty.zipchat.views.CircleProfilePictureView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/chat_request_sender_picture"
             android:layout_width="48dp"
             android:layout_height="48dp"

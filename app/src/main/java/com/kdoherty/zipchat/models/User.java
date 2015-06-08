@@ -11,9 +11,9 @@ import java.util.Objects;
  */
 public class User implements Parcelable {
 
+    private long userId;
     private String name;
     private String facebookId;
-    private long userId;
 
     public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
         public User createFromParcel(Parcel in) {

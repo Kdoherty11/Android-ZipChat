@@ -84,7 +84,6 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         mUserLearnedDrawer = PrefsUtils.readFromPreferences(getActivity(),
                 PREFS_FILE_NAME, KEY_USER_LEARNED_DRAWER, false);
 
@@ -109,7 +108,7 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
                     public void onItemClick(View view, int position) {
                         User user = mRoomMembersAdapter.getUser(position);
                         Intent intent = UserDetailsActivity.getIntent(getActivity(), user.getUserId(),
-                                user.getName(), user.getFacebookId());
+                                user.getName(), user.getFacebookId(), false);
                         startActivity(intent);
                     }
                 })

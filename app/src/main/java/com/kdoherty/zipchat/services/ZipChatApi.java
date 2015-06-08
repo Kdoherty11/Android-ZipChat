@@ -1,5 +1,8 @@
 package com.kdoherty.zipchat.services;
 
+import android.content.Context;
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -26,6 +29,7 @@ import retrofit.http.DELETE;
 import retrofit.http.Field;
 import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
+import retrofit.http.Header;
 import retrofit.http.POST;
 import retrofit.http.PUT;
 import retrofit.http.Path;
@@ -40,17 +44,10 @@ public interface ZipChatApi {
 
     Gson GSON = new GsonBuilder().create();
 
-    RequestInterceptor requestInterceptor = new RequestInterceptor() {
-        @Override
-        public void intercept(RequestFacade request) {
-            request.addHeader("X-AUTH-TOKEN", UserUtils.getAuthToken(ZipChatApplication.getAppContext()));
-        }
-    };
-
     RestAdapter ADAPTER = new RestAdapter.Builder()
             .setEndpoint(ENDPOINT)
             .setConverter(new GsonConverter(GSON))
-            .setRequestInterceptor(requestInterceptor);
+            .setLogLevel(RestAdapter.LogLevel.HEADERS)
             .build();
 
     ZipChatApi INSTANCE = ADAPTER.create(ZipChatApi.class);
@@ -58,7 +55,7 @@ public interface ZipChatApi {
     // *************** Rooms ***************
 
     @GET("/rooms/{roomId}/messages")
-    void getRoomMessages(@Path("roomId") long roomId,
+    void getRoomMessages(@Header("X-AUTH-TOKEN") String authToken, @Path("roomId") long roomId,
                          @Query("limit") int limit,
                          @Query("offset") int offset,
                          Callback<List<Message>> response);
@@ -67,67 +64,69 @@ public interface ZipChatApi {
 
     @FormUrlEncoded
     @POST("/publicRooms")
-    void createPublicRoom(@Field("name") String roomName, @Field("radius") int radius,
+    void createPublicRoom(@Header("X-AUTH-TOKEN") String authToken, @Field("name") String roomName, @Field("radius") int radius,
                           @Field("latitude") double latitude, @Field("longitude") double longitude,
                           Callback<Response> response);
 
     @GET("/test")
-    void getPublicRooms(@Query("lat") double latitude,
+    void getPublicRooms(@Header("X-AUTH-TOKEN") String authToken, @Query("lat") double latitude,
                         @Query("lon") double longitude,
                         Callback<List<PublicRoom>> response);
 
     @FormUrlEncoded
     @POST("/publicRooms/{roomId}/subscriptions")
-    void subscribe(@Path("roomId") long roomId, @Field("userId") long userId, Callback<Response> response);
+    void subscribe(@Header("X-AUTH-TOKEN") String authToken, @Path("roomId") long roomId, @Field("userId") long userId, Callback<Response> response);
 
     @DELETE("/publicRooms/{roomId}/subscriptions/{userId}")
-    void removeSubscription(@Path("roomId") long roomId, @Path("userId") long userId, Callback<Response> response);
+    void removeSubscription(@Header("X-AUTH-TOKEN") String authToken, @Path("roomId") long roomId, @Path("userId") long userId, Callback<Response> response);
 
     // *************** Private Rooms ***************
 
     @PUT("/privateRooms/{roomId}/leave")
-    void leaveRoom(@Path("roomId") long roomId, @Query("userId") long userId, Callback<Response> response);
+    void leaveRoom(@Header("X-AUTH-TOKEN") String authToken, @Path("roomId") long roomId, @Query("userId") long userId, Callback<Response> response);
 
     // *************** Private Rooms ***************
 
     @GET("/privateRooms")
-    void getPrivateRooms(@Query("userId") long userId, Callback<List<PrivateRoom>> response);
+    void getPrivateRooms(@Header("X-AUTH-TOKEN") String authToken, @Query("userId") long userId, Callback<List<PrivateRoom>> response);
 
     // *************** Messages ***************
 
     @PUT("/messages/{messageId}/favorite")
-    void favoriteMessage(@Path("messageId") long messageId, @Query("userId") long userId, Callback<Response> response);
+    void favoriteMessage(@Header("X-AUTH-TOKEN") String authToken, @Path("messageId") long messageId, @Query("userId") long userId, Callback<Response> response);
 
     @DELETE("/messages/{messageId}/favorite")
-    void removeFavorite(@Path("messageId") long messageId, @Query("userId") long userId, Callback<Response> response);
+    void removeFavorite(@Header("X-AUTH-TOKEN") String authToken, @Path("messageId") long messageId, @Query("userId") long userId, Callback<Response> response);
 
     @PUT("/messages/{messageId}/favorite")
-    void flagMessage(@Path("messageId") long messageId, @Query("userId") long userId, Callback<Response> response);
+    void flagMessage(@Header("X-AUTH-TOKEN") String authToken, @Path("messageId") long messageId, @Query("userId") long userId, Callback<Response> response);
 
     @DELETE("/messages/{messageId}/favorite")
-    void removeFlag(@Path("messageId") long messageId, @Query("userId") long userId, Callback<Response> response);
+    void removeFlag(@Header("X-AUTH-TOKEN") String authToken, @Path("messageId") long messageId, @Query("userId") long userId, Callback<Response> response);
 
     // *************** Requests ***************
 
     @GET("/requests")
-    void getRequests(@Query("userId") long receiverId, Callback<List<Request>> response);
+    void getRequests(@Header("X-AUTH-TOKEN") String authToken, @Query("userId") long receiverId, Callback<List<Request>> response);
 
     @FormUrlEncoded
     @POST("/requests")
-    void sendChatRequest(@Field("sender") long senderId, @Field("receiver") long receiverId, Callback<Response> response);
+    void sendChatRequest(@Header("X-AUTH-TOKEN") String authToken, @Field("sender") long senderId, @Field("receiver") long receiverId, @Field("isAnon") boolean isAnon, Callback<Response> response);
 
     @FormUrlEncoded
     @PUT("/requests/{requestId}")
-    void respondToRequest(@Path("requestId") long requestId, @Field("status") String status, Callback<Response> response);
+    void respondToRequest(@Header("X-AUTH-TOKEN") String authToken, @Path("requestId") long requestId, @Field("status") String status, Callback<Response> response);
 
     @GET("/requests/status")
-    void getStatus(@Query("senderId") long senderId, @Query("receiverId") long receiverId, Callback<Response> response);
+    void getStatus(@Header("X-AUTH-TOKEN") String authToken, @Query("senderId") long senderId, @Query("receiverId") long receiverId, Callback<Response> response);
 
     // *************** Users ***************
 
     @FormUrlEncoded
-    @POST("/users")
-    void createUser(@Field("name") String name, @Field("facebookId") String facebookId,
-                    @Field("registrationId") String regId, @Field("platform") String platform, Callback<Response> response);
+    @PUT("/users")
+    void createUser(@Field("fbAccessToken") String fbAccessToken, @Field("registrationId") String regId,
+                    @Field("platform") String platform, Callback<Response> response);
 
+    @GET("/auth")
+    void auth(@Query("fbAccessToken") String fbAccessToken, Callback<Response> response);
 }

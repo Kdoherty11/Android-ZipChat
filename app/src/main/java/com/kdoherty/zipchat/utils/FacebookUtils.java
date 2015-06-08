@@ -4,11 +4,11 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
+import android.widget.ImageView;
 
-import com.facebook.Request;
-import com.facebook.Response;
-import com.facebook.Session;
-import com.facebook.model.GraphUser;
+import com.kdoherty.zipchat.R;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.IOException;
 import java.net.URL;
@@ -24,9 +24,18 @@ public class FacebookUtils {
     private static final String PREFS_USER_ID_KEY = "facebookUserIdKey";
     private static final String PREFS_FACEBOOK_NAME_KEY = "facebookUsernameKey";
 
+    public static final DisplayImageOptions displayProfPicOpts = new DisplayImageOptions.Builder()
+            .showImageOnLoading(R.drawable.com_facebook_profile_picture_blank_portrait)
+            .showImageForEmptyUri(R.drawable.com_facebook_profile_picture_blank_portrait)
+            .showImageOnFail(R.drawable.com_facebook_profile_picture_blank_portrait)
+            .cacheInMemory(true)
+            .cacheOnDisk(true)
+            .considerExifParams(true)
+            .build();
+
     private FacebookUtils() { }
 
-    private static void saveFacebookInformation(Context context, String facebookName, String facebookId) {
+    public static void saveFacebookInformation(Context context, String facebookName, String facebookId) {
         PrefsUtils.saveToPreferences(context, FACEBOOK_PREFERENCES, PREFS_FACEBOOK_NAME_KEY, facebookName);
         PrefsUtils.saveToPreferences(context, FACEBOOK_PREFERENCES, PREFS_USER_ID_KEY, facebookId);
     }
@@ -43,44 +52,25 @@ public class FacebookUtils {
         PrefsUtils.clearPreferences(context, FACEBOOK_PREFERENCES);
     }
 
-    public static void storeFacebookInformation(final Context context) {
-        // No need to store if we already have this information
-        if (!getFacebookId(context).isEmpty() && !getFacebookName(context).isEmpty()) {
-            return;
-        }
-
-        final Session session = Session.getActiveSession();
-        if (session != null && session.isOpened()) {
-            // If the session is open, make an API call to get user data
-            // and define a new callback to handle the response
-            Request request = Request.newMeRequest(session, new Request.GraphUserCallback() {
-                @Override
-                public void onCompleted(GraphUser user, Response response) {
-                    // If the response is successful
-                    if (session == Session.getActiveSession()) {
-                        if (user != null) {
-
-                            Log.d(TAG, "FACEBOOK INFO: " + user);
-
-                            String id = user.getId();
-                            String name = user.getName();
-
-                            Log.d(TAG, "Attempting to create user from FacebookUtils.storeFacebookInformation");
-                            UserUtils.attemptCreateUser(context, name, id, GcmUtils.getRegistrationId(context));
-                            saveFacebookInformation(context, name, id);
-                        } else {
-                            throw new IllegalStateException("Facebook user is null");
-                        }
-                    }
-                }
-            });
-            Request.executeBatchAsync(request);
-        }
+    public static String getProfilePicUrl(String userId) {
+        return getProfilePicUrl(userId, "square");
     }
 
-    public static Bitmap getFacebookProfilePicture(String userID) {
+    public static String getProfilePicUrl(String userId, String type) {
+        return "https://graph.facebook.com/" + userId + "/picture?type=" + type;
+    }
+
+    public static void displayProfilePicture(String userId, ImageView imageView) {
+        ImageLoader.getInstance().displayImage(getProfilePicUrl(userId), imageView, displayProfPicOpts);
+    }
+
+    public static void displayProfilePicture(String userId, ImageView imageView, String type) {
+        ImageLoader.getInstance().displayImage(getProfilePicUrl(userId, type), imageView, displayProfPicOpts);
+    }
+
+    public static Bitmap getFacebookProfilePicture(String userId) {
         try {
-            URL imageURL = new URL("https://graph.facebook.com/" + userID + "/picture?type=large");
+            URL imageURL = new URL(getProfilePicUrl(userId, "square"));
             return BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
         } catch (IOException e) {
             Log.e(TAG, "Problem getting the facebook profile picture: " + e.getMessage());

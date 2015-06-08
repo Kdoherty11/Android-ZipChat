@@ -10,7 +10,7 @@
         android:id="@+id/request_activity_app_bar"
         layout="@layout/app_bar_default" />
 
-    <com.facebook.widget.ProfilePictureView
+    <ImageView
         android:id="@+id/chat_request_profile_picture"
         android:layout_width="0dp"
         android:layout_height="0dp"

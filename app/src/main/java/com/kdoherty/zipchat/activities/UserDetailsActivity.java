@@ -14,12 +14,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.facebook.widget.ProfilePictureView;
 import com.kdoherty.zipchat.R;
-import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.ZipChatApi;
+import com.kdoherty.zipchat.utils.FacebookUtils;
 import com.kdoherty.zipchat.utils.UserUtils;
 import com.kdoherty.zipchat.utils.Utils;
 
@@ -31,21 +31,24 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
     private static final String TAG = UserDetailsActivity.class.getSimpleName();
 
-    private static final String EXTRA_RECEIVER_FB_ID = "ChatRequestActivityFacebookIdKey";
-    private static final String EXTRA_RECEIVER_USER_ID = "ChatRequestActivityReceiverIdKey";
-    private static final String EXTRA_RECEIVER_NAME = "ChatRequestActivityReceiverNameKey";
+    private static final String EXTRA_RECEIVER_FB_ID = "UserDetailsActivityFacebookIdKey";
+    private static final String EXTRA_RECEIVER_USER_ID = "UserDetailsActivityReceiverIdKey";
+    private static final String EXTRA_RECEIVER_NAME = "UserDetailsActivityReceiverNameKey";
+    private static final String EXTRA_IS_ANON = "UserDetailsActivityIsAnonKey";
 
     private long mReceiverUserId;
     private String mReceiverFbId;
 
     private Button mRequestButton;
     private String mReceiverName;
+    private boolean mIsAnon;
 
-    public static Intent getIntent(Context context, long userId, String userName, String facebookId) {
+    public static Intent getIntent(Context context, long userId, String userName, String facebookId, boolean isAnon) {
         Intent userDetailsIntent = new Intent(context, UserDetailsActivity.class);
         userDetailsIntent.putExtra(EXTRA_RECEIVER_USER_ID, userId);
         userDetailsIntent.putExtra(EXTRA_RECEIVER_NAME, userName);
         userDetailsIntent.putExtra(EXTRA_RECEIVER_FB_ID, facebookId);
+        userDetailsIntent.putExtra(EXTRA_IS_ANON, isAnon);
         return userDetailsIntent;
     }
 
@@ -59,6 +62,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         mReceiverUserId = intent.getExtras().getLong(EXTRA_RECEIVER_USER_ID);
         mReceiverName = intent.getStringExtra(EXTRA_RECEIVER_NAME);
         mReceiverFbId = intent.getStringExtra(EXTRA_RECEIVER_FB_ID);
+        mIsAnon = intent.getBooleanExtra(EXTRA_IS_ANON, false);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.request_activity_app_bar);
         setSupportActionBar(toolbar);
@@ -73,8 +77,8 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         mRequestButton = (Button) findViewById(R.id.chat_request_button);
         mRequestButton.setOnClickListener(this);
 
-        final ProfilePictureView profilePictureView = (ProfilePictureView) findViewById(R.id.chat_request_profile_picture);
-        profilePictureView.setProfileId(mReceiverFbId);
+        final ImageView profilePictureView = (ImageView) findViewById(R.id.chat_request_profile_picture);
+        FacebookUtils.displayProfilePicture(mReceiverFbId, profilePictureView, "large");
 
         setButtonText();
 
@@ -101,10 +105,14 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void setButtonText() {
+        if (mIsAnon) {
+            return;
+        }
         if (!Utils.checkOnline(this)) {
             return;
         }
-        ZipChatApi.INSTANCE.getStatus(UserUtils.getId(this), mReceiverUserId, new Callback<Response>() {
+
+        ZipChatApi.INSTANCE.getStatus(UserUtils.getAuthToken(this), UserUtils.getId(this), mReceiverUserId, new Callback<Response>() {
             @Override
             public void success(Response result, Response response) {
                 String status = Utils.responseToString(result);
@@ -168,7 +176,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         }
         Log.d(TAG, "Sending chat request to user " + mReceiverUserId);
         long userId = UserUtils.getId(this);
-        ZipChatApi.INSTANCE.sendChatRequest(userId, mReceiverUserId, new Callback<Response>() {
+        ZipChatApi.INSTANCE.sendChatRequest(UserUtils.getAuthToken(this), userId, mReceiverUserId, mIsAnon, new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
                 finish();
