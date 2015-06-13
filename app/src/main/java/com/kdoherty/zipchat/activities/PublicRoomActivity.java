@@ -29,8 +29,8 @@ import com.kdoherty.zipchat.fragments.PublicRoomDrawerFragment;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
-import com.kdoherty.zipchat.utils.UserUtils;
-import com.kdoherty.zipchat.utils.Utils;
+import com.kdoherty.zipchat.utils.NetworkManager;
+import com.kdoherty.zipchat.utils.UserInfo;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
@@ -188,10 +188,10 @@ public class PublicRoomActivity extends AbstractLocationActivity {
     }
 
     private void subscribe() {
-        if (!Utils.checkOnline(this)) {
+        if (!NetworkManager.checkOnline(this)) {
             return;
         }
-        ZipChatApi.INSTANCE.subscribe(UserUtils.getAuthToken(this), mRoomId, UserUtils.getId(this), new Callback<Response>() {
+        ZipChatApi.INSTANCE.subscribe(UserInfo.getAuthToken(this), mRoomId, UserInfo.getId(this), new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
                 Log.d(TAG, "Subscribed to room " + mRoomId);
@@ -199,16 +199,16 @@ public class PublicRoomActivity extends AbstractLocationActivity {
 
             @Override
             public void failure(RetrofitError error) {
-                Utils.logErrorResponse(TAG, "Subscribing to room with id " + mRoomId, error);
+                NetworkManager.logErrorResponse(TAG, "Subscribing to room with id " + mRoomId, error);
             }
         });
     }
 
     private void removeSubscription() {
-        if (!Utils.checkOnline(this)) {
+        if (!NetworkManager.checkOnline(this)) {
             return;
         }
-        ZipChatApi.INSTANCE.removeSubscription(UserUtils.getAuthToken(this), mRoomId, UserUtils.getId(this), new Callback<Response>() {
+        ZipChatApi.INSTANCE.removeSubscription(UserInfo.getAuthToken(this), mRoomId, UserInfo.getId(this), new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
                 Log.d(TAG, "Removed subscription from room " + mRoomId);
@@ -216,7 +216,7 @@ public class PublicRoomActivity extends AbstractLocationActivity {
 
             @Override
             public void failure(RetrofitError error) {
-                Utils.logErrorResponse(TAG, "Removing subscription from room with id " + mRoomId, error);
+                NetworkManager.logErrorResponse(TAG, "Removing subscription from room with id " + mRoomId, error);
             }
         });
     }

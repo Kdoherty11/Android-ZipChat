@@ -9,8 +9,8 @@ import android.view.ViewGroup;
 import com.devspark.robototextview.widget.RobotoTextView;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.models.User;
-import com.kdoherty.zipchat.utils.FacebookUtils;
-import com.kdoherty.zipchat.utils.UserUtils;
+import com.kdoherty.zipchat.utils.FacebookManager;
+import com.kdoherty.zipchat.utils.UserInfo;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ public class PublicRoomDrawerAdapter extends RecyclerView.Adapter<PublicRoomDraw
     public PublicRoomDrawerAdapter(Context context, List<User> roomMembers) {
         mInflater = LayoutInflater.from(context);
         mRoomMembers = roomMembers;
-        addUser(0, UserUtils.getSelf(context));
+        addUser(0, UserInfo.getSelf(context));
     }
 
     @Override
@@ -44,7 +44,7 @@ public class PublicRoomDrawerAdapter extends RecyclerView.Adapter<PublicRoomDraw
         User user = mRoomMembers.get(i);
 
         drawerCellViewHolder.text.setText(user.getName());
-        FacebookUtils.displayProfilePicture(user.getFacebookId(), drawerCellViewHolder.profilePicture);
+        FacebookManager.displayProfilePicture(user.getFacebookId(), drawerCellViewHolder.profilePicture);
     }
 
     @Override

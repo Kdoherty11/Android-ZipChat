@@ -1,5 +1,6 @@
 package com.kdoherty.zipchat.activities;
 
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -8,7 +9,10 @@ import android.util.Log;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
 import com.kdoherty.zipchat.fragments.LoginFragment;
-import com.kdoherty.zipchat.utils.GcmUtils;
+import com.kdoherty.zipchat.services.RegistrationIntentService;
+import com.kdoherty.zipchat.utils.UserInfo;
+import com.kdoherty.zipchat.utils.Utils;
+
 import io.fabric.sdk.android.Fabric;
 
 
@@ -27,7 +31,7 @@ public class LoginActivity extends FragmentActivity {
 
         Log.d(TAG, "Logging in");
 
-        GcmUtils.register(this);
+        Utils.checkServices(this);
 
         if (savedInstanceState == null) {
             // Add the fragment on initial activity setup
@@ -41,6 +45,5 @@ public class LoginActivity extends FragmentActivity {
             mLoginFragment = (LoginFragment) getSupportFragmentManager()
                     .findFragmentById(android.R.id.content);
         }
-
     }
 }

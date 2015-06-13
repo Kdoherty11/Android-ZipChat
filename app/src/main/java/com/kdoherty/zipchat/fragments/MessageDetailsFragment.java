@@ -17,8 +17,7 @@ import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.adapters.MessageFavoritorAdapter;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
-import com.kdoherty.zipchat.receivers.GcmBroadcastReceiver;
-import com.kdoherty.zipchat.services.GcmIntentService;
+import com.kdoherty.zipchat.services.MyGcmListenerService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,9 +42,9 @@ public class MessageDetailsFragment extends Fragment {
     private BroadcastReceiver mGcmFavoriteReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String event = intent.getStringExtra(GcmIntentService.Key.EVENT);
+            String event = intent.getStringExtra(MyGcmListenerService.Key.EVENT);
 
-            if (GcmIntentService.Event.MESSAGE_FAVORITED.equals(event)) {
+            if (MyGcmListenerService.Event.MESSAGE_FAVORITED.equals(event)) {
                 // TODO
             } else {
                 // Let GCM intent service deal with it

@@ -14,7 +14,7 @@ import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.adapters.HomeTabsAdapter;
 import com.kdoherty.zipchat.events.TabChangeEvent;
 import com.kdoherty.zipchat.services.BusProvider;
-import com.kdoherty.zipchat.utils.PrefsUtils;
+import com.kdoherty.zipchat.utils.PrefsHelper;
 import com.kdoherty.zipchat.views.SlidingTabLayout;
 
 public class HomeTabsFragment extends Fragment implements ViewPager.OnPageChangeListener {
@@ -39,7 +39,7 @@ public class HomeTabsFragment extends Fragment implements ViewPager.OnPageChange
         mTabTitles = getResources().getStringArray(R.array.home_tab_titles);
 
         // Clear tab preferences
-        boolean removed = PrefsUtils.removeFromPreferences(getActivity(), PREFS_FILE_NAME, PREFS_TAB_POSITION);
+        boolean removed = PrefsHelper.removeFromPreferences(getActivity(), PREFS_FILE_NAME, PREFS_TAB_POSITION);
         Log.d(TAG, "Cleared stored tab position: " + removed);
     }
 
@@ -80,7 +80,7 @@ public class HomeTabsFragment extends Fragment implements ViewPager.OnPageChange
         Log.d(TAG, "Going to tab: " + tabIndex);
         mTabPosition = tabIndex;
         mViewPager.setCurrentItem(mTabPosition);
-        PrefsUtils.saveToPreferences(getActivity(), PREFS_FILE_NAME, PREFS_TAB_POSITION, mTabPosition);
+        PrefsHelper.saveToPreferences(getActivity(), PREFS_FILE_NAME, PREFS_TAB_POSITION, mTabPosition);
     }
 
     @Override
@@ -108,7 +108,7 @@ public class HomeTabsFragment extends Fragment implements ViewPager.OnPageChange
     public void onResume() {
         super.onResume();
         BusProvider.getInstance().register(this);
-        mTabPosition = PrefsUtils.readFromPreferences(getActivity(), PREFS_FILE_NAME, PREFS_TAB_POSITION, 0);
+        mTabPosition = PrefsHelper.readFromPreferences(getActivity(), PREFS_FILE_NAME, PREFS_TAB_POSITION, 0);
         Log.d(TAG, "Using stored tab position: " + mTabPosition);
         mViewPager.setCurrentItem(mTabPosition);
     }
@@ -117,7 +117,7 @@ public class HomeTabsFragment extends Fragment implements ViewPager.OnPageChange
     public void onPause() {
         super.onPause();
         Log.d(TAG, "Storing tab position: " + mTabPosition);
-        PrefsUtils.saveToPreferences(getActivity(), PREFS_FILE_NAME, PREFS_TAB_POSITION, mTabPosition);
+        PrefsHelper.saveToPreferences(getActivity(), PREFS_FILE_NAME, PREFS_TAB_POSITION, mTabPosition);
         BusProvider.getInstance().unregister(this);
     }
 

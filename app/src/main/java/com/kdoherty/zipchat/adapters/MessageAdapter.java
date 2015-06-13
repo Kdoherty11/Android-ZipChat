@@ -2,10 +2,10 @@ package com.kdoherty.zipchat.adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,24 +14,17 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.UserDetailsActivity;
 import com.kdoherty.zipchat.activities.ZipChatApplication;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
-import com.kdoherty.zipchat.utils.FacebookUtils;
-import com.kdoherty.zipchat.utils.UserUtils;
+import com.kdoherty.zipchat.utils.FacebookManager;
+import com.kdoherty.zipchat.utils.UserInfo;
 import com.kdoherty.zipchat.views.AnimateFirstDisplayListener;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
-import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
-import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -122,27 +115,28 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
     @Override
     public void onBindViewHolder(final MessageCellViewHolder messageCellViewHolder, int i) {
         final Message message = mMessages.get(i);
+        final User sender = message.getSender();
 
-        if (message.isAnon()) {
+        if (TextUtils.isEmpty(sender.getFacebookId())) {
             messageCellViewHolder.profilePicture.setImageDrawable(mContext.getResources().getDrawable(R.drawable.com_facebook_profile_picture_blank_square));
         } else {
-            ImageLoader.getInstance().displayImage(FacebookUtils.getProfilePicUrl(message.getSenderFbId()), messageCellViewHolder.profilePicture,
-                    FacebookUtils.displayProfPicOpts, mAnimateFirstListener);
+            ImageLoader.getInstance().displayImage(FacebookManager.getProfilePicUrl(sender.getFacebookId()), messageCellViewHolder.profilePicture,
+                    FacebookManager.displayProfPicOpts, mAnimateFirstListener);
         }
 
-        messageCellViewHolder.name.setText(message.getSenderName());
+        messageCellViewHolder.name.setText(sender.getName());
 
         messageCellViewHolder.profilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = UserDetailsActivity.getIntent(mContext, message.getSenderId(), message.getSenderName(), message.getSenderFbId(), message.isAnon());
+                Intent intent = UserDetailsActivity.getIntent(mContext, sender);
                 mContext.startActivity(intent);
             }
         });
 
         messageCellViewHolder.message.setText(message.getMessage());
 
-        long userId = UserUtils.getId(mContext);
+        long userId = UserInfo.getId(mContext);
         messageCellViewHolder.favorite.setOnClickListener(new FavoriteClickListener(message, userId));
 
         Message.FavoriteState favoriteState = message.getFavoriteState(userId);
@@ -161,7 +155,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         messageCellViewHolder.favoriteCount.setText(String.valueOf(message.getFavoriteCount()));
 
         CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(
-                message.getTimeStamp() * 1000);
+                message.getCreatedAt() * 1000);
         messageCellViewHolder.timestamp.setText(timeAgo);
     }
 
@@ -261,9 +255,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
             final boolean isAddFavorite = favoriteState != Message.FavoriteState.USER_FAVORITED;
 
             if (isAddFavorite) {
-                favoriteMessage(UserUtils.getSelf(mContext), message.getMessageId(), userId);
+                favoriteMessage(UserInfo.getSelf(mContext), message.getMessageId(), userId);
             } else {
-                removeFavorite(UserUtils.getSelf(mContext), message.getMessageId(), userId);
+                removeFavorite(UserInfo.getSelf(mContext), message.getMessageId(), userId);
             }
 
             if (mHasPendingFavorite) {

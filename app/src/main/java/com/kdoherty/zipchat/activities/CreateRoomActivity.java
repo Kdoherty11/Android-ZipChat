@@ -27,7 +27,9 @@ import com.kdoherty.zipchat.events.RoomCreatedEvent;
 import com.kdoherty.zipchat.fragments.PublicRoomsFragment;
 import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
-import com.kdoherty.zipchat.utils.UserUtils;
+import com.kdoherty.zipchat.utils.LocationManager;
+import com.kdoherty.zipchat.utils.NetworkManager;
+import com.kdoherty.zipchat.utils.UserInfo;
 import com.kdoherty.zipchat.utils.Utils;
 
 import retrofit.Callback;
@@ -39,24 +41,20 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
 
     private static final String TAG = CreateRoomActivity.class.getSimpleName();
 
-    public static final float CIRCLE_STROKE_WIDTH = 6f;
-
     private EditText mRoomNameEt;
     private boolean mDisableButton = false;
-
-    private Location mLocation;
 
     // Name of the room that was created before we had a location
     private String waitListRoom;
 
+    private Location mLocation;
     private GoogleMap mGoogleMap;
     private Circle mMapCircle;
     private Marker mMarker;
     private int mRadius;
+    private SeekBar mRadiusSeekBar;
 
     private boolean mMapLoaded = false;
-
-    private SeekBar mRadiusSeekBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +110,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
                 Utils.hideKeyboard(this, mRoomNameEt);
                 final String roomName = mRoomNameEt.getText().toString().trim();
                 if (!roomName.isEmpty()) {
-                    if (Utils.checkOnline(this)) {
+                    if (NetworkManager.checkOnline(this)) {
                         new CreateRoomTask(roomName).execute();
                         finish();
                     }
@@ -198,9 +196,9 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
             if (location == null) {
                 Toast.makeText(getApplicationContext(), "Could not find location", Toast.LENGTH_SHORT).show();
                 Log.w(TAG, "Null location found in create room. Not creating room");
-            } else if (Utils.checkOnline(CreateRoomActivity.this)) {
+            } else if (NetworkManager.checkOnline(CreateRoomActivity.this)) {
 
-                ZipChatApi.INSTANCE.createPublicRoom(UserUtils.getAuthToken(CreateRoomActivity.this), name, mRadius, location.getLatitude(), location.getLongitude(), new Callback<Response>() {
+                ZipChatApi.INSTANCE.createPublicRoom(UserInfo.getAuthToken(CreateRoomActivity.this), name, mRadius, location.getLatitude(), location.getLongitude(), new Callback<Response>() {
                     @Override
                     public void success(Response response, Response response2) {
                         Log.i(TAG, "Successfully created chat room");
@@ -212,7 +210,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
 
                     @Override
                     public void failure(RetrofitError error) {
-                        Utils.logErrorResponse(TAG, "Creating a chat room", error);
+                        NetworkManager.logErrorResponse(TAG, "Creating a chat room", error);
                     }
                 });
             }
@@ -246,6 +244,6 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
         mMarker = mGoogleMap.addMarker(new MarkerOptions().position(userLatLng)
                 .title("My Location"));
 
-        mMapCircle = Utils.setRoomCircle(this, mGoogleMap, userLatLng, mRadius);
+        mMapCircle = LocationManager.setRoomCircle(this, mGoogleMap, userLatLng, mRadius);
     }
 }

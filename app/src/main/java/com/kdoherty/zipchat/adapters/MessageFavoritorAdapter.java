@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import com.devspark.robototextview.widget.RobotoTextView;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.models.User;
-import com.kdoherty.zipchat.utils.FacebookUtils;
+import com.kdoherty.zipchat.utils.FacebookManager;
 
 import java.util.List;
 
@@ -41,7 +41,7 @@ public class MessageFavoritorAdapter extends RecyclerView.Adapter<MessageFavorit
         User user = mMessageFavoritors.get(i);
 
         messageFavoritorViewHolder.text.setText(user.getName());
-        FacebookUtils.displayProfilePicture(user.getFacebookId(), messageFavoritorViewHolder.profilePicture);
+        FacebookManager.displayProfilePicture(user.getFacebookId(), messageFavoritorViewHolder.profilePicture);
     }
 
     @Override

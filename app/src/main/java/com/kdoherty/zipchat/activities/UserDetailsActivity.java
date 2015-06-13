@@ -18,9 +18,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.kdoherty.zipchat.R;
+import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.ZipChatApi;
-import com.kdoherty.zipchat.utils.FacebookUtils;
-import com.kdoherty.zipchat.utils.UserUtils;
+import com.kdoherty.zipchat.utils.FacebookManager;
+import com.kdoherty.zipchat.utils.NetworkManager;
+import com.kdoherty.zipchat.utils.UserInfo;
 import com.kdoherty.zipchat.utils.Utils;
 
 import retrofit.Callback;
@@ -41,14 +43,12 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
     private Button mRequestButton;
     private String mReceiverName;
-    private boolean mIsAnon;
 
-    public static Intent getIntent(Context context, long userId, String userName, String facebookId, boolean isAnon) {
+    public static Intent getIntent(Context context, User user) {
         Intent userDetailsIntent = new Intent(context, UserDetailsActivity.class);
-        userDetailsIntent.putExtra(EXTRA_RECEIVER_USER_ID, userId);
-        userDetailsIntent.putExtra(EXTRA_RECEIVER_NAME, userName);
-        userDetailsIntent.putExtra(EXTRA_RECEIVER_FB_ID, facebookId);
-        userDetailsIntent.putExtra(EXTRA_IS_ANON, isAnon);
+        userDetailsIntent.putExtra(EXTRA_RECEIVER_USER_ID, user.getUserId());
+        userDetailsIntent.putExtra(EXTRA_RECEIVER_NAME, user.getName());
+        userDetailsIntent.putExtra(EXTRA_RECEIVER_FB_ID, user.getFacebookId());
         return userDetailsIntent;
     }
 
@@ -62,7 +62,6 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         mReceiverUserId = intent.getExtras().getLong(EXTRA_RECEIVER_USER_ID);
         mReceiverName = intent.getStringExtra(EXTRA_RECEIVER_NAME);
         mReceiverFbId = intent.getStringExtra(EXTRA_RECEIVER_FB_ID);
-        mIsAnon = intent.getBooleanExtra(EXTRA_IS_ANON, false);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.request_activity_app_bar);
         setSupportActionBar(toolbar);
@@ -78,7 +77,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         mRequestButton.setOnClickListener(this);
 
         final ImageView profilePictureView = (ImageView) findViewById(R.id.chat_request_profile_picture);
-        FacebookUtils.displayProfilePicture(mReceiverFbId, profilePictureView, "large");
+        FacebookManager.displayProfilePicture(mReceiverFbId, profilePictureView, "large");
 
         setButtonText();
 
@@ -105,17 +104,14 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void setButtonText() {
-        if (mIsAnon) {
-            return;
-        }
-        if (!Utils.checkOnline(this)) {
+        if (!NetworkManager.checkOnline(this)) {
             return;
         }
 
-        ZipChatApi.INSTANCE.getStatus(UserUtils.getAuthToken(this), UserUtils.getId(this), mReceiverUserId, new Callback<Response>() {
+        ZipChatApi.INSTANCE.getStatus(UserInfo.getAuthToken(this), UserInfo.getId(this), mReceiverUserId, new Callback<Response>() {
             @Override
             public void success(Response result, Response response) {
-                String status = Utils.responseToString(result);
+                String status = NetworkManager.responseToString(result);
 
                 final Long privateRoomId = Utils.tryParse(status);
 
@@ -138,7 +134,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
             @Override
             public void failure(RetrofitError error) {
-                Utils.logErrorResponse(TAG, "Getting request status", error);
+                NetworkManager.logErrorResponse(TAG, "Getting request status", error);
             }
         });
     }
@@ -171,12 +167,12 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void sendChatRequest() {
-        if (!Utils.checkOnline(this)) {
+        if (!NetworkManager.checkOnline(this)) {
             return;
         }
         Log.d(TAG, "Sending chat request to user " + mReceiverUserId);
-        long userId = UserUtils.getId(this);
-        ZipChatApi.INSTANCE.sendChatRequest(UserUtils.getAuthToken(this), userId, mReceiverUserId, mIsAnon, new Callback<Response>() {
+        long userId = UserInfo.getId(this);
+        ZipChatApi.INSTANCE.sendChatRequest(UserInfo.getAuthToken(this), userId, mReceiverUserId, new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
                 finish();
@@ -184,7 +180,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
             @Override
             public void failure(RetrofitError error) {
-                Utils.logErrorResponse(TAG, "Sending a chat request", error);
+                NetworkManager.logErrorResponse(TAG, "Sending a chat request", error);
             }
         });
     }

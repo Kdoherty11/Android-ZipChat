@@ -20,8 +20,8 @@ import com.kdoherty.zipchat.events.ReceivedRoomMembersEvent;
 import com.kdoherty.zipchat.fragments.ChatRoomFragment;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.BusProvider;
-import com.kdoherty.zipchat.utils.FacebookUtils;
-import com.kdoherty.zipchat.utils.UserUtils;
+import com.kdoherty.zipchat.utils.FacebookManager;
+import com.kdoherty.zipchat.utils.UserInfo;
 import com.squareup.otto.Subscribe;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -44,7 +44,6 @@ public class PrivateRoomActivity extends AppCompatActivity implements View.OnCli
     private long mRoomId;
     private String mOtherFbId;
 
-
     public static Intent getIntent(Context context, long roomId, String name, String facebookId) {
         Intent privateRoomIntent = new Intent(context, PrivateRoomActivity.class);
         privateRoomIntent.putExtra(EXTRA_ROOM_ID, roomId);
@@ -63,10 +62,12 @@ public class PrivateRoomActivity extends AppCompatActivity implements View.OnCli
         String userName = intent.getStringExtra(EXTRA_USER_NAME);
         String facebookId = intent.getStringExtra(EXTRA_USER_FB_ID);
 
+        ZipChatApplication.initImageLoader(this);
+
         mActiveUserCircle = (CircleImageView) findViewById(R.id.active_user_circle);
         Toolbar toolbar = (Toolbar) findViewById(R.id.private_chat_room_app_bar);
         ImageView otherMembersPic = (ImageView) toolbar.findViewById(R.id.other_user_pic);
-        FacebookUtils.displayProfilePicture(facebookId, otherMembersPic);
+        FacebookManager.displayProfilePicture(facebookId, otherMembersPic);
         otherMembersPic.setOnClickListener(this);
         setSupportActionBar(toolbar);
 
@@ -104,7 +105,7 @@ public class PrivateRoomActivity extends AppCompatActivity implements View.OnCli
     @SuppressWarnings("unused")
     public void onUserJoinEvent(MemberJoinEvent event) {
         User joined = event.getUser();
-        if (joined.getUserId() == UserUtils.getId(this)) {
+        if (joined.getUserId() == UserInfo.getId(this)) {
             Log.e(TAG, "Received own join event");
             return;
         }

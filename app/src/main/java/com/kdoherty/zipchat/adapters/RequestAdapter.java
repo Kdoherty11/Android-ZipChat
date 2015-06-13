@@ -18,9 +18,9 @@ import com.kdoherty.zipchat.models.Request;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
-import com.kdoherty.zipchat.utils.FacebookUtils;
-import com.kdoherty.zipchat.utils.UserUtils;
-import com.kdoherty.zipchat.utils.Utils;
+import com.kdoherty.zipchat.utils.FacebookManager;
+import com.kdoherty.zipchat.utils.NetworkManager;
+import com.kdoherty.zipchat.utils.UserInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +74,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
         final User sender = request.getSender();
         holder.senderTv.setText(sender.getName());
-        FacebookUtils.displayProfilePicture(sender.getFacebookId(), holder.senderPicture);
+        FacebookManager.displayProfilePicture(sender.getFacebookId(), holder.senderPicture);
         holder.acceptButton.setOnClickListener(new ResponseClickListener(Request.Status.accepted, position));
         holder.denyButton.setOnClickListener(new ResponseClickListener(Request.Status.denied, position));
     }
@@ -113,12 +113,12 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
         @Override
         public void onClick(View v) {
-            if (!Utils.checkOnline(mContext)) {
+            if (!NetworkManager.checkOnline(mContext)) {
                 return;
             }
 
             final long requestId = getRequest(position).getRequestId();
-            ZipChatApi.INSTANCE.respondToRequest(UserUtils.getAuthToken(mContext), requestId, status.toString(), new Callback<Response>() {
+            ZipChatApi.INSTANCE.respondToRequest(UserInfo.getAuthToken(mContext), requestId, status.toString(), new Callback<Response>() {
                 @Override
                 public void success(Response result, Response response) {
                     if (status == Request.Status.accepted) {
@@ -128,7 +128,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
                 @Override
                 public void failure(RetrofitError error) {
-                    Utils.logErrorResponse(TAG, "Responding to request with id: " + requestId, error);
+                    NetworkManager.logErrorResponse(TAG, "Responding to request with id: " + requestId, error);
                 }
             });
 

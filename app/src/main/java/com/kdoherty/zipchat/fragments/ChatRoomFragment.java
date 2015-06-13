@@ -28,8 +28,9 @@ import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ChatService;
 import com.kdoherty.zipchat.services.ZipChatApi;
-import com.kdoherty.zipchat.utils.FacebookUtils;
-import com.kdoherty.zipchat.utils.UserUtils;
+import com.kdoherty.zipchat.utils.FacebookManager;
+import com.kdoherty.zipchat.utils.NetworkManager;
+import com.kdoherty.zipchat.utils.UserInfo;
 import com.kdoherty.zipchat.utils.Utils;
 import com.kdoherty.zipchat.views.AnimateFirstDisplayListener;
 import com.kdoherty.zipchat.views.DividerItemDecoration;
@@ -89,6 +90,27 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
 
     private boolean mIsPublicRoom;
 
+    private Callback<List<Message>> mGetMessagesCallback = new Callback<List<Message>>() {
+        @Override
+        public void success(List<Message> messages, Response response) {
+            populateMessageList(messages);
+            int numMessagesLoaded = messages.size();
+            mMessageOffset += messages.size();
+            mMessagesLoading = true;
+
+            if (numMessagesLoaded < MESSAGE_LIMIT) {
+                mLoadedAllMessages = true;
+            }
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            String roomType = mIsPublicRoom ? "public" : "private";
+            NetworkManager.logErrorResponse(TAG, "Getting " + roomType + " room chat messages", error);
+            mMessagesLoading = true;
+        }
+    };
+
     public static ChatRoomFragment newInstance(long roomId, boolean isPublicRoom) {
         Bundle args = new Bundle();
         args.putLong(ARG_ROOM_ID, roomId);
@@ -105,19 +127,19 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mProfilePicUrl = "http://graph.facebook.com/" + FacebookUtils.getFacebookId(getActivity()) + "/picture?type=square";
+        mProfilePicUrl = "http://graph.facebook.com/" + FacebookManager.getFacebookId(getActivity()) + "/picture?type=square";
         ZipChatApplication.initImageLoader(getActivity());
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSelfId = UserUtils.getId(getActivity());
+        mSelfId = UserInfo.getId(getActivity());
         Bundle args = getArguments();
         mRoomId = args.getLong(ARG_ROOM_ID);
         mIsPublicRoom = args.getBoolean(ARG_IS_PUBLIC_ROOM);
 
-        new ChatService(mSelfId, mRoomId, mIsPublicRoom, UserUtils.getAuthToken(getActivity()), this);
+        new ChatService(mSelfId, mRoomId, mIsPublicRoom, UserInfo.getAuthToken(getActivity()), this);
 
         options = new DisplayImageOptions.Builder()
                 .showImageOnLoading(R.drawable.com_facebook_profile_picture_blank_portrait)
@@ -223,29 +245,17 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     }
 
     private void populateMessageList() {
-        if (!Utils.checkOnline(getActivity())) {
+        if (!NetworkManager.checkOnline(getActivity())) {
             return;
         }
 
-        ZipChatApi.INSTANCE.getRoomMessages(UserUtils.getAuthToken(getActivity()), mRoomId, MESSAGE_LIMIT, mMessageOffset, new Callback<List<Message>>() {
-            @Override
-            public void success(List<Message> messages, Response response) {
-                populateMessageList(messages);
-                int numMessagesLoaded = messages.size();
-                mMessageOffset += messages.size();
-                mMessagesLoading = true;
-
-                if (numMessagesLoaded < MESSAGE_LIMIT) {
-                    mLoadedAllMessages = true;
-                }
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                Utils.logErrorResponse(TAG, "Getting chat messages", error);
-                mMessagesLoading = true;
-            }
-        });
+        if (mIsPublicRoom) {
+            ZipChatApi.INSTANCE.getPublicRoomMessages(UserInfo.getAuthToken(getActivity()), mRoomId,
+                    MESSAGE_LIMIT, mMessageOffset, mGetMessagesCallback);
+        } else {
+            ZipChatApi.INSTANCE.getPrivateRoomMessages(UserInfo.getAuthToken(getActivity()), mRoomId,
+                    MESSAGE_LIMIT, mMessageOffset, mGetMessagesCallback);
+        }
     }
 
     private class MessagesScrollListener extends RecyclerView.OnScrollListener {

@@ -23,8 +23,8 @@ import com.kdoherty.zipchat.models.PrivateRoom;
 import com.kdoherty.zipchat.models.PrivateRoomComparator;
 import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
-import com.kdoherty.zipchat.utils.UserUtils;
-import com.kdoherty.zipchat.utils.Utils;
+import com.kdoherty.zipchat.utils.NetworkManager;
+import com.kdoherty.zipchat.utils.UserInfo;
 import com.kdoherty.zipchat.views.DividerItemDecoration;
 import com.kdoherty.zipchat.views.RecyclerItemClickListener;
 import com.squareup.otto.Subscribe;
@@ -93,13 +93,13 @@ public class PrivateRoomsFragment extends Fragment implements Filterable, SwipeR
     }
 
     public void populateList() {
-        if (!Utils.checkOnline(getActivity())) {
+        if (!NetworkManager.checkOnline(getActivity())) {
             return;
         }
 
-        final long userId = UserUtils.getId(getActivity());
+        final long userId = UserInfo.getId(getActivity());
 
-        ZipChatApi.INSTANCE.getPrivateRooms(UserUtils.getAuthToken(getActivity()), userId, new Callback<List<PrivateRoom>>() {
+        ZipChatApi.INSTANCE.getPrivateRooms(UserInfo.getAuthToken(getActivity()), userId, new Callback<List<PrivateRoom>>() {
             @Override
             public void success(List<PrivateRoom> privateRooms, Response response) {
                 mSwipeRefreshLayout.setRefreshing(false);
@@ -112,7 +112,7 @@ public class PrivateRoomsFragment extends Fragment implements Filterable, SwipeR
             @Override
             public void failure(RetrofitError error) {
                 mSwipeRefreshLayout.setRefreshing(false);
-                Utils.logErrorResponse(TAG, "Getting private rooms by userId: " + userId, error);
+                NetworkManager.logErrorResponse(TAG, "Getting private rooms by userId: " + userId, error);
             }
         });
     }

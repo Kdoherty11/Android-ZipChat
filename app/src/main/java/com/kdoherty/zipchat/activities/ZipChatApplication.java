@@ -12,14 +12,13 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
  */
 public class ZipChatApplication extends Application {
 
-    private static Context sContext;
+    private static final String TAG = ZipChatApplication.class.getSimpleName();
 
     @Override
     public void onCreate() {
         super.onCreate();
-        sContext = getApplicationContext();
-        initImageLoader(sContext);
-        FacebookSdk.sdkInitialize(sContext);
+        initImageLoader(this);
+        FacebookSdk.sdkInitialize(this);
     }
 
     public static void initImageLoader(Context context) {
@@ -29,7 +28,4 @@ public class ZipChatApplication extends Application {
         }
     }
 
-    public static Context getAppContext() {
-        return sContext;
-    }
 }

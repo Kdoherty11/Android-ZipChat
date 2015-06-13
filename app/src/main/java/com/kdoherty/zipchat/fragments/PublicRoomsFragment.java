@@ -1,7 +1,6 @@
 package com.kdoherty.zipchat.fragments;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -37,8 +36,9 @@ import com.kdoherty.zipchat.models.PublicRoom;
 import com.kdoherty.zipchat.models.SortingTabs;
 import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
-import com.kdoherty.zipchat.utils.UserUtils;
-import com.kdoherty.zipchat.utils.Utils;
+import com.kdoherty.zipchat.utils.LocationManager;
+import com.kdoherty.zipchat.utils.NetworkManager;
+import com.kdoherty.zipchat.utils.UserInfo;
 import com.kdoherty.zipchat.views.DividerItemDecoration;
 import com.kdoherty.zipchat.views.QuickReturnRecyclerView;
 import com.kdoherty.zipchat.views.RecyclerItemClickListener;
@@ -153,7 +153,7 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
             double longitude = publicRoom.getLongitude();
 
             // TODO Get from server
-            int distance = (int) Utils.getDistance(location.getLatitude(), location.getLongitude(),
+            int distance = (int) LocationManager.getDistance(location.getLatitude(), location.getLongitude(),
                     latitude, longitude);
             publicRoom.setDistance(distance);
         }
@@ -258,11 +258,11 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
             return;
         }
 
-        if (!Utils.checkOnline(getActivity())) {
+        if (!NetworkManager.checkOnline(getActivity())) {
             return;
         }
 
-        ZipChatApi.INSTANCE.getPublicRooms(UserUtils.getAuthToken(getActivity()), location.getLatitude(), location.getLongitude(), new Callback<List<PublicRoom>>() {
+        ZipChatApi.INSTANCE.getPublicRooms(UserInfo.getAuthToken(getActivity()), location.getLatitude(), location.getLongitude(), new Callback<List<PublicRoom>>() {
             @Override
             public void success(List<PublicRoom> publicRooms, Response response) {
                 populateList(publicRooms);
@@ -275,7 +275,7 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
                 if (mAdapter == null) {
                     mAdapter = new PublicRoomAdapter(getActivity(), new ArrayList<PublicRoom>());
                 }
-                Utils.logErrorResponse(TAG, "Getting public rooms", error);
+                NetworkManager.logErrorResponse(TAG, "Getting public rooms", error);
             }
         });
     }
@@ -334,11 +334,11 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
         if (location != null) {
             Log.d(TAG, "Sending location with accuracy " + location.getAccuracy() + " to server in getPublicRooms request");
 
-            if (!Utils.checkOnline(getActivity())) {
+            if (!NetworkManager.checkOnline(getActivity())) {
                 return;
             }
 
-            ZipChatApi.INSTANCE.getPublicRooms(UserUtils.getAuthToken(getActivity()),
+            ZipChatApi.INSTANCE.getPublicRooms(UserInfo.getAuthToken(getActivity()),
                     location.getLatitude(), location.getLongitude(), new Callback<List<PublicRoom>>() {
                 @Override
                 public void success(List<PublicRoom> publicRooms, Response response) {
@@ -347,7 +347,7 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
 
                 @Override
                 public void failure(RetrofitError error) {
-                    Utils.logErrorResponse(TAG, "Getting public rooms", error);
+                    NetworkManager.logErrorResponse(TAG, "Getting public rooms", error);
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
             });

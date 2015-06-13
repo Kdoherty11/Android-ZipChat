@@ -73,25 +73,6 @@ public class Utils {
                 InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
-    public static boolean isOnline(Context context) {
-        ConnectivityManager cm =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnectedOrConnecting();
-    }
-
-    public static boolean checkOnline(Context context) {
-        return checkOnline(context, context.getString(R.string.default_no_internet_toast));
-    }
-
-    public static boolean checkOnline(Context context, String message) {
-        boolean isOnline = isOnline(context);
-        if (!isOnline) {
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-        }
-        return isOnline;
-    }
-
     public static boolean checkServices(Activity activity) {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(activity);
 
@@ -100,26 +81,6 @@ public class Utils {
         } else {
             GooglePlayServicesUtil.getErrorDialog(resultCode, activity, 0).show();
             return false;
-        }
-    }
-
-    public static boolean isLocationEnabled(Context context) {
-        int locationMode = 0;
-        String locationProviders;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            try {
-                locationMode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE);
-
-            } catch (Settings.SettingNotFoundException e) {
-                e.printStackTrace();
-            }
-
-            return locationMode != Settings.Secure.LOCATION_MODE_OFF;
-
-        } else {
-            locationProviders = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
-            return !TextUtils.isEmpty(locationProviders);
         }
     }
 
@@ -134,59 +95,6 @@ public class Utils {
         } catch (PackageManager.NameNotFoundException e) {
             // should never happen
             throw new RuntimeException("Could not get package name: " + e);
-        }
-    }
-
-    public static String responseToString(Response result) {
-        if (result == null || result.getBody() == null) {
-            return "";
-        }
-        BufferedReader reader;
-        StringBuilder sb = new StringBuilder();
-        try {
-
-            reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
-
-            String line;
-
-            try {
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                }
-            } catch (IOException e) {
-                Log.e(TAG, "Problem reading response " + e.getMessage());
-            }
-        } catch (IOException e) {
-            Log.e(TAG, "Problem initializing BufferedReader " + e.getMessage());
-        }
-
-        return sb.toString();
-    }
-
-    public static void checkLocation(final Activity activity) {
-        if (!isLocationEnabled(activity)) {
-
-            AlertDialog.Builder dialog = new AlertDialog.Builder(activity);
-            dialog.setMessage(activity.getString(R.string.location_not_enabled));
-            dialog.setPositiveButton(activity.getString(R.string.open_location_settings), new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                    Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    activity.startActivity(myIntent);
-                }
-            });
-
-            dialog.setNegativeButton(activity.getString(R.string.cancel_location_dialog), new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                    // Do nothing if user cancels
-                }
-            });
-
-            dialog.show();
-
         }
     }
 
@@ -223,94 +131,6 @@ public class Utils {
         } else {
             return -accum;
         }
-    }
-
-    private static boolean isLocationEnabled(Activity activity) {
-        LocationManager lm = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
-        boolean isGpsEnabled = false;
-        boolean isNetworkEnabled = false;
-        try {
-            isGpsEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch (Exception ex) {
-            // isGpsEnabled is still false
-        }
-        try {
-            isNetworkEnabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch (Exception ex) {
-            // isNetworkEnabled is still false
-        }
-        return isGpsEnabled || isNetworkEnabled;
-    }
-
-    public static double getDistance(double thisLat, double thisLong, double otherLat, double otherLong) {
-        final int earthRadius = 6371;
-        return Math.acos(Math.sin(Math.toRadians(thisLat)) * Math.sin(Math.toRadians(otherLat)) + Math.cos(Math.toRadians(thisLat)) * Math.cos(Math.toRadians(otherLat)) * Math.cos(Math.toRadians(thisLong) - Math.toRadians(otherLong))) * earthRadius * 1000;
-    }
-
-    public static void logErrorResponse(String tag, String scenario, RetrofitError error) {
-        StringBuilder sb = new StringBuilder();
-        if (!TextUtils.isEmpty(scenario)) {
-            sb.append("Scenario: ");
-            sb.append(scenario);
-        }
-
-        if (error != null) {
-            sb.append("\nURL: ");
-            sb.append(error.getUrl());
-
-            if (error.getResponse() != null) {
-                sb.append("\nStatus: ");
-                sb.append(error.getResponse().getStatus());
-            }
-
-            sb.append("\nResponse: ");
-            sb.append(responseToString(error.getResponse()));
-
-            sb.append("\nMessage: ");
-            sb.append(error.getMessage());
-        }
-
-        String errorMessage = sb.toString();
-
-        Crashlytics.log(Log.ERROR, tag, errorMessage);
-    }
-
-    public static LatLng computeOffset(LatLng from, double distance, double heading) {
-        distance /= 6371009.0D;
-        heading = Math.toRadians(heading);
-        double fromLat = Math.toRadians(from.latitude);
-        double fromLng = Math.toRadians(from.longitude);
-        double cosDistance = Math.cos(distance);
-        double sinDistance = Math.sin(distance);
-        double sinFromLat = Math.sin(fromLat);
-        double cosFromLat = Math.cos(fromLat);
-        double sinLat = cosDistance * sinFromLat + sinDistance * cosFromLat * Math.cos(heading);
-        double dLng = Math.atan2(sinDistance * cosFromLat * Math.sin(heading), cosDistance - sinFromLat * sinLat);
-        return new LatLng(Math.toDegrees(Math.asin(sinLat)), Math.toDegrees(fromLng + dLng));
-    }
-
-    public static Circle setRoomCircle(Context context, GoogleMap map, LatLng center, int radius) {
-        Resources res = context.getResources();
-        CircleOptions circleOptions = new CircleOptions()
-                .center(center)
-                .radius(radius)
-                .fillColor(res.getColor(R.color.create_room_map_circle_fill))
-                .strokeColor(res.getColor(R.color.zipchat_blue))
-                .strokeWidth(6f);
-
-        Circle circle = map.addCircle(circleOptions);
-
-        int minRadius = 100;
-        radius = Math.max(radius, minRadius);
-        LatLngBounds bounds = new LatLngBounds.Builder().
-                include(computeOffset(center, radius, 0)).
-                include(computeOffset(center, radius, 90)).
-                include(computeOffset(center, radius, 180)).
-                include(computeOffset(center, radius, 270)).build();
-        int paddingPx = 50;
-        map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, paddingPx));
-
-        return circle;
     }
 
 }

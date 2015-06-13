@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:background="@color/zipchat_blue">
 
-    <com.facebook.widget.ProfilePictureView
+    <ImageView
         android:id="@+id/other_user_pic"
         android:layout_width="@dimen/private_chat_room_pic_side"
         android:layout_height="@dimen/private_chat_room_pic_side"

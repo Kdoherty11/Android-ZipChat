@@ -14,10 +14,11 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.kdoherty.zipchat.R;
+import com.kdoherty.zipchat.activities.ZipChatApplication;
 import com.kdoherty.zipchat.models.PrivateRoom;
 import com.kdoherty.zipchat.models.User;
-import com.kdoherty.zipchat.utils.FacebookUtils;
-import com.kdoherty.zipchat.utils.UserUtils;
+import com.kdoherty.zipchat.utils.FacebookManager;
+import com.kdoherty.zipchat.utils.UserInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +44,7 @@ public class PrivateRoomAdapter extends RecyclerView.Adapter<PrivateRoomAdapter.
         mContext = context;
         mPrivateRooms = privateRooms;
         mFilteredPrivateRooms = privateRooms;
+        ZipChatApplication.initImageLoader(mContext);
     }
 
     @Override
@@ -57,10 +59,10 @@ public class PrivateRoomAdapter extends RecyclerView.Adapter<PrivateRoomAdapter.
 
         User other = privateRoom.getOther();
         if (other == null) {
-            other = privateRoom.getAndSetOther(UserUtils.getId(mContext));
+            other = privateRoom.getAndSetOther(UserInfo.getId(mContext));
         }
 
-        FacebookUtils.displayProfilePicture(other.getFacebookId(), roomCellViewHolder.circleProfilePictureView);
+        FacebookManager.displayProfilePicture(other.getFacebookId(), roomCellViewHolder.circleProfilePictureView);
         roomCellViewHolder.title.setText(other.getName());
 
         CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(

@@ -18,12 +18,12 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.HomeActivity;
+import com.kdoherty.zipchat.services.RegistrationIntentService;
 import com.kdoherty.zipchat.services.ZipChatApi;
-import com.kdoherty.zipchat.utils.FacebookUtils;
-import com.kdoherty.zipchat.utils.PrefsUtils;
-import com.kdoherty.zipchat.utils.UserUtils;
+import com.kdoherty.zipchat.utils.FacebookManager;
+import com.kdoherty.zipchat.utils.NetworkManager;
+import com.kdoherty.zipchat.utils.UserInfo;
 import com.kdoherty.zipchat.utils.Utils;
-import com.koushikdutta.async.Util;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,6 +37,7 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
     private static final String TAG = LoginFragment.class.getSimpleName();
 
     private CallbackManager mCallbackManager;
+    private boolean mSentAuthRequest = false;
     private LoginButton mLoginButton;
 
     @Override
@@ -47,9 +48,16 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
         mCallbackManager = CallbackManager.Factory.create();
-        final LoginButton mLoginButton = (LoginButton) view.findViewById(R.id.login_button);
-        mLoginButton.setReadPermissions("user_friends");
-        mLoginButton.setFragment(this);
+
+
+        mLoginButton = (LoginButton) view.findViewById(R.id.login_button);
+        if (mSentAuthRequest) {
+            mLoginButton.setVisibility(View.GONE);
+        } else {
+            mLoginButton.setReadPermissions("user_friends");
+            mLoginButton.setFragment(this);
+            mLoginButton.registerCallback(mCallbackManager, this);
+        }
 
         return view;
     }
@@ -58,10 +66,9 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         AccessToken currentAccessToken = AccessToken.getCurrentAccessToken();
-        if (!TextUtils.isEmpty(currentAccessToken.getToken()) && !currentAccessToken.isExpired()) {
+        if (currentAccessToken != null && !TextUtils.isEmpty(currentAccessToken.getToken()) && !currentAccessToken.isExpired()) {
             authUser(currentAccessToken.getToken());
-        } else {
-            mLoginButton.registerCallback(mCallbackManager, this);
+            mSentAuthRequest = true;
         }
     }
 
@@ -70,9 +77,9 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
             @Override
             public void success(Response response, Response response2) {
                 try {
-                    JSONObject respJson = new JSONObject(Utils.responseToString(response));
+                    JSONObject respJson = new JSONObject(NetworkManager.responseToString(response));
                     String authToken = respJson.getString("authToken");
-                    UserUtils.storeAuthToken(getActivity(), authToken);
+                    UserInfo.storeAuthToken(getActivity(), authToken);
                 } catch (JSONException e) {
                     Log.e(TAG, "Problem parsing the auth json response");
                     return;
@@ -83,7 +90,7 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
 
             @Override
             public void failure(RetrofitError error) {
-                Utils.logErrorResponse(TAG, "Sending fb access token", error);
+                NetworkManager.logErrorResponse(TAG, "Sending fb access token", error);
             }
         });
     }
@@ -103,16 +110,18 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
 
     @Override
     public void onSuccess(LoginResult loginResult) {
-        if (UserUtils.didCreateUser(getActivity())) {
+        if (UserInfo.didCreateUser(getActivity()) && !mSentAuthRequest) {
             authUser(loginResult.getAccessToken().getToken());
         } else {
             Log.i(TAG, "Creating user");
+
+            mLoginButton.setVisibility(View.GONE);
 
             ZipChatApi.INSTANCE.createUser(loginResult.getAccessToken().getToken(), null, "android", new Callback<Response>() {
                 @Override
                 public void success(Response response, Response response2) {
                     try {
-                        JSONObject respJson = new JSONObject(Utils.responseToString(response));
+                        JSONObject respJson = new JSONObject(NetworkManager.responseToString(response));
                         long userId = respJson.getLong("userId");
                         String authToken = respJson.getString("authToken");
                         String fbId = respJson.getString("facebookId");
@@ -124,9 +133,13 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
                         Log.i(TAG, "OnCreate fbName: " + fbName);
 
                         Activity activity = getActivity();
-                        UserUtils.saveId(activity, userId);
-                        UserUtils.storeAuthToken(activity, authToken);
-                        FacebookUtils.saveFacebookInformation(activity, fbName, fbId);
+                        UserInfo.storeId(activity, userId);
+                        UserInfo.storeAuthToken(activity, authToken);
+                        FacebookManager.saveFacebookInformation(activity, fbName, fbId);
+
+                        // Start service which will register the device
+                        Intent intent = new Intent(getActivity(), RegistrationIntentService.class);
+                        getActivity().startService(intent);
                     } catch (JSONException e) {
                         Log.e(TAG, "Problem parsing the createUser json response " + e.getMessage());
                         return;
@@ -137,7 +150,8 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
 
                 @Override
                 public void failure(RetrofitError error) {
-                    Utils.logErrorResponse(TAG, "Creating a user", error);
+                    NetworkManager.logErrorResponse(TAG, "Creating a user", error);
+                    mLoginButton.setVisibility(View.VISIBLE);
                 }
             });
         }

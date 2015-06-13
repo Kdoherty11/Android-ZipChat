@@ -7,9 +7,9 @@ import android.os.Parcelable;
 /**
  * Created by kdoherty on 12/30/14.
  */
-public class PrefsUtils {
+public class PrefsHelper {
 
-    private PrefsUtils() {
+    private PrefsHelper() {
         // Hide constructor
     }
 

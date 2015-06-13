@@ -16,9 +16,9 @@ import java.net.URL;
 /**
  * Created by kdoherty on 12/31/14.
  */
-public class FacebookUtils {
+public class FacebookManager {
 
-    private static final String TAG = FacebookUtils.class.getSimpleName();
+    private static final String TAG = FacebookManager.class.getSimpleName();
 
     private static final String FACEBOOK_PREFERENCES = "facebookPreferences";
     private static final String PREFS_USER_ID_KEY = "facebookUserIdKey";
@@ -33,23 +33,23 @@ public class FacebookUtils {
             .considerExifParams(true)
             .build();
 
-    private FacebookUtils() { }
+    private FacebookManager() { }
 
     public static void saveFacebookInformation(Context context, String facebookName, String facebookId) {
-        PrefsUtils.saveToPreferences(context, FACEBOOK_PREFERENCES, PREFS_FACEBOOK_NAME_KEY, facebookName);
-        PrefsUtils.saveToPreferences(context, FACEBOOK_PREFERENCES, PREFS_USER_ID_KEY, facebookId);
+        PrefsHelper.saveToPreferences(context, FACEBOOK_PREFERENCES, PREFS_FACEBOOK_NAME_KEY, facebookName);
+        PrefsHelper.saveToPreferences(context, FACEBOOK_PREFERENCES, PREFS_USER_ID_KEY, facebookId);
     }
 
     public static String getFacebookId(Context context) {
-        return PrefsUtils.readFromPreferences(context, FACEBOOK_PREFERENCES, PREFS_USER_ID_KEY, "");
+        return PrefsHelper.readFromPreferences(context, FACEBOOK_PREFERENCES, PREFS_USER_ID_KEY, "");
     }
 
     public static String getFacebookName(Context context) {
-        return PrefsUtils.readFromPreferences(context, FACEBOOK_PREFERENCES, PREFS_FACEBOOK_NAME_KEY, "");
+        return PrefsHelper.readFromPreferences(context, FACEBOOK_PREFERENCES, PREFS_FACEBOOK_NAME_KEY, "");
     }
 
     public static void clearStoredFacebookInformation(Context context) {
-        PrefsUtils.clearPreferences(context, FACEBOOK_PREFERENCES);
+        PrefsHelper.clearPreferences(context, FACEBOOK_PREFERENCES);
     }
 
     public static String getProfilePicUrl(String userId) {

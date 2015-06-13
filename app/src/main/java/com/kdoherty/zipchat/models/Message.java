@@ -16,16 +16,12 @@ public class Message implements Parcelable {
 
     private long messageId;
     private String message;
-
-    private long senderId;
-    private String senderName;
-    private String senderFbId;
+    private User sender;
 
     private int score;
-    private boolean isAnon;
 
-    private long timeStamp;
-    private Date timeStampDate;
+    private long createdAt;
+    private Date createdAtDate;
 
     private List<User> favorites = new ArrayList<>();
 
@@ -35,52 +31,8 @@ public class Message implements Parcelable {
         USER_FAVORITED, FAVORITED, UNFAVORITED
     }
 
-    public long getMessageId() {
-        return messageId;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public long getSenderId() {
-        return senderId;
-    }
-
-    public String getSenderName() {
-        return senderName;
-    }
-
-    public String getSenderFbId() {
-        return senderFbId;
-    }
-
-    public int getScore() {
-        return score;
-    }
-
-    public long getTimeStamp() {
-        return timeStamp;
-    }
-
-    public Date getTimeStampDate() {
-        return timeStampDate;
-    }
-
-    public List<User> getFavorites() {
-        return favorites;
-    }
-
-    public FavoriteState getFavoriteState() {
-        return favoriteState;
-    }
-
     public int getFavoriteCount() {
         return favorites.size();
-    }
-
-    public boolean isAnon() {
-        return isAnon;
     }
 
     public void addFavorite(User user, long selfId) {
@@ -118,6 +70,39 @@ public class Message implements Parcelable {
         return favoriteState;
     }
 
+    public long getMessageId() {
+        return messageId;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public User getSender() {
+        return sender;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public Date getCreatedAtDate() {
+        return createdAtDate;
+    }
+
+    public List<User> getFavorites() {
+        return favorites;
+    }
+
+    public FavoriteState getFavoriteState() {
+        return favoriteState;
+    }
+
+
     @Override
     public int describeContents() {
         return 0;
@@ -127,32 +112,31 @@ public class Message implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(this.messageId);
         dest.writeString(this.message);
-        dest.writeLong(this.timeStamp);
-        dest.writeString(this.senderName);
-        dest.writeLong(timeStampDate != null ? timeStampDate.getTime() : -1);
-        dest.writeString(this.senderFbId);
-        dest.writeLong(this.senderId);
+        dest.writeParcelable(this.sender, 0);
         dest.writeInt(this.score);
+        dest.writeLong(this.createdAt);
+        dest.writeLong(createdAtDate != null ? createdAtDate.getTime() : -1);
         dest.writeTypedList(favorites);
         dest.writeInt(this.favoriteState == null ? -1 : this.favoriteState.ordinal());
     }
 
-    private Message(Parcel in) {
+    public Message() {
+    }
+
+    protected Message(Parcel in) {
         this.messageId = in.readLong();
         this.message = in.readString();
-        this.timeStamp = in.readLong();
-        this.senderName = in.readString();
-        long tmpTimeStampDate = in.readLong();
-        this.timeStampDate = tmpTimeStampDate == -1 ? null : new Date(tmpTimeStampDate);
-        this.senderFbId = in.readString();
-        this.senderId = in.readLong();
+        this.sender = in.readParcelable(User.class.getClassLoader());
         this.score = in.readInt();
-        in.readTypedList(favorites, User.CREATOR);
+        this.createdAt = in.readLong();
+        long tmpCreatedAtDate = in.readLong();
+        this.createdAtDate = tmpCreatedAtDate == -1 ? null : new Date(tmpCreatedAtDate);
+        this.favorites = in.createTypedArrayList(User.CREATOR);
         int tmpFavoriteState = in.readInt();
         this.favoriteState = tmpFavoriteState == -1 ? null : FavoriteState.values()[tmpFavoriteState];
     }
 
-    public static final Parcelable.Creator<Message> CREATOR = new Parcelable.Creator<Message>() {
+    public static final Creator<Message> CREATOR = new Creator<Message>() {
         public Message createFromParcel(Parcel source) {
             return new Message(source);
         }

@@ -19,8 +19,8 @@ import com.kdoherty.zipchat.events.ReceivedRequestEvent;
 import com.kdoherty.zipchat.models.Request;
 import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
-import com.kdoherty.zipchat.utils.UserUtils;
-import com.kdoherty.zipchat.utils.Utils;
+import com.kdoherty.zipchat.utils.NetworkManager;
+import com.kdoherty.zipchat.utils.UserInfo;
 import com.kdoherty.zipchat.views.DividerItemDecoration;
 import com.squareup.otto.Subscribe;
 
@@ -72,13 +72,13 @@ public class RequestsFragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     public void populateList() {
-        if (!Utils.checkOnline(getActivity())) {
+        if (!NetworkManager.checkOnline(getActivity())) {
             return;
         }
 
-        final long userId = UserUtils.getId(getActivity());
+        final long userId = UserInfo.getId(getActivity());
 
-        ZipChatApi.INSTANCE.getRequests(UserUtils.getAuthToken(getActivity()), userId, new Callback<List<Request>>() {
+        ZipChatApi.INSTANCE.getRequests(UserInfo.getAuthToken(getActivity()), userId, new Callback<List<Request>>() {
 
             @Override
             public void success(List<Request> requests, Response response) {
@@ -90,7 +90,7 @@ public class RequestsFragment extends Fragment implements SwipeRefreshLayout.OnR
             @Override
             public void failure(RetrofitError error) {
                 mSwipeRefreshLayout.setRefreshing(false);
-                Utils.logErrorResponse(TAG, "Getting chat requests for a user with ID: " + userId, error);
+                NetworkManager.logErrorResponse(TAG, "Getting chat requests for a user with ID: " + userId, error);
             }
         });
     }

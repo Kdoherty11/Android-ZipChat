@@ -1,6 +1,5 @@
 package com.kdoherty.zipchat.services;
 
-import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -12,12 +11,11 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.gcm.GcmListenerService;
 import com.google.android.gms.location.LocationServices;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.HomeActivity;
@@ -26,19 +24,17 @@ import com.kdoherty.zipchat.activities.PublicRoomActivity;
 import com.kdoherty.zipchat.events.ReceivedRequestEvent;
 import com.kdoherty.zipchat.events.RequestAcceptedEvent;
 import com.kdoherty.zipchat.models.Request;
-import com.kdoherty.zipchat.receivers.GcmBroadcastReceiver;
-import com.kdoherty.zipchat.utils.FacebookUtils;
-import com.kdoherty.zipchat.utils.Utils;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+import com.kdoherty.zipchat.utils.FacebookManager;
+import com.kdoherty.zipchat.utils.LocationManager;
 
 import java.util.concurrent.TimeUnit;
 
-public class GcmIntentService extends IntentService {
+public class MyGcmListenerService extends GcmListenerService {
     public static final int NOTIFICATION_ID = 1;
     public static final int LOCATION_TIMEOUT_IN_SECONDS = 8;
 
-    private static final String TAG = GcmIntentService.class.getSimpleName();
+    private static final String TAG = MyGcmListenerService.class.getSimpleName();
+
     private static final int LIGHT_ON_MS = 1000;
     private static final int LIGHT_OFF_MS = 4000;
     private static final int LIGHT_COLOR = Color.argb(0, 93, 188, 210);
@@ -70,76 +66,62 @@ public class GcmIntentService extends IntentService {
     }
 
     private NotificationManager mNotificationManager;
-    private GoogleApiClient mGoogleApiClient;
-
-    public GcmIntentService() {
-        super("GcmIntentService");
-    }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
-        Bundle extras = intent.getExtras();
-        GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
-        String messageType = gcm.getMessageType(intent);
+    public void onMessageReceived(String from, Bundle data) {
+        Log.d(TAG, "From: " + from);
 
-        if (!extras.isEmpty()) {  // has effect of unparcelling Bundle
-            if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)
-                    && !TextUtils.isEmpty(extras.getString(Key.EVENT))) {
-                String event = extras.getString(Key.EVENT);
+        final String event = data.getString(Key.EVENT);
 
-                switch (event) {
-                    case Event.CHAT_MESSAGE:
-                        String roomType = extras.getString(Key.ROOM_TYPE);
-                        long roomId = Long.parseLong(extras.getString(Key.ROOM_ID));
-                        String senderName = extras.getString(Key.FACEBOOK_NAME);
-                        String senderFacebookId = extras.getString(Key.FACEBOOK_ID);
-                        String message = extras.getString(Key.MESSAGE);
+        switch (event) {
+            case Event.CHAT_MESSAGE:
+                String roomType = data.getString(Key.ROOM_TYPE);
+                long roomId = Long.parseLong(data.getString(Key.ROOM_ID));
+                String senderName = data.getString(Key.FACEBOOK_NAME);
+                String senderFacebookId = data.getString(Key.FACEBOOK_ID);
+                String message = data.getString(Key.MESSAGE);
 
-                        if (Value.PUBLIC_ROOM_TYPE.equals(roomType)) {
-                            String roomName = extras.getString(Key.ROOM_NAME);
-                            int roomRadius = Integer.parseInt(extras.getString(Key.ROOM_RADIUS));
-                            double roomLat = Double.parseDouble(extras.getString(Key.ROOM_LATITUDE));
-                            double roomLon = Double.parseDouble(extras.getString(Key.ROOM_LONGITUDE));
-                            receivePublicChatMessage(roomId, roomName, roomRadius, roomLat, roomLon, senderName, senderFacebookId, message);
-                        } else {
-                            receivePrivateChatMessage(roomId, senderName, senderFacebookId, message);
-                        }
-                        break;
-                    case Event.MESSAGE_FAVORITED:
-                        String favoritorName = extras.getString(Key.FACEBOOK_NAME);
-                        long messageRoomId = Long.parseLong(extras.getString(Key.ROOM_ID));
-                        String messageText = extras.getString(Key.MESSAGE);
-                        String type = extras.getString(Key.ROOM_TYPE);
-                        if (Value.PUBLIC_ROOM_TYPE.equals(type)) {
-                            String roomName = extras.getString(Key.ROOM_NAME);
-                            int roomRadius = Integer.parseInt(extras.getString(Key.ROOM_RADIUS));
-                            double roomLat = Double.parseDouble(extras.getString(Key.ROOM_LATITUDE));
-                            double roomLon = Double.parseDouble(extras.getString(Key.ROOM_LONGITUDE));
-                            receivePublicRoomMessageFavorited(favoritorName, messageRoomId, messageText, roomName, roomRadius, roomLat, roomLon);
-                        } else {
-                            String favoritorFacebookId = extras.getString(Key.FACEBOOK_ID);
-                            receivePrivateRoomMessageFavorited(favoritorName, favoritorFacebookId, messageRoomId, messageText);
-                        }
-                        break;
-                    case Event.CHAT_REQUEST:
-                        String requesterName = extras.getString(Key.FACEBOOK_NAME);
-                        String facebookId = extras.getString(Key.FACEBOOK_ID);
-                        receiveChatRequest(requesterName, facebookId);
-                        break;
-                    case Event.CHAT_REQUEST_RESPONSE:
-                        String respondedName = extras.getString(Key.FACEBOOK_NAME);
-                        String response = extras.getString(Key.CHAT_REQUEST_RESPONSE);
-                        receiveChatRequestResponse(respondedName, response);
-                        break;
-                    default:
-                        Log.i(TAG, "Received notification with event: " + event);
+                if (Value.PUBLIC_ROOM_TYPE.equals(roomType)) {
+                    String roomName = data.getString(Key.ROOM_NAME);
+                    int roomRadius = Integer.parseInt(data.getString(Key.ROOM_RADIUS));
+                    double roomLat = Double.parseDouble(data.getString(Key.ROOM_LATITUDE));
+                    double roomLon = Double.parseDouble(data.getString(Key.ROOM_LONGITUDE));
+                    receivePublicChatMessage(roomId, roomName, roomRadius, roomLat, roomLon, senderName, senderFacebookId, message);
+                } else {
+                    receivePrivateChatMessage(roomId, senderName, senderFacebookId, message);
                 }
-
-                Log.i(TAG, "Received notification extras: " + extras.toString());
-            }
+                break;
+            case Event.MESSAGE_FAVORITED:
+                String favoritorName = data.getString(Key.FACEBOOK_NAME);
+                long messageRoomId = Long.parseLong(data.getString(Key.ROOM_ID));
+                String messageText = data.getString(Key.MESSAGE);
+                String type = data.getString(Key.ROOM_TYPE);
+                if (Value.PUBLIC_ROOM_TYPE.equals(type)) {
+                    String roomName = data.getString(Key.ROOM_NAME);
+                    int roomRadius = Integer.parseInt(data.getString(Key.ROOM_RADIUS));
+                    double roomLat = Double.parseDouble(data.getString(Key.ROOM_LATITUDE));
+                    double roomLon = Double.parseDouble(data.getString(Key.ROOM_LONGITUDE));
+                    receivePublicRoomMessageFavorited(favoritorName, messageRoomId, messageText, roomName, roomRadius, roomLat, roomLon);
+                } else {
+                    String favoritorFacebookId = data.getString(Key.FACEBOOK_ID);
+                    receivePrivateRoomMessageFavorited(favoritorName, favoritorFacebookId, messageRoomId, messageText);
+                }
+                break;
+            case Event.CHAT_REQUEST:
+                String requesterName = data.getString(Key.FACEBOOK_NAME);
+                String facebookId = data.getString(Key.FACEBOOK_ID);
+                receiveChatRequest(requesterName, facebookId);
+                break;
+            case Event.CHAT_REQUEST_RESPONSE:
+                String respondedName = data.getString(Key.FACEBOOK_NAME);
+                String response = data.getString(Key.CHAT_REQUEST_RESPONSE);
+                receiveChatRequestResponse(respondedName, response);
+                break;
+            default:
+                Log.i(TAG, "Received notification with event: " + event);
         }
-        // Release the wake lock provided by the WakefulBroadcastReceiver.
-        GcmBroadcastReceiver.completeWakefulIntent(intent);
+
+        Log.i(TAG, "Received notification extras: " + data.toString());
     }
 
     private void receivePrivateRoomMessageFavorited(String userName, String facebookId,
@@ -206,7 +188,7 @@ public class GcmIntentService extends IntentService {
                         .setContentIntent(contentIntent)
                         .setContentText(message);
 
-        Bitmap facebookPicture = FacebookUtils.getFacebookProfilePicture(senderFacebookId);
+        Bitmap facebookPicture = FacebookManager.getFacebookProfilePicture(senderFacebookId);
         if (facebookPicture != null) {
             builder.setLargeIcon(facebookPicture);
         }
@@ -216,7 +198,7 @@ public class GcmIntentService extends IntentService {
 
     private boolean isInArea(double lat, double lon, int radius) {
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).build();
+        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).build();
 
         ConnectionResult connectionResult = mGoogleApiClient.blockingConnect(LOCATION_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
 
@@ -226,7 +208,7 @@ public class GcmIntentService extends IntentService {
                 // No location could be found
                 return false;
             }
-            double distance = Utils.getDistance(currentLocation.getLatitude(), currentLocation.getLongitude(), lat, lon);
+            double distance = LocationManager.getDistance(currentLocation.getLatitude(), currentLocation.getLongitude(), lat, lon);
             return distance <= radius;
         }
 
@@ -255,7 +237,7 @@ public class GcmIntentService extends IntentService {
                         .setContentIntent(contentIntent)
                         .setContentText(message);
 
-        Bitmap facebookPicture = FacebookUtils.getFacebookProfilePicture(senderFacebookId);
+        Bitmap facebookPicture = FacebookManager.getFacebookProfilePicture(senderFacebookId);
         if (facebookPicture != null) {
             builder.setLargeIcon(facebookPicture);
         } else {
@@ -322,7 +304,7 @@ public class GcmIntentService extends IntentService {
                         .setContentIntent(contentIntent)
                         .setContentText(message);
 
-        Bitmap facebookPicture = FacebookUtils.getFacebookProfilePicture(facebookId);
+        Bitmap facebookPicture = FacebookManager.getFacebookProfilePicture(facebookId);
         if (facebookPicture != null) {
             builder.setLargeIcon(facebookPicture);
         }

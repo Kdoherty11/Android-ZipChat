@@ -24,7 +24,7 @@ public class HomeActivity extends AbstractLocationActivity implements SearchView
 
     private static final String TAG = HomeActivity.class.getSimpleName();
 
-    public static final String ACTION_OPEN_REQUESTS_TAB = "OpenRequestsTabAction";
+    public static final String ACTION_OPEN_REQUESTS_TAB = "OpenRequestsTab";
     public static final String ACTION_OPEN_PRIVATE_ROOMS_TAB = "OpenOnPrivateRoomsTab";
 
     private HomeTabsFragment mTabsFragment;

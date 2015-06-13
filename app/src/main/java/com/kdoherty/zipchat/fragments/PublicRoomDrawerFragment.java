@@ -15,7 +15,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -28,8 +27,8 @@ import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.UserDetailsActivity;
 import com.kdoherty.zipchat.adapters.PublicRoomDrawerAdapter;
 import com.kdoherty.zipchat.models.User;
-import com.kdoherty.zipchat.utils.PrefsUtils;
-import com.kdoherty.zipchat.utils.Utils;
+import com.kdoherty.zipchat.utils.LocationManager;
+import com.kdoherty.zipchat.utils.PrefsHelper;
 import com.kdoherty.zipchat.views.RecyclerItemClickListener;
 
 import java.util.Collections;
@@ -84,7 +83,7 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mUserLearnedDrawer = PrefsUtils.readFromPreferences(getActivity(),
+        mUserLearnedDrawer = PrefsHelper.readFromPreferences(getActivity(),
                 PREFS_FILE_NAME, KEY_USER_LEARNED_DRAWER, false);
 
         Bundle args = getArguments();
@@ -107,8 +106,7 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
                     @Override
                     public void onItemClick(View view, int position) {
                         User user = mRoomMembersAdapter.getUser(position);
-                        Intent intent = UserDetailsActivity.getIntent(getActivity(), user.getUserId(),
-                                user.getName(), user.getFacebookId(), false);
+                        Intent intent = UserDetailsActivity.getIntent(getActivity(), user);
                         startActivity(intent);
                     }
                 })
@@ -143,7 +141,7 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                 .title(mRoomName));
 
-        Utils.setRoomCircle(getActivity(), mGoogleMap, mRoomCenter, mRoomRadius);
+        LocationManager.setRoomCircle(getActivity(), mGoogleMap, mRoomCenter, mRoomRadius);
     }
 
     public void setUp(final Activity context, DrawerLayout drawerLayout, final Toolbar toolbar, int drawerFragmentId) {
@@ -163,7 +161,7 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
             public void onDrawerOpened(View drawerView) {
                 if (!mUserLearnedDrawer) {
                     mUserLearnedDrawer = true;
-                    PrefsUtils.saveToPreferences(getActivity(), PREFS_FILE_NAME,
+                    PrefsHelper.saveToPreferences(getActivity(), PREFS_FILE_NAME,
                             KEY_USER_LEARNED_DRAWER, true);
                 }
                 context.invalidateOptionsMenu();

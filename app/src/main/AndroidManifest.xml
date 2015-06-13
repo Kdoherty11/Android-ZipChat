@@ -32,7 +32,9 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_zipchat"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        android:name=".activities.ZipChatApplication">
+
         <activity
             android:name=".activities.HomeActivity"
             android:label="@string/app_name"
@@ -92,16 +94,36 @@
         </activity>
 
         <receiver
-            android:name=".receivers.GcmBroadcastReceiver"
+            android:name="com.google.android.gms.gcm.GcmReceiver"
+            android:exported="true"
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
                 <category android:name="com.kdoherty.zipchat" />
             </intent-filter>
         </receiver>
 
-        <service android:name=".services.GcmIntentService" />
+        <service
+            android:name=".services.MyGcmListenerService"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="com.kdoherty.zipchat.services.MyInstanceIDListenerService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.gms.iid.InstanceID"/>
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="com.kdoherty.zipchat.services.RegistrationIntentService"
+            android:exported="false">
+        </service>
 
         <uses-feature
             android:glEsVersion="0x00020000"
