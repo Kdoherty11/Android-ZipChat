@@ -74,6 +74,7 @@
     <string name="title_activity_message_detail">MessageDetailActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="drawer_user_location_pin_title">My Location</string>
+    <string name="action_flag_message">Flag Message</string>
 
 
 </resources>

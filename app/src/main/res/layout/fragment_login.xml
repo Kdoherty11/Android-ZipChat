@@ -21,4 +21,13 @@
         android:layout_marginTop="48dp"
         android:layout_centerHorizontal="true"/>
 
+    <ProgressBar
+        android:id="@+id/auth_pb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/zip_chat_logo"
+        android:layout_marginTop="48dp"
+        android:visibility="gone"
+        android:layout_centerHorizontal="true"/>
+
 </RelativeLayout>

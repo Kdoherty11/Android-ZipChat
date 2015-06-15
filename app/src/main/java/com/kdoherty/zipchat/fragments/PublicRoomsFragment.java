@@ -60,9 +60,6 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
     public static final String REFRESH_FEED_ACTION = "ChatRoomsFragmentRefreshFeedAction";
     private static final String BUNDLE_RECYCLER_LAYOUT_KEY = "classname.recycler.layout";
 
-    private static final String PREFS_FILE_NAME = "PublicRoomsFragmentPrefs";
-    private static final String PREFS_LIST_STATE_KEY = "PublicRoomsFragmentListState";
-
     private PublicRoomAdapter mAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mChatRoomsRv;
@@ -74,8 +71,6 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
     private String mSortByDistanceTab;
     private String mSortByActivityTab;
     private String mSortByVotesTab;
-
-    private View mQuickReturnView;
 
     private String mCurrentTabTitle;
 
@@ -104,7 +99,6 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
         View rootView = inflater.inflate(R.layout.fragment_public_rooms, container, false);
 
         mChatRoomsRv = (QuickReturnRecyclerView) rootView.findViewById(R.id.chat_rooms);
-        mQuickReturnView = rootView.findViewById(R.id.quick_return_view);
 
         return rootView;
     }

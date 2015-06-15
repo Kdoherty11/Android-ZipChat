@@ -23,7 +23,7 @@ public class Message implements Parcelable {
     private long createdAt;
     private Date createdAtDate;
 
-    private List<User> favorites = new ArrayList<>();
+    private List<User> favorites;
 
     private FavoriteState favoriteState;
 
@@ -145,4 +145,19 @@ public class Message implements Parcelable {
             return new Message[size];
         }
     };
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Message{");
+        sb.append("messageId=").append(messageId);
+        sb.append(", message='").append(message).append('\'');
+        sb.append(", sender=").append(sender);
+        sb.append(", score=").append(score);
+        sb.append(", createdAt=").append(createdAt);
+        sb.append(", createdAtDate=").append(createdAtDate);
+        sb.append(", favorites=").append(favorites);
+        sb.append(", favoriteState=").append(favoriteState);
+        sb.append('}');
+        return sb.toString();
+    }
 }

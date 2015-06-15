@@ -3,6 +3,8 @@ package com.kdoherty.zipchat.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,7 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.kdoherty.zipchat.R;
-import com.kdoherty.zipchat.fragments.MessageDetailsFragment;
+import com.kdoherty.zipchat.fragments.MessageFavoritesFragment;
 import com.kdoherty.zipchat.models.Message;
 
 public class MessageDetailsActivity extends AppCompatActivity {
@@ -24,8 +26,7 @@ public class MessageDetailsActivity extends AppCompatActivity {
         return messageDetail;
     }
 
-    private Message mMessage;
-    private MessageDetailsFragment mMessageDetailsFragment;
+    private MessageFavoritesFragment mMessageFavoritesFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,21 +46,15 @@ public class MessageDetailsActivity extends AppCompatActivity {
         }
 
 
-//        if (savedInstanceState == null) {
-//            // Add the fragment on initial activity setup
-//            mMessageDetailsFragment = new MessageDetailsFragment();
-//            getSupportFragmentManager()
-//                    .beginTransaction()
-//                    .add(android.R.id.content, mMessageDetailsFragment)
-//                    .commit();
-//        } else {
-//            // Or set the fragment from restored state info
-//            mMessageDetailsFragment = (MessageDetailsFragment) getSupportFragmentManager()
-//                    .findFragmentById(android.R.id.content);
-//        }
+        if (mMessageFavoritesFragment == null) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        mMessage = getIntent().getParcelableExtra(EXTRA_MESSAGE);
-        //mMessageDetailsFragment.displayMessage(mMessage);
+            Message message = getIntent().getParcelableExtra(EXTRA_MESSAGE);
+            mMessageFavoritesFragment = MessageFavoritesFragment.newInstance(message.getFavorites());
+            fragmentTransaction.add(R.id.message_favorites_placeholder, mMessageFavoritesFragment);
+            fragmentTransaction.commit();
+        }
     }
 
     @Override

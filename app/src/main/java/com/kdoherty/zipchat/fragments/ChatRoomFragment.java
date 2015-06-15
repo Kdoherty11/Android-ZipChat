@@ -236,9 +236,12 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
 
     private void populateMessageList(List<Message> messageList) {
         if (mMessageAdapter == null) {
-            mMessageAdapter = new MessageAdapter(getActivity(), messageList, this);
-            mMessagesRv.setAdapter(mMessageAdapter);
-            mMessagesRv.scrollToPosition(mMessageAdapter.getItemCount() - 1);
+            Activity activity = getActivity();
+            if (activity != null) {
+                mMessageAdapter = new MessageAdapter(activity, messageList, this);
+                mMessagesRv.setAdapter(mMessageAdapter);
+                mMessagesRv.scrollToPosition(mMessageAdapter.getItemCount() - 1);
+            }
         } else {
             mMessageAdapter.addMessagesToStart(messageList);
         }
@@ -368,6 +371,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
 
     private void sendMessage(String message) {
         if (!socketIsAvailable()) {
+            Log.w(TAG, "WebSocket is closed... Adding to queue and trying to reconnect");
             mMessageQueue.add(message);
             return;
         }
@@ -416,6 +420,8 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
                 case "talk":
                     if (!HEARTBEAT_MESSAGE.equals(message)) {
                         addMessage(gson.fromJson(message, Message.class));
+                    } else {
+                        Log.d(TAG, "Received heartbeat from socket...");
                     }
                     break;
                 case "join":

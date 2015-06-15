@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.kdoherty.zipchat.R;
+import com.kdoherty.zipchat.activities.MessageDetailsActivity;
 import com.kdoherty.zipchat.activities.UserDetailsActivity;
 import com.kdoherty.zipchat.activities.ZipChatApplication;
 import com.kdoherty.zipchat.models.Message;
@@ -92,6 +93,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
     private static final long SEND_FAVORITE_EVENT_DELAY = 1000; // MS
 
     public MessageAdapter(Context context, List<Message> messages, MessageFavoriteListener messageFavoriteListener) {
+        if (context == null) {
+            throw new IllegalArgumentException("Context is null");
+        }
+        if (messages == null) {
+            throw new IllegalArgumentException("messages is null");
+        }
         mInflater = LayoutInflater.from(context);
         mMessages = messages;
         mContext = context;
@@ -105,8 +112,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent intent = MessageDetailsActivity.getIntent(mContext, getMessage(position));
-                //mContext.startActivity(intent);
+                Log.d(TAG, "MessageAdapter: " + getMessage(position));
+                Intent intent = MessageDetailsActivity.getIntent(mContext, getMessage(position));
+                mContext.startActivity(intent);
             }
         });
         return new MessageCellViewHolder(view);

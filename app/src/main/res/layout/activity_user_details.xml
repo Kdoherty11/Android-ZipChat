@@ -7,7 +7,7 @@
     tools:context="com.kdoherty.zipchat.activities.UserDetailsActivity">
 
     <include
-        android:id="@+id/request_activity_app_bar"
+        android:id="@+id/user_details_app_bar"
         layout="@layout/app_bar_default" />
 
     <ImageView

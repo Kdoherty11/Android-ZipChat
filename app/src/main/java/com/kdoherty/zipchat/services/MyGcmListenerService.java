@@ -6,11 +6,13 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -209,8 +211,11 @@ public class MyGcmListenerService extends GcmListenerService {
                 return false;
             }
             double distance = LocationManager.getDistance(currentLocation.getLatitude(), currentLocation.getLongitude(), lat, lon);
+            Log.d(TAG, "Distance from the center of the room: " + distance + " and radius is: " + radius);
             return distance <= radius;
         }
+
+        Log.e(TAG, "isInArea returning false because Google api client could not connect...");
 
         // Could not connect to mGoogleApi before the timeout
         return false;
@@ -220,7 +225,10 @@ public class MyGcmListenerService extends GcmListenerService {
                                           double roomLat, double roomLon,
                                           String senderName, String senderFacebookId, String message) {
 
+        Log.d(TAG, "Receive public chat message");
+
         if (!isInArea(roomLat, roomLon, roomRadius)) {
+            Log.d(TAG, "Not showing notification because not in the room radius");
             return;
         }
 
@@ -237,14 +245,22 @@ public class MyGcmListenerService extends GcmListenerService {
                         .setContentIntent(contentIntent)
                         .setContentText(message);
 
-        Bitmap facebookPicture = FacebookManager.getFacebookProfilePicture(senderFacebookId);
-        if (facebookPicture != null) {
-            builder.setLargeIcon(facebookPicture);
+        Bitmap facebookPicBm;
+        if (!TextUtils.isEmpty(senderFacebookId)) {
+            facebookPicBm = FacebookManager.getFacebookProfilePicture(senderFacebookId);
+            if (facebookPicBm == null) {
+                facebookPicBm = BitmapFactory.decodeResource(getResources(), R.drawable.com_facebook_profile_picture_blank_square);
+                Log.w(TAG, "Null facebook picture for facebookId: " + senderFacebookId);
+            }
         } else {
-            Log.w(TAG, "Null facebook picture for facebookId: " + senderFacebookId);
+            facebookPicBm = BitmapFactory.decodeResource(getResources(), R.drawable.com_facebook_profile_picture_blank_square);
         }
 
+        builder.setLargeIcon(facebookPicBm);
+
         notify(builder.build());
+
+        Log.d(TAG, "Success receiving public room chat message");
     }
 
     private void notify(Notification notification) {

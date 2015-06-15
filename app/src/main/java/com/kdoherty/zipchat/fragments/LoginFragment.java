@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -39,6 +40,7 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
     private CallbackManager mCallbackManager;
     private boolean mSentAuthRequest = false;
     private LoginButton mLoginButton;
+    private ProgressBar mAuthPb;
 
     @Override
     public View onCreateView(
@@ -49,10 +51,11 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
 
         mCallbackManager = CallbackManager.Factory.create();
 
-
         mLoginButton = (LoginButton) view.findViewById(R.id.login_button);
+        mAuthPb = (ProgressBar) view.findViewById(R.id.auth_pb);
+
         if (mSentAuthRequest) {
-            mLoginButton.setVisibility(View.GONE);
+            showLoading();
         } else {
             mLoginButton.setReadPermissions("user_friends");
             mLoginButton.setFragment(this);
@@ -80,6 +83,7 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
                     JSONObject respJson = new JSONObject(NetworkManager.responseToString(response));
                     String authToken = respJson.getString("authToken");
                     UserInfo.storeAuthToken(getActivity(), authToken);
+                    mAuthPb.setVisibility(View.GONE);
                 } catch (JSONException e) {
                     Log.e(TAG, "Problem parsing the auth json response");
                     return;
@@ -91,6 +95,7 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
             @Override
             public void failure(RetrofitError error) {
                 NetworkManager.logErrorResponse(TAG, "Sending fb access token", error);
+                mAuthPb.setVisibility(View.GONE);
             }
         });
     }
@@ -108,6 +113,11 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
+    private void showLoading() {
+        mLoginButton.setVisibility(View.GONE);
+        mAuthPb.setVisibility(View.VISIBLE);
+    }
+
     @Override
     public void onSuccess(LoginResult loginResult) {
         if (UserInfo.didCreateUser(getActivity()) && !mSentAuthRequest) {
@@ -115,7 +125,7 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
         } else {
             Log.i(TAG, "Creating user");
 
-            mLoginButton.setVisibility(View.GONE);
+            showLoading();
 
             ZipChatApi.INSTANCE.createUser(loginResult.getAccessToken().getToken(), null, "android", new Callback<Response>() {
                 @Override
@@ -136,14 +146,16 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
                         UserInfo.storeId(activity, userId);
                         UserInfo.storeAuthToken(activity, authToken);
                         FacebookManager.saveFacebookInformation(activity, fbName, fbId);
-
-                        // Start service which will register the device
-                        Intent intent = new Intent(getActivity(), RegistrationIntentService.class);
-                        getActivity().startService(intent);
                     } catch (JSONException e) {
-                        Log.e(TAG, "Problem parsing the createUser json response " + e.getMessage());
+                        Log.e(TAG, "Parsing the createUser json response " + e);
                         return;
                     }
+
+                    // Start service which will register the device
+                    Intent intent = new Intent(getActivity(), RegistrationIntentService.class);
+                    getActivity().startService(intent);
+
+                    mAuthPb.setVisibility(View.GONE);
 
                     continueToApp();
                 }
@@ -152,6 +164,7 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
                 public void failure(RetrofitError error) {
                     NetworkManager.logErrorResponse(TAG, "Creating a user", error);
                     mLoginButton.setVisibility(View.VISIBLE);
+                    mAuthPb.setVisibility(View.GONE);
                 }
             });
         }

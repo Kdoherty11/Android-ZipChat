@@ -36,7 +36,6 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     private static final String EXTRA_RECEIVER_FB_ID = "UserDetailsActivityFacebookIdKey";
     private static final String EXTRA_RECEIVER_USER_ID = "UserDetailsActivityReceiverIdKey";
     private static final String EXTRA_RECEIVER_NAME = "UserDetailsActivityReceiverNameKey";
-    private static final String EXTRA_IS_ANON = "UserDetailsActivityIsAnonKey";
 
     private long mReceiverUserId;
     private String mReceiverFbId;
@@ -63,7 +62,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         mReceiverName = intent.getStringExtra(EXTRA_RECEIVER_NAME);
         mReceiverFbId = intent.getStringExtra(EXTRA_RECEIVER_FB_ID);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.request_activity_app_bar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.user_details_app_bar);
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();

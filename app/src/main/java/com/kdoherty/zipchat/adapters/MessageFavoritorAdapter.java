@@ -1,15 +1,21 @@
 package com.kdoherty.zipchat.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.devspark.robototextview.widget.RobotoTextView;
 import com.kdoherty.zipchat.R;
+import com.kdoherty.zipchat.activities.MessageDetailsActivity;
+import com.kdoherty.zipchat.activities.UserDetailsActivity;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.FacebookManager;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.List;
 
@@ -22,24 +28,32 @@ public class MessageFavoritorAdapter extends RecyclerView.Adapter<MessageFavorit
 
     private static final String TAG = MessageFavoritorAdapter.class.getSimpleName();
 
+    private Context mContext;
     private final LayoutInflater mInflater;
     private final List<User> mMessageFavoritors;
 
     public MessageFavoritorAdapter(Context context, List<User> messageFavoritors) {
+        mContext = context;
         mInflater = LayoutInflater.from(context);
         mMessageFavoritors = messageFavoritors;
     }
 
     @Override
-    public UserCellViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public UserCellViewHolder onCreateViewHolder(ViewGroup viewGroup, final int position) {
         View view = mInflater.inflate(R.layout.cell_user, viewGroup, false);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent userDetailsIntent = UserDetailsActivity.getIntent(mContext, getUser(position));
+                mContext.startActivity(userDetailsIntent);
+            }
+        });
         return new UserCellViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(UserCellViewHolder messageFavoritorViewHolder, int i) {
         User user = mMessageFavoritors.get(i);
-
         messageFavoritorViewHolder.text.setText(user.getName());
         FacebookManager.displayProfilePicture(user.getFacebookId(), messageFavoritorViewHolder.profilePicture);
     }
