@@ -66,19 +66,19 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
                 .getMapAsync(this);
 
         // Fixing Later Map loading Delay
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    MapView mv = new MapView(getApplicationContext());
-                    mv.onCreate(null);
-                    mv.onPause();
-                    mv.onDestroy();
-                }catch (Exception ignored){
-
-                }
-            }
-        }).start();
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    MapView mv = new MapView(getApplicationContext());
+//                    mv.onCreate(null);
+//                    mv.onPause();
+//                    mv.onDestroy();
+//                } catch (Exception ignored){
+//
+//                }
+//            }
+//        }).start();
 
         mRadius = 50;
 
