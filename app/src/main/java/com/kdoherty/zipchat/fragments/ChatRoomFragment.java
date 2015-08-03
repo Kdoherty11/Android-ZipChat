@@ -203,7 +203,9 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     public void onPause() {
         super.onPause();
         if (socketIsAvailable()) {
-            mMessageAdapter.sendPendingEvents();
+            if (mMessageAdapter != null) {
+                mMessageAdapter.sendPendingEvents();
+            }
             Log.i(TAG, "Closing socket!");
             mWebSocket.close();
         }
