@@ -1,6 +1,5 @@
 package com.kdoherty.zipchat.activities;
 
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -9,8 +8,6 @@ import android.util.Log;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
 import com.kdoherty.zipchat.fragments.LoginFragment;
-import com.kdoherty.zipchat.services.RegistrationIntentService;
-import com.kdoherty.zipchat.utils.UserInfo;
 import com.kdoherty.zipchat.utils.Utils;
 
 import io.fabric.sdk.android.Fabric;

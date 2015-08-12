@@ -21,7 +21,7 @@ import com.kdoherty.zipchat.activities.ZipChatApplication;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.FacebookManager;
-import com.kdoherty.zipchat.utils.UserInfo;
+import com.kdoherty.zipchat.utils.UserManager;
 import com.kdoherty.zipchat.views.AnimateFirstDisplayListener;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
@@ -144,7 +144,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
 
         messageCellViewHolder.message.setText(message.getMessage());
 
-        long userId = UserInfo.getId(mContext);
+        long userId = UserManager.getId(mContext);
         messageCellViewHolder.favorite.setOnClickListener(new FavoriteClickListener(message, userId));
 
         Message.FavoriteState favoriteState = message.getFavoriteState(userId);
@@ -263,9 +263,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
             final boolean isAddFavorite = favoriteState != Message.FavoriteState.USER_FAVORITED;
 
             if (isAddFavorite) {
-                favoriteMessage(UserInfo.getSelf(mContext), message.getMessageId(), userId);
+                favoriteMessage(UserManager.getSelf(mContext), message.getMessageId(), userId);
             } else {
-                removeFavorite(UserInfo.getSelf(mContext), message.getMessageId(), userId);
+                removeFavorite(UserManager.getSelf(mContext), message.getMessageId(), userId);
             }
 
             if (mHasPendingFavorite) {

@@ -30,7 +30,7 @@ import com.kdoherty.zipchat.services.ChatService;
 import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.FacebookManager;
 import com.kdoherty.zipchat.utils.NetworkManager;
-import com.kdoherty.zipchat.utils.UserInfo;
+import com.kdoherty.zipchat.utils.UserManager;
 import com.kdoherty.zipchat.utils.Utils;
 import com.kdoherty.zipchat.views.AnimateFirstDisplayListener;
 import com.kdoherty.zipchat.views.DividerItemDecoration;
@@ -134,12 +134,12 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSelfId = UserInfo.getId(getActivity());
+        mSelfId = UserManager.getId(getActivity());
         Bundle args = getArguments();
         mRoomId = args.getLong(ARG_ROOM_ID);
         mIsPublicRoom = args.getBoolean(ARG_IS_PUBLIC_ROOM);
 
-        new ChatService(mSelfId, mRoomId, mIsPublicRoom, UserInfo.getAuthToken(getActivity()), this);
+        new ChatService(mSelfId, mRoomId, mIsPublicRoom, UserManager.getAuthToken(getActivity()), this);
 
         options = new DisplayImageOptions.Builder()
                 .showImageOnLoading(R.drawable.com_facebook_profile_picture_blank_portrait)
@@ -255,10 +255,10 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         }
 
         if (mIsPublicRoom) {
-            ZipChatApi.INSTANCE.getPublicRoomMessages(UserInfo.getAuthToken(getActivity()), mRoomId,
+            ZipChatApi.INSTANCE.getPublicRoomMessages(UserManager.getAuthToken(getActivity()), mRoomId,
                     MESSAGE_LIMIT, mMessageOffset, mGetMessagesCallback);
         } else {
-            ZipChatApi.INSTANCE.getPrivateRoomMessages(UserInfo.getAuthToken(getActivity()), mRoomId,
+            ZipChatApi.INSTANCE.getPrivateRoomMessages(UserManager.getAuthToken(getActivity()), mRoomId,
                     MESSAGE_LIMIT, mMessageOffset, mGetMessagesCallback);
         }
     }
@@ -346,7 +346,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     public void sendFavoriteEvent(long messageId, boolean isFavorite) {
         Log.i(TAG, "Sending a favorite event to message " + messageId + " is favorite: " + isFavorite);
         if (!socketIsAvailable()) {
-            Toast.makeText(getActivity(), "sendFavoriteEvent called when the socket is null or closed", Toast.LENGTH_LONG).show();
+            Utils.debugToast(getActivity(), "sendFavoriteEvent called when the socket is null or closed");
             return;
         }
 
@@ -472,7 +472,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(getActivity(), "Error: " + message, Toast.LENGTH_LONG).show();
+                            Utils.debugToast(getActivity(), "Error: " + message);
                         }
                     });
                     break;

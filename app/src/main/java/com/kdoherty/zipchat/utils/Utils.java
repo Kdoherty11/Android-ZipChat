@@ -32,6 +32,7 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.kdoherty.zipchat.BuildConfig;
 import com.kdoherty.zipchat.R;
 
 import java.io.BufferedReader;
@@ -84,20 +85,6 @@ public class Utils {
         }
     }
 
-    /**
-     * @return Application's version code from the {@code PackageManager}.
-     */
-    public static int getAppVersion(Context context) {
-        try {
-            PackageInfo packageInfo = context.getPackageManager()
-                    .getPackageInfo(context.getPackageName(), 0);
-            return packageInfo.versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            // should never happen
-            throw new RuntimeException("Could not get package name: " + e);
-        }
-    }
-
     public static Long tryParse(String string) {
         if (TextUtils.isEmpty(string)) {
             return null;
@@ -107,13 +94,13 @@ public class Utils {
         if (index == string.length()) {
             return null;
         }
-        int digit = string.charAt(index++) - '0';
+        int digit = string.charAt(index) - '0';
         if (digit < 0 || digit > 9) {
             return null;
         }
         long accum = -digit;
         while (index < string.length()) {
-            digit = string.charAt(index++) - '0';
+            digit = string.charAt(index) - '0';
             if (digit < 0 || digit > 9 || accum < Long.MIN_VALUE / 10) {
                 return null;
             }
@@ -130,6 +117,12 @@ public class Utils {
             return null;
         } else {
             return -accum;
+        }
+    }
+
+    public static void debugToast(Context context, String message) {
+        if (BuildConfig.DEBUG) {
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
         }
     }
 

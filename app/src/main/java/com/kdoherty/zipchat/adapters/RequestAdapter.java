@@ -20,7 +20,7 @@ import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.FacebookManager;
 import com.kdoherty.zipchat.utils.NetworkManager;
-import com.kdoherty.zipchat.utils.UserInfo;
+import com.kdoherty.zipchat.utils.UserManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,7 +118,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             }
 
             final long requestId = getRequest(position).getRequestId();
-            ZipChatApi.INSTANCE.respondToRequest(UserInfo.getAuthToken(mContext), requestId, status.toString(), new Callback<Response>() {
+            ZipChatApi.INSTANCE.respondToRequest(UserManager.getAuthToken(mContext), requestId, status.toString(), new Callback<Response>() {
                 @Override
                 public void success(Response result, Response response) {
                     if (status == Request.Status.accepted) {

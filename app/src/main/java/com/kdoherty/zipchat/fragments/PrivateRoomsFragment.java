@@ -24,7 +24,7 @@ import com.kdoherty.zipchat.models.PrivateRoomComparator;
 import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.NetworkManager;
-import com.kdoherty.zipchat.utils.UserInfo;
+import com.kdoherty.zipchat.utils.UserManager;
 import com.kdoherty.zipchat.views.DividerItemDecoration;
 import com.kdoherty.zipchat.views.RecyclerItemClickListener;
 import com.squareup.otto.Subscribe;
@@ -97,9 +97,9 @@ public class PrivateRoomsFragment extends Fragment implements Filterable, SwipeR
             return;
         }
 
-        final long userId = UserInfo.getId(getActivity());
+        final long userId = UserManager.getId(getActivity());
 
-        ZipChatApi.INSTANCE.getPrivateRooms(UserInfo.getAuthToken(getActivity()), userId, new Callback<List<PrivateRoom>>() {
+        ZipChatApi.INSTANCE.getPrivateRooms(UserManager.getAuthToken(getActivity()), userId, new Callback<List<PrivateRoom>>() {
             @Override
             public void success(List<PrivateRoom> privateRooms, Response response) {
                 mSwipeRefreshLayout.setRefreshing(false);

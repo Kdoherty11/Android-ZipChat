@@ -18,7 +18,7 @@ import com.kdoherty.zipchat.activities.ZipChatApplication;
 import com.kdoherty.zipchat.models.PrivateRoom;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.FacebookManager;
-import com.kdoherty.zipchat.utils.UserInfo;
+import com.kdoherty.zipchat.utils.UserManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +59,7 @@ public class PrivateRoomAdapter extends RecyclerView.Adapter<PrivateRoomAdapter.
 
         User other = privateRoom.getOther();
         if (other == null) {
-            other = privateRoom.getAndSetOther(UserInfo.getId(mContext));
+            other = privateRoom.getAndSetOther(UserManager.getId(mContext));
         }
 
         FacebookManager.displayProfilePicture(other.getFacebookId(), roomCellViewHolder.circleProfilePictureView);

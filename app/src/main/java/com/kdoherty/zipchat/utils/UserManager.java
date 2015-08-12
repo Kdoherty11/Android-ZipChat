@@ -4,9 +4,9 @@ import android.content.Context;
 
 import com.kdoherty.zipchat.models.User;
 
-public class UserInfo {
+public class UserManager {
 
-    private static final String TAG = UserInfo.class.getSimpleName();
+    private static final String TAG = UserManager.class.getSimpleName();
 
     private static final String PREFS_FILE = "UserInfoPrefsFile";
 
@@ -18,7 +18,7 @@ public class UserInfo {
     private static final String DEFAULT_AUTH_TOKEN = "";
     private static final long DEFAULT_DEVICE_ID = -1;
 
-    private UserInfo() { }
+    private UserManager() { }
 
     public static void storeId(Context context, long userId) {
         PrefsHelper.saveToPreferences(context, PREFS_FILE, PREFS_USER_ID, userId);

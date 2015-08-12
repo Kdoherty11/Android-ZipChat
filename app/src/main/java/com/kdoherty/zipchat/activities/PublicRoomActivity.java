@@ -30,7 +30,8 @@ import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.NetworkManager;
-import com.kdoherty.zipchat.utils.UserInfo;
+import com.kdoherty.zipchat.utils.UserManager;
+import com.kdoherty.zipchat.utils.Utils;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
@@ -174,7 +175,7 @@ public class PublicRoomActivity extends AbstractLocationActivity {
         if (mNotificationsToggle != null) {
             mNotificationsToggle.setIcon(iconId);
         } else {
-            Toast.makeText(this, "mNotificationsToggle is null in set notification icon", Toast.LENGTH_LONG).show();
+            Utils.debugToast(getApplicationContext(), "mNotificationsToggle is null in set notification icon");
             Log.e(TAG, "mNotificationsToggle is null in set notification icon");
         }
     }
@@ -191,7 +192,7 @@ public class PublicRoomActivity extends AbstractLocationActivity {
         if (!NetworkManager.checkOnline(this)) {
             return;
         }
-        ZipChatApi.INSTANCE.subscribe(UserInfo.getAuthToken(this), mRoomId, UserInfo.getId(this), new Callback<Response>() {
+        ZipChatApi.INSTANCE.subscribe(UserManager.getAuthToken(this), mRoomId, UserManager.getId(this), new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
                 Log.d(TAG, "Subscribed to room " + mRoomId);
@@ -208,7 +209,7 @@ public class PublicRoomActivity extends AbstractLocationActivity {
         if (!NetworkManager.checkOnline(this)) {
             return;
         }
-        ZipChatApi.INSTANCE.removeSubscription(UserInfo.getAuthToken(this), mRoomId, UserInfo.getId(this), new Callback<Response>() {
+        ZipChatApi.INSTANCE.removeSubscription(UserManager.getAuthToken(this), mRoomId, UserManager.getId(this), new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
                 Log.d(TAG, "Removed subscription from room " + mRoomId);
@@ -227,7 +228,7 @@ public class PublicRoomActivity extends AbstractLocationActivity {
         if (mDrawerFragment != null) {
             mDrawerFragment.addUserMarker(location);
         } else {
-            Log.e(TAG, "TODO Fix this. onConnected cb before mDrawerFragment is initialized");
+            Log.e(TAG, "onConnected cb before mDrawerFragment is initialized");
         }
     }
 
