@@ -150,6 +150,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
 
         long userId = UserManager.getId(mContext);
 
+        messageCellViewHolder.favorite.setOnClickListener(new FavoriteClickListener(message, userId));
 
         if (message.isConfirmed()) {
             messageCellViewHolder.favorite.setOnClickListener(new FavoriteClickListener(message, userId));

@@ -95,13 +95,13 @@ public class Utils {
         if (index == string.length()) {
             return null;
         }
-        int digit = string.charAt(index++) - '0';
+        int digit = string.charAt(index) - '0';
         if (digit < 0 || digit > 9) {
             return null;
         }
         long accum = -digit;
         while (index < string.length()) {
-            digit = string.charAt(index++) - '0';
+            digit = string.charAt(index) - '0';
             if (digit < 0 || digit > 9 || accum < Long.MIN_VALUE / 10) {
                 return null;
             }

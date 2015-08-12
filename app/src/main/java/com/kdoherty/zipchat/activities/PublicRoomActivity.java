@@ -175,7 +175,7 @@ public class PublicRoomActivity extends AbstractLocationActivity {
         if (mNotificationsToggle != null) {
             mNotificationsToggle.setIcon(iconId);
         } else {
-            Utils.debugToast(this, "mNotificationsToggle is null in set notification icon");
+            Utils.debugToast(getApplicationContext(), "mNotificationsToggle is null in set notification icon");
             Log.e(TAG, "mNotificationsToggle is null in set notification icon");
         }
     }

@@ -193,7 +193,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
         @Override
         protected void onPostExecute(Location location) {
             if (location == null) {
-                Utils.debugToast(getApplicationContext(), "Could not find location");
+                Utils.debugToast(getApplicationContext(), "Could not find location... not creating room");
                 Log.w(TAG, "Null location found in create room. Not creating room");
             } else if (NetworkManager.checkOnline(CreateRoomActivity.this)) {
 
