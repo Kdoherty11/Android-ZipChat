@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -32,6 +33,7 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.kdoherty.zipchat.BuildConfig;
 import com.kdoherty.zipchat.R;
 
 import java.io.BufferedReader;
@@ -84,20 +86,6 @@ public class Utils {
         }
     }
 
-    /**
-     * @return Application's version code from the {@code PackageManager}.
-     */
-    public static int getAppVersion(Context context) {
-        try {
-            PackageInfo packageInfo = context.getPackageManager()
-                    .getPackageInfo(context.getPackageName(), 0);
-            return packageInfo.versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            // should never happen
-            throw new RuntimeException("Could not get package name: " + e);
-        }
-    }
-
     public static Long tryParse(String string) {
         if (TextUtils.isEmpty(string)) {
             return null;
@@ -130,6 +118,12 @@ public class Utils {
             return null;
         } else {
             return -accum;
+        }
+    }
+
+    public static void debugToast(Context context, String message) {
+        if (BuildConfig.DEBUG) {
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
         }
     }
 

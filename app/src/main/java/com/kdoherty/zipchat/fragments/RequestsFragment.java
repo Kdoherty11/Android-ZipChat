@@ -20,7 +20,7 @@ import com.kdoherty.zipchat.models.Request;
 import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.NetworkManager;
-import com.kdoherty.zipchat.utils.UserInfo;
+import com.kdoherty.zipchat.utils.UserManager;
 import com.kdoherty.zipchat.views.DividerItemDecoration;
 import com.squareup.otto.Subscribe;
 
@@ -76,9 +76,9 @@ public class RequestsFragment extends Fragment implements SwipeRefreshLayout.OnR
             return;
         }
 
-        final long userId = UserInfo.getId(getActivity());
+        final long userId = UserManager.getId(getActivity());
 
-        ZipChatApi.INSTANCE.getRequests(UserInfo.getAuthToken(getActivity()), userId, new Callback<List<Request>>() {
+        ZipChatApi.INSTANCE.getRequests(UserManager.getAuthToken(getActivity()), userId, new Callback<List<Request>>() {
 
             @Override
             public void success(List<Request> requests, Response response) {

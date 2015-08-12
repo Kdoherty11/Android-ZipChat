@@ -16,7 +16,6 @@ import android.widget.Toast;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
@@ -29,7 +28,7 @@ import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.LocationManager;
 import com.kdoherty.zipchat.utils.NetworkManager;
-import com.kdoherty.zipchat.utils.UserInfo;
+import com.kdoherty.zipchat.utils.UserManager;
 import com.kdoherty.zipchat.utils.Utils;
 
 import retrofit.Callback;
@@ -129,7 +128,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
         mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (waitListRoom != null) {
             Log.d(TAG, "Creating room using waitListRoom");
-            Toast.makeText(getApplicationContext(), "Creating room using waitListRoom", Toast.LENGTH_SHORT).show();
+            Utils.debugToast(this, "Creating room using waitListRoom");
             new CreateRoomTask(waitListRoom).execute();
         }
 
@@ -194,11 +193,11 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
         @Override
         protected void onPostExecute(Location location) {
             if (location == null) {
-                Toast.makeText(getApplicationContext(), "Could not find location", Toast.LENGTH_SHORT).show();
+                Utils.debugToast(getApplicationContext(), "Could not find location");
                 Log.w(TAG, "Null location found in create room. Not creating room");
             } else if (NetworkManager.checkOnline(CreateRoomActivity.this)) {
 
-                ZipChatApi.INSTANCE.createPublicRoom(UserInfo.getAuthToken(CreateRoomActivity.this), name, mRadius, location.getLatitude(), location.getLongitude(), new Callback<Response>() {
+                ZipChatApi.INSTANCE.createPublicRoom(UserManager.getAuthToken(CreateRoomActivity.this), name, mRadius, location.getLatitude(), location.getLongitude(), new Callback<Response>() {
                     @Override
                     public void success(Response response, Response response2) {
                         Log.i(TAG, "Successfully created chat room");

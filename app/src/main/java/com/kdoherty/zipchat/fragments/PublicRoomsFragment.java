@@ -38,7 +38,7 @@ import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.LocationManager;
 import com.kdoherty.zipchat.utils.NetworkManager;
-import com.kdoherty.zipchat.utils.UserInfo;
+import com.kdoherty.zipchat.utils.UserManager;
 import com.kdoherty.zipchat.views.DividerItemDecoration;
 import com.kdoherty.zipchat.views.QuickReturnRecyclerView;
 import com.kdoherty.zipchat.views.RecyclerItemClickListener;
@@ -256,7 +256,7 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
             return;
         }
 
-        ZipChatApi.INSTANCE.getPublicRooms(UserInfo.getAuthToken(getActivity()), location.getLatitude(), location.getLongitude(), new Callback<List<PublicRoom>>() {
+        ZipChatApi.INSTANCE.getPublicRooms(UserManager.getAuthToken(getActivity()), location.getLatitude(), location.getLongitude(), new Callback<List<PublicRoom>>() {
             @Override
             public void success(List<PublicRoom> publicRooms, Response response) {
                 populateList(publicRooms);
@@ -332,7 +332,7 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
                 return;
             }
 
-            ZipChatApi.INSTANCE.getPublicRooms(UserInfo.getAuthToken(getActivity()),
+            ZipChatApi.INSTANCE.getPublicRooms(UserManager.getAuthToken(getActivity()),
                     location.getLatitude(), location.getLongitude(), new Callback<List<PublicRoom>>() {
                 @Override
                 public void success(List<PublicRoom> publicRooms, Response response) {

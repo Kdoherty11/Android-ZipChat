@@ -22,7 +22,7 @@ import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.FacebookManager;
 import com.kdoherty.zipchat.utils.NetworkManager;
-import com.kdoherty.zipchat.utils.UserInfo;
+import com.kdoherty.zipchat.utils.UserManager;
 import com.kdoherty.zipchat.utils.Utils;
 
 import retrofit.Callback;
@@ -107,7 +107,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
             return;
         }
 
-        ZipChatApi.INSTANCE.getStatus(UserInfo.getAuthToken(this), UserInfo.getId(this), mReceiverUserId, new Callback<Response>() {
+        ZipChatApi.INSTANCE.getStatus(UserManager.getAuthToken(this), UserManager.getId(this), mReceiverUserId, new Callback<Response>() {
             @Override
             public void success(Response result, Response response) {
                 String status = NetworkManager.responseToString(result);
@@ -170,8 +170,8 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
             return;
         }
         Log.d(TAG, "Sending chat request to user " + mReceiverUserId);
-        long userId = UserInfo.getId(this);
-        ZipChatApi.INSTANCE.sendChatRequest(UserInfo.getAuthToken(this), userId, mReceiverUserId, new Callback<Response>() {
+        long userId = UserManager.getId(this);
+        ZipChatApi.INSTANCE.sendChatRequest(UserManager.getAuthToken(this), userId, mReceiverUserId, new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
                 finish();

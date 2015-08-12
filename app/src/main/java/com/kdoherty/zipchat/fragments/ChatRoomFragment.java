@@ -30,7 +30,7 @@ import com.kdoherty.zipchat.services.ChatService;
 import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.FacebookManager;
 import com.kdoherty.zipchat.utils.NetworkManager;
-import com.kdoherty.zipchat.utils.UserInfo;
+import com.kdoherty.zipchat.utils.UserManager;
 import com.kdoherty.zipchat.utils.Utils;
 import com.kdoherty.zipchat.views.AnimateFirstDisplayListener;
 import com.kdoherty.zipchat.views.DividerItemDecoration;
@@ -44,6 +44,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
@@ -134,12 +135,12 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSelfId = UserInfo.getId(getActivity());
+        mSelfId = UserManager.getId(getActivity());
         Bundle args = getArguments();
         mRoomId = args.getLong(ARG_ROOM_ID);
         mIsPublicRoom = args.getBoolean(ARG_IS_PUBLIC_ROOM);
 
-        new ChatService(mSelfId, mRoomId, mIsPublicRoom, UserInfo.getAuthToken(getActivity()), this);
+        new ChatService(mSelfId, mRoomId, mIsPublicRoom, UserManager.getAuthToken(getActivity()), this);
 
         options = new DisplayImageOptions.Builder()
                 .showImageOnLoading(R.drawable.com_facebook_profile_picture_blank_portrait)
@@ -255,10 +256,10 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         }
 
         if (mIsPublicRoom) {
-            ZipChatApi.INSTANCE.getPublicRoomMessages(UserInfo.getAuthToken(getActivity()), mRoomId,
+            ZipChatApi.INSTANCE.getPublicRoomMessages(UserManager.getAuthToken(getActivity()), mRoomId,
                     MESSAGE_LIMIT, mMessageOffset, mGetMessagesCallback);
         } else {
-            ZipChatApi.INSTANCE.getPrivateRoomMessages(UserInfo.getAuthToken(getActivity()), mRoomId,
+            ZipChatApi.INSTANCE.getPrivateRoomMessages(UserManager.getAuthToken(getActivity()), mRoomId,
                     MESSAGE_LIMIT, mMessageOffset, mGetMessagesCallback);
         }
     }
@@ -296,6 +297,11 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
             Utils.hideKeyboard(getActivity(), mMessageBoxEt);
             mMessageBoxEt.setText("");
         }
+    }
+
+    private void addMessageLocally(String messageContent) {
+        Message userMessage = new Message(messageContent, UserManager.getSelf(getActivity()), mIsAnon);
+        addMessage(userMessage);
     }
 
     private void favoriteMessage(final User user, final long messageId) {
@@ -337,7 +343,6 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
                 } else {
                     Log.w(TAG, "mMessageAdapter was null in addMessage");
                 }
-
             }
         });
     }
@@ -346,7 +351,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     public void sendFavoriteEvent(long messageId, boolean isFavorite) {
         Log.i(TAG, "Sending a favorite event to message " + messageId + " is favorite: " + isFavorite);
         if (!socketIsAvailable()) {
-            Toast.makeText(getActivity(), "sendFavoriteEvent called when the socket is null or closed", Toast.LENGTH_LONG).show();
+            Utils.debugToast(getActivity(), "sendFavoriteEvent called when the socket is null or closed");
             return;
         }
 
@@ -372,6 +377,8 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     }
 
     private void sendMessage(String message) {
+        addMessageLocally(message);
+
         if (!socketIsAvailable()) {
             Log.w(TAG, "WebSocket is closed... Adding to queue and trying to reconnect");
             mMessageQueue.add(message);
@@ -421,9 +428,18 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
             switch (event) {
                 case "talk":
                     if (!HEARTBEAT_MESSAGE.equals(message)) {
-                        addMessage(gson.fromJson(message, Message.class));
+                        final Message receivedTalk = gson.fromJson(message, Message.class);
+                        if (receivedTalk.getSender().getUserId() != mSelfId) {
+                            Log.d(TAG, "Received talk: " + receivedTalk.getMessage());
+                            addMessage(receivedTalk);
+                        } else {
+                            // Anon messages wont be confirmed because they have different
+                            // user id then mSelfId
+                            Log.d(TAG, "Confirming talk: " + receivedTalk.getMessage());
+                            confirmMessage(receivedTalk);
+                        }
                     } else {
-                        Log.d(TAG, "Received heartbeat from socket...");
+                        Log.d(TAG, "Received heartbeat from socket...: " + message);
                     }
                     break;
                 case "join":
@@ -472,7 +488,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(getActivity(), "Error: " + message, Toast.LENGTH_LONG).show();
+                            Utils.debugToast(getActivity(), "Error: " + message);
                         }
                     });
                     break;
@@ -482,5 +498,14 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         } catch (JSONException e) {
             Log.e(TAG, "Problem parsing socket received JSON: " + s);
         }
+    }
+
+    private void confirmMessage(final Message receivedTalk) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mMessageAdapter.confirmMessage(receivedTalk.getMessage(), receivedTalk);
+            }
+        });
     }
 }

@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.kdoherty.zipchat.utils.UserManager;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,12 +22,14 @@ public class Message implements Parcelable {
 
     private int score;
 
-    private long createdAt;
+    private long createdAt = new Date().getTime() / 1000;
     private Date createdAtDate;
 
-    private List<User> favorites;
+    private List<User> favorites = new ArrayList<>();
 
     private FavoriteState favoriteState;
+
+    private boolean isConfirmed = true;
 
     public enum FavoriteState {
         USER_FAVORITED, FAVORITED, UNFAVORITED
@@ -86,6 +90,12 @@ public class Message implements Parcelable {
         return score;
     }
 
+    public boolean isConfirmed() { return isConfirmed; }
+
+    public void confirm() {
+        this.isConfirmed = true;
+    }
+
     public long getCreatedAt() {
         return createdAt;
     }
@@ -123,6 +133,18 @@ public class Message implements Parcelable {
     public Message() {
     }
 
+    public Message(String message, User sender, boolean isAnon) {
+        this.messageId = -1;
+        this.message = message;
+        this.sender = new User(sender);
+        if (isAnon) {
+            this.sender.setFacebookId(null);
+            this.sender.setName("");
+        }
+        this.createdAt = System.currentTimeMillis() * 1000;
+        this.isConfirmed = false;
+    }
+
     protected Message(Parcel in) {
         this.messageId = in.readLong();
         this.message = in.readString();
@@ -145,6 +167,7 @@ public class Message implements Parcelable {
             return new Message[size];
         }
     };
+
 
     @Override
     public String toString() {

@@ -21,7 +21,7 @@ import com.kdoherty.zipchat.fragments.ChatRoomFragment;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.utils.FacebookManager;
-import com.kdoherty.zipchat.utils.UserInfo;
+import com.kdoherty.zipchat.utils.UserManager;
 import com.squareup.otto.Subscribe;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -105,7 +105,7 @@ public class PrivateRoomActivity extends AppCompatActivity implements View.OnCli
     @SuppressWarnings("unused")
     public void onUserJoinEvent(MemberJoinEvent event) {
         User joined = event.getUser();
-        if (joined.getUserId() == UserInfo.getId(this)) {
+        if (joined.getUserId() == UserManager.getId(this)) {
             Log.e(TAG, "Received own join event");
             return;
         }

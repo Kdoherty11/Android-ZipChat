@@ -9,7 +9,7 @@ import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 import com.kdoherty.zipchat.utils.NetworkManager;
-import com.kdoherty.zipchat.utils.UserInfo;
+import com.kdoherty.zipchat.utils.UserManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,7 +54,7 @@ public class RegistrationIntentService extends IntentService {
 
     private void sendRegistrationToServer(String token) {
         final Context appContext = getApplicationContext();
-        if (UserInfo.didRegisterDevice(appContext)) {
+        if (UserManager.didRegisterDevice(appContext)) {
             updateRegId(token);
         } else {
             registerDevice(token);
@@ -62,7 +62,7 @@ public class RegistrationIntentService extends IntentService {
     }
 
     private void updateRegId(String token) {
-        ZipChatApi.INSTANCE.replaceRegId(UserInfo.getAuthToken(getApplicationContext()), UserInfo.getDeviceId(getApplicationContext()), token, new Callback<Response>() {
+        ZipChatApi.INSTANCE.replaceRegId(UserManager.getAuthToken(getApplicationContext()), UserManager.getDeviceId(getApplicationContext()), token, new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
                 Log.i(TAG, "Successfully replaced regId");
@@ -76,7 +76,7 @@ public class RegistrationIntentService extends IntentService {
     }
 
     private void registerDevice(String token) {
-        ZipChatApi.INSTANCE.registerDevice(UserInfo.getAuthToken(getApplicationContext()), UserInfo.getId(getApplicationContext()), token, "android", new Callback<Response>() {
+        ZipChatApi.INSTANCE.registerDevice(UserManager.getAuthToken(getApplicationContext()), UserManager.getId(getApplicationContext()), token, "android", new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
                 Log.i(TAG, "Successfully registered device");
@@ -84,7 +84,7 @@ public class RegistrationIntentService extends IntentService {
                 try {
                     JSONObject respJson = new JSONObject(respStr);
                     long deviceId = respJson.getLong("deviceId");
-                    UserInfo.storeDeviceId(getApplicationContext(), deviceId);
+                    UserManager.storeDeviceId(getApplicationContext(), deviceId);
                     Log.i(TAG, "Successfully stored device id: " + deviceId);
                 } catch (JSONException e) {
                     Log.e(TAG, "Parsing register device json", e);

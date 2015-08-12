@@ -23,8 +23,7 @@ import com.kdoherty.zipchat.services.RegistrationIntentService;
 import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.FacebookManager;
 import com.kdoherty.zipchat.utils.NetworkManager;
-import com.kdoherty.zipchat.utils.UserInfo;
-import com.kdoherty.zipchat.utils.Utils;
+import com.kdoherty.zipchat.utils.UserManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -82,7 +81,7 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
                 try {
                     JSONObject respJson = new JSONObject(NetworkManager.responseToString(response));
                     String authToken = respJson.getString("authToken");
-                    UserInfo.storeAuthToken(getActivity(), authToken);
+                    UserManager.storeAuthToken(getActivity(), authToken);
                     mAuthPb.setVisibility(View.GONE);
                 } catch (JSONException e) {
                     Log.e(TAG, "Problem parsing the auth json response");
@@ -120,7 +119,7 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
 
     @Override
     public void onSuccess(LoginResult loginResult) {
-        if (UserInfo.didCreateUser(getActivity()) && !mSentAuthRequest) {
+        if (UserManager.didCreateUser(getActivity()) && !mSentAuthRequest) {
             authUser(loginResult.getAccessToken().getToken());
         } else {
             Log.i(TAG, "Creating user");
@@ -143,8 +142,8 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
                         Log.i(TAG, "OnCreate fbName: " + fbName);
 
                         Activity activity = getActivity();
-                        UserInfo.storeId(activity, userId);
-                        UserInfo.storeAuthToken(activity, authToken);
+                        UserManager.storeId(activity, userId);
+                        UserManager.storeAuthToken(activity, authToken);
                         FacebookManager.saveFacebookInformation(activity, fbName, fbId);
                     } catch (JSONException e) {
                         Log.e(TAG, "Parsing the createUser json response " + e);

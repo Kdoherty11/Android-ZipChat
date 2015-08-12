@@ -25,6 +25,12 @@ public class User implements Parcelable {
         }
     };
 
+    public User(User user) {
+        this.userId = user.getUserId();
+        this.facebookId = user.getFacebookId();
+        this.name = user.getName();
+    }
+
     public User(String name, String facebookId, long userId) {
         this.name = name;
         this.facebookId = facebookId;
@@ -62,6 +68,11 @@ public class User implements Parcelable {
         dest.writeString(name);
         dest.writeString(facebookId);
     }
+
+    public void setFacebookId(String facebookId) {
+        this.facebookId = facebookId;
+    }
+    public void setName(String name) { this.name = name; }
 
     @Override
     public boolean equals(Object o) {
