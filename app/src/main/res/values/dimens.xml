@@ -25,7 +25,7 @@
 
     <!-- ***** Home Screen Chat room cell ***** -->
     <dimen name="chat_room_distance_text_size">18sp</dimen>
-    <dimen name="chat_room_margins">8dp</dimen>
+    <dimen name="chat_room_margins">6dp</dimen>
     <dimen name="chat_room_favorite_margins">6dp</dimen>
     <dimen name="chat_room_divider_height">1dp</dimen>
 

@@ -68,10 +68,6 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
 
     private Map<String, ImageView> mDotIndicatorMap = new HashMap<>();
 
-    private String mSortByDistanceTab;
-    private String mSortByActivityTab;
-    private String mSortByVotesTab;
-
     private String mCurrentTabTitle;
 
     private AbstractLocationActivity mLocationCallback;
@@ -168,9 +164,8 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
 
     private void setupSortingTabs() {
 
-        mSortByDistanceTab = getString(R.string.home_sort_by_distance_tab);
-        mSortByActivityTab = getString(R.string.home_sort_by_activity_tab);
-        mSortByVotesTab = getString(R.string.home_sort_by_votes_tab);
+        String mSortByDistanceTab = getString(R.string.home_sort_by_distance_tab);
+        String mSortByActivityTab = getString(R.string.home_sort_by_activity_tab);
 
         mCurrentTabTitle = mSortByDistanceTab;
 
@@ -187,7 +182,6 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
         mTabHost.setup();
         setupTab(mTabHost, new TextView(getActivity()), mSortByDistanceTab);
         setupTab(mTabHost, new TextView(getActivity()), mSortByActivityTab);
-        setupTab(mTabHost, new TextView(getActivity()), mSortByVotesTab);
         //mTabHost.getTabWidget().setShowDividers(TabWidget.SHOW_DIVIDER_MIDDLE);
         //mTabHost.getTabWidget().setDividerDrawable(R.drawable.home_screen_tabs_divider);
 

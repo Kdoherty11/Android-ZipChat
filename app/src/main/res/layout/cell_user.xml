@@ -6,8 +6,8 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/drawer_cell_icon"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         android:layout_centerVertical="true"
         android:layout_marginLeft="@dimen/chat_room_drawer_cell_icon_horizontal_margins"
         android:layout_marginRight="@dimen/chat_room_drawer_cell_icon_horizontal_margins"

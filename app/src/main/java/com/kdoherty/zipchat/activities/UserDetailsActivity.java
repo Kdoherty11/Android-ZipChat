@@ -114,6 +114,8 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
                 final Long privateRoomId = Utils.tryParse(status);
 
+                Utils.debugToast(UserDetailsActivity.this, "Status: " + status + "PrivateRoomId: " + privateRoomId);
+
                 if (privateRoomId != null) {
                     mRequestButton.setText("Already chatting");
                     mRequestButton.setOnClickListener(new View.OnClickListener() {

@@ -218,6 +218,7 @@ public class RoomSocket {
 
     public void onResume() {
         if (mWebSocket != null && mWebSocket.isPaused()) {
+            Log.i(TAG, "Resuming socket!");
             mWebSocket.resume();
             Utils.debugToast(mContext, "Resuming socket in on resume", Toast.LENGTH_SHORT);
         }

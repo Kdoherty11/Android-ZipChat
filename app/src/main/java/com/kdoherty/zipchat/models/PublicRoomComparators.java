@@ -20,6 +20,10 @@ public class PublicRoomComparators {
             final int c1Distance = c1.getDistance();
             final int c2Distance = c2.getDistance();
 
+            if (c1Distance == c2Distance) {
+                return ActivityComparator.DESCENDING.compare(c1, c2);
+            }
+
             return c1Distance - c2Distance;
         }
     }
@@ -37,18 +41,7 @@ public class PublicRoomComparators {
             } else if (c1LastActivity > c2LastActivity) {
                 return -1;
             }
-            return 0;
-        }
-    }
-
-    public enum VotesComparator implements Comparator<PublicRoom> {
-
-        DESCENDING;
-
-        @Override
-        public int compare(PublicRoom c1, PublicRoom c2) {
-            // TODO
-            return 0;
+            return DistanceComparator.ASCENDING.compare(c1, c2);
         }
     }
 }

@@ -79,10 +79,6 @@ public class PublicRoomAdapter extends RecyclerView.Adapter<PublicRoomAdapter.Ch
                 Collections.sort(mPublicRooms, PublicRoomComparators.ActivityComparator.DESCENDING);
                 notifyDataSetChanged();
                 break;
-            case VOTES:
-                Collections.sort(mPublicRooms, PublicRoomComparators.VotesComparator.DESCENDING);
-                notifyDataSetChanged();
-                break;
         }
     }
 

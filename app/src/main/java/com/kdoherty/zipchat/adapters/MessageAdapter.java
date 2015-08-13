@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.kdoherty.zipchat.R;
@@ -109,14 +110,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
     @Override
     public MessageCellViewHolder onCreateViewHolder(ViewGroup viewGroup, final int position) {
         View view = mInflater.inflate(R.layout.cell_message, viewGroup, false);
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "MessageAdapter: " + getMessage(position));
-                Intent intent = MessageDetailsActivity.getIntent(mContext, getMessage(position));
-                mContext.startActivity(intent);
-            }
-        });
         return new MessageCellViewHolder(view);
     }
 
@@ -165,6 +158,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(
                 message.getCreatedAt() * 1000);
         messageCellViewHolder.timestamp.setText(timeAgo);
+        messageCellViewHolder.layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mContext.startActivity(MessageDetailsActivity.getIntent(mContext, message));
+            }
+        });
     }
 
     @Override
@@ -298,9 +297,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         private ImageView favorite;
         private TextView favoriteCount;
         private TextView timestamp;
+        private RelativeLayout layout;
 
         public MessageCellViewHolder(View itemView) {
             super(itemView);
+            layout = (RelativeLayout) itemView;
             profilePicture = (ImageView) itemView.findViewById(R.id.message_picture);
             name = (TextView) itemView.findViewById(R.id.message_sender);
             message = (TextView) itemView.findViewById(R.id.message_text);

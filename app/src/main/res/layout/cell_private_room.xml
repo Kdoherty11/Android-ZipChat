@@ -2,7 +2,7 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="96dp"
     android:background="@color/white">
 
     <LinearLayout
@@ -24,13 +24,6 @@
             android:layout_marginTop="@dimen/private_chat_picture_margins"
             android:src="@drawable/profile_pic" />
 
-        <TextView
-            android:id="@+id/private_chat_last_activity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/zipchat_blue"
-            android:textSize="@dimen/home_screen_cell_last_activity_text_size" />
-
     </LinearLayout>
 
     <TextView
@@ -41,5 +34,16 @@
         android:layout_toRightOf="@id/private_chat_pic_and_time_layout"
         android:textColor="@color/black"
         android:textSize="@dimen/home_screen_cell_name_text_size" />
+
+    <TextView
+        android:id="@+id/private_chat_last_activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="6dp"
+        android:layout_marginBottom="4dp"
+        android:textColor="@color/zipchat_blue"
+        android:textSize="@dimen/home_screen_cell_last_activity_text_size" />
 
 </RelativeLayout>

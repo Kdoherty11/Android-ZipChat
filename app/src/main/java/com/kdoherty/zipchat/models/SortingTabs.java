@@ -5,6 +5,6 @@ package com.kdoherty.zipchat.models;
  */
 public enum SortingTabs {
 
-    DISTANCE, ACTIVITY, VOTES;
+    DISTANCE, ACTIVITY;
 
 }

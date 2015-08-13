@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.fragments.MessageFavoritesFragment;
 import com.kdoherty.zipchat.models.Message;
+import com.kdoherty.zipchat.utils.Utils;
 
 public class MessageDetailsActivity extends AppCompatActivity {
 
@@ -46,15 +47,16 @@ public class MessageDetailsActivity extends AppCompatActivity {
         }
 
 
-        if (mMessageFavoritesFragment == null) {
+        //if (mMessageFavoritesFragment == null) {
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
             Message message = getIntent().getParcelableExtra(EXTRA_MESSAGE);
+            Utils.debugToast(this,"Message: " + message.getMessage() + " Favoritors: " + message.getFavorites());
             mMessageFavoritesFragment = MessageFavoritesFragment.newInstance(message.getFavorites());
             fragmentTransaction.add(R.id.message_favorites_placeholder, mMessageFavoritesFragment);
             fragmentTransaction.commit();
-        }
+        //}
     }
 
     @Override
