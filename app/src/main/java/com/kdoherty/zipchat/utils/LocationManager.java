@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.location.Location;
 import android.provider.Settings;
 
 import com.google.android.gms.maps.CameraUpdateFactory;

@@ -2,9 +2,6 @@ package com.kdoherty.zipchat.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
-
-import java.util.Objects;
 
 /**
  * Created by kdoherty on 12/18/14.

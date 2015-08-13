@@ -5,11 +5,11 @@ import com.kdoherty.zipchat.models.Message;
 /**
  * Created by kdoherty on 8/13/15.
  */
-public class TalkReceivedEvent {
+public class TalkEvent {
 
     private Message message;
 
-    public TalkReceivedEvent(Message message) {
+    public TalkEvent(Message message) {
         this.message = message;
     }
 

@@ -5,7 +5,7 @@ import com.kdoherty.zipchat.models.User;
 /**
  * Created by kdoherty on 8/13/15.
  */
-public abstract class FavoriteEvent {
+abstract class FavoriteEvent {
 
     private User user;
     private long messageId;

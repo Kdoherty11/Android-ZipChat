@@ -2,7 +2,6 @@ package com.kdoherty.zipchat.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Parcelable;
 
 /**
  * Created by kdoherty on 12/30/14.

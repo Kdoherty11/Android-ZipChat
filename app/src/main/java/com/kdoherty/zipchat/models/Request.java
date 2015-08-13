@@ -1,7 +1,5 @@
 package com.kdoherty.zipchat.models;
 
-import com.kdoherty.zipchat.models.User;
-
 /**
  * Created by kdoherty on 12/14/14.
  */

@@ -1,9 +1,5 @@
 package com.kdoherty.zipchat.services;
 
-import android.util.Log;
-import android.widget.ProgressBar;
-
-import com.kdoherty.zipchat.utils.Utils;
 import com.koushikdutta.async.future.Future;
 import com.koushikdutta.async.http.AsyncHttpClient;
 import com.koushikdutta.async.http.WebSocket;

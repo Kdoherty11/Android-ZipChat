@@ -1,17 +1,18 @@
 package com.kdoherty.zipchat.services;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.kdoherty.zipchat.events.AddFavoriteEvent;
 import com.kdoherty.zipchat.events.IsSubscribedEvent;
 import com.kdoherty.zipchat.events.MemberJoinEvent;
 import com.kdoherty.zipchat.events.MemberLeaveEvent;
-import com.kdoherty.zipchat.events.MessageFavoritedEvent;
-import com.kdoherty.zipchat.events.MessageUnfavoritedEvent;
 import com.kdoherty.zipchat.events.ReceivedRoomMembersEvent;
-import com.kdoherty.zipchat.events.TalkReceivedEvent;
+import com.kdoherty.zipchat.events.RemoveFavoriteEvent;
+import com.kdoherty.zipchat.events.TalkEvent;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.UserManager;
@@ -31,8 +32,9 @@ import java.util.Queue;
 public class RoomSocket {
 
     private static final String TAG = RoomSocket.class.getSimpleName();
+    public static final String KEEP_ALIVE_MSG = "Beat";
 
-    interface ReconnectCallback {
+    public interface ReconnectCallback {
         void reconnect();
     }
 
@@ -60,12 +62,12 @@ public class RoomSocket {
 
                 switch (event) {
                     case "talk":
-                        JSONObject talkJson = new JSONObject(message);
-                        if (talkJson.has("sender")) {
+                        // This will still allow
+                        if (!KEEP_ALIVE_MSG.equals(message)) {
                             Message msg = gson.fromJson(message, Message.class);
-                            BusProvider.getInstance().post(new TalkReceivedEvent(msg));
+                            BusProvider.getInstance().post(new TalkEvent(msg));
                         } else {
-                            Log.d(TAG, "Received heartbeat from socket " + talkJson);
+                            Log.d(TAG, "Received heartbeat from socket");
                         }
                         break;
                     case "join":
@@ -91,13 +93,13 @@ public class RoomSocket {
                     case "favorite":
                         User msgFavoritor = gson.fromJson(stringJson.getString("user"), User.class);
                         if (msgFavoritor.getUserId() != userId) {
-                            BusProvider.getInstance().post(new MessageFavoritedEvent(msgFavoritor, Long.parseLong(message)));
+                            BusProvider.getInstance().post(new AddFavoriteEvent(msgFavoritor, Long.parseLong(message)));
                         }
                         break;
                     case "removeFavorite":
                         User msgUnfavoritor = gson.fromJson(stringJson.getString("user"), User.class);
                         if (msgUnfavoritor.getUserId() != userId) {
-                            BusProvider.getInstance().post(new MessageUnfavoritedEvent(msgUnfavoritor, Long.parseLong(message)));
+                            BusProvider.getInstance().post(new RemoveFavoriteEvent(msgUnfavoritor, Long.parseLong(message)));
                         }
                         break;
                     case "error":
@@ -125,13 +127,22 @@ public class RoomSocket {
 
     public RoomSocket(Context context, WebSocket webSocket, ReconnectCallback reconnectCallback) {
         this.mContext = context;
-        this.mWebSocket = webSocket;
         this.mReconnectCallback = reconnectCallback;
         this.userId = UserManager.getId(context);
-        this.mWebSocket.setStringCallback(stringCallback);
-        this.mWebSocket.setClosedCallback(closedCallback);
+        setWebSocket(webSocket);
+    }
 
-        sendQueuedEvents();
+    public RoomSocket(Context context, ReconnectCallback reconnectCallback) {
+        this(context, null, reconnectCallback);
+    }
+
+    public void setWebSocket(@Nullable WebSocket webSocket) {
+        this.mWebSocket = webSocket;
+        if (webSocket != null) {
+            this.mWebSocket.setStringCallback(stringCallback);
+            this.mWebSocket.setClosedCallback(closedCallback);
+            sendQueuedEvents();
+        }
     }
 
     public void sendTalk(String message, boolean isAnon) {
