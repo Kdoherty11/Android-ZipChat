@@ -34,6 +34,7 @@ import com.kdoherty.zipchat.utils.UserManager;
 import com.kdoherty.zipchat.utils.Utils;
 import com.kdoherty.zipchat.views.AnimateFirstDisplayListener;
 import com.kdoherty.zipchat.views.DividerItemDecoration;
+import com.koushikdutta.async.callback.CompletedCallback;
 import com.koushikdutta.async.http.AsyncHttpClient;
 import com.koushikdutta.async.http.WebSocket;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -72,7 +73,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     private EditText mMessageBoxEt;
     private long mRoomId;
 
-    private Queue<String> mMessageQueue = new ArrayDeque<>();
+    private Queue<JSONObject> mSocketEventQueue = new ArrayDeque<>();
     private WebSocket mWebSocket;
 
     private int mMessageOffset = 0;
@@ -89,6 +90,8 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     private String mProfilePicUrl;
 
     private boolean mIsPublicRoom;
+
+    private ChatService mChatService;
 
     private Callback<List<Message>> mGetMessagesCallback = new Callback<List<Message>>() {
         @Override
@@ -138,8 +141,10 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         Bundle args = getArguments();
         mRoomId = args.getLong(ARG_ROOM_ID);
         mIsPublicRoom = args.getBoolean(ARG_IS_PUBLIC_ROOM);
+        ChatService.RoomType roomType = mIsPublicRoom ? ChatService.RoomType.PUBLIC :
+                ChatService.RoomType.PRIVATE;
 
-        new ChatService(mSelfId, mRoomId, mIsPublicRoom, UserManager.getAuthToken(getActivity()), this);
+        mChatService = new ChatService(mSelfId, mRoomId, roomType, UserManager.getAuthToken(getActivity()), this);
 
         options = new DisplayImageOptions.Builder()
                 .showImageOnLoading(R.drawable.com_facebook_profile_picture_blank_portrait)
@@ -206,8 +211,18 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
             if (mMessageAdapter != null) {
                 mMessageAdapter.sendPendingEvents();
             }
-            Log.i(TAG, "Closing socket!");
-            mWebSocket.close();
+            Log.i(TAG, "Pausing socket!");
+            Utils.debugToast(getActivity(), "Pausing socket in on pause", Toast.LENGTH_SHORT);
+            mWebSocket.pause();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mWebSocket != null && mWebSocket.isPaused()) {
+            mWebSocket.resume();
+            Utils.debugToast(getActivity(), "Resuming socket in on resume", Toast.LENGTH_SHORT);
         }
     }
 
@@ -345,10 +360,6 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     @Override
     public void sendFavoriteEvent(long messageId, boolean isFavorite) {
         Log.i(TAG, "Sending a favorite event to message " + messageId + " is favorite: " + isFavorite);
-        if (!socketIsAvailable()) {
-            Utils.debugToast(getActivity(), "sendFavoriteEvent called when the socket is null or closed");
-            return;
-        }
 
         JSONObject json = new JSONObject();
         try {
@@ -361,23 +372,27 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
             return;
         }
 
-        mWebSocket.send(json.toString());
+        sendEventOverSocket(json);
     }
 
-    private void sendQueuedMessages() {
-        while (!mMessageQueue.isEmpty()) {
-            Log.d(TAG, "Sending message from mMessageQueue");
-            sendMessage(mMessageQueue.poll());
+    private void sendEventOverSocket(JSONObject event) {
+        if (socketIsAvailable()) {
+            mWebSocket.send(event.toString());
+        } else {
+            sendEventSocketNotAvailable(event);
+        }
+    }
+
+    private void sendQueuedEvents() {
+        while (!mSocketEventQueue.isEmpty()) {
+            JSONObject event = mSocketEventQueue.poll();
+            Utils.debugToast(getActivity(), "Sending message from mSocketEventQueue: " + event);
+            Log.w(TAG, "Sending message from mSocketEventQueue: " + event);
+            sendEventOverSocket(event);
         }
     }
 
     private void sendMessage(String message) {
-        if (!socketIsAvailable()) {
-            Log.w(TAG, "WebSocket is closed... Adding to queue and trying to reconnect");
-            mMessageQueue.add(message);
-            return;
-        }
-
         JSONObject json = new JSONObject();
         try {
             json.put("event", "talk");
@@ -390,7 +405,18 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
             return;
         }
 
-        mWebSocket.send(json.toString());
+        sendEventOverSocket(json);
+    }
+
+    private void sendEventSocketNotAvailable(JSONObject event) {
+        String err = "WebSocket is closed when trying to send "
+                + event.toString() + "... Adding event to queue";
+        Utils.debugToast(getActivity(), err);
+        Log.w(TAG, err);
+        mSocketEventQueue.add(event);
+
+        reconnect();
+        Utils.debugToast(getActivity(), "ChatService is not currently connecting... Attempting to reconnect");
     }
 
     @Override
@@ -399,9 +425,29 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
             Log.e(TAG, "Problem connecting to the web socket: " + exception.getMessage());
             return;
         }
+        Utils.debugToast(getActivity(), "Connected to the socket!");
         mWebSocket = webSocket;
         mWebSocket.setStringCallback(this);
-        sendQueuedMessages();
+
+        CompletedCallback completedCallback = new CompletedCallback() {
+            @Override
+            public void onCompleted(Exception ex) {
+                Utils.debugToast(getActivity(), "Closed websocket. Exception: " + ex);
+                if (ex != null) {
+                    Log.w(TAG, "Attempting to recover from " + ex.getMessage());
+                    Utils.debugToast(getActivity(), "Attempting to recover from " + ex.getMessage());
+                    reconnect();
+                }
+            }
+        };
+
+        mWebSocket.setClosedCallback(completedCallback);
+        sendQueuedEvents();
+    }
+
+    private void reconnect() {
+        mChatService.cancel();
+        mChatService = new ChatService(mChatService);
     }
 
     private boolean socketIsAvailable() {
@@ -469,15 +515,11 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
                     break;
                 case "error":
                     Log.e(TAG, "Error: " + message);
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Utils.debugToast(getActivity(), "Error: " + message);
-                        }
-                    });
+                    Utils.debugToast(getActivity(), "Error: " + message);
                     break;
                 default:
-                    Log.i(TAG, "DEFAULT RECEIVED: " + s);
+                    Utils.debugToast(getActivity(), "Default socket event " + s);
+                    Log.w(TAG, "DEFAULT RECEIVED: " + s);
             }
         } catch (JSONException e) {
             Log.e(TAG, "Problem parsing socket received JSON: " + s);

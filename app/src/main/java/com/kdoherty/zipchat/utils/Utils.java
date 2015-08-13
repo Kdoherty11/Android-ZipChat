@@ -121,8 +121,19 @@ public class Utils {
     }
 
     public static void debugToast(Context context, String message) {
+        debugToast(context, message, Toast.LENGTH_LONG);
+    }
+
+    public static void debugToast(final Context context, final String message, final int duration) {
         if (BuildConfig.DEBUG) {
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+            if (context instanceof Activity) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, message, duration).show();
+                    }
+                });
+            }
         }
     }
 
