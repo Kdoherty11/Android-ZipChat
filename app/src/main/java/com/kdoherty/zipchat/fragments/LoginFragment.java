@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -95,6 +96,10 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
             public void failure(RetrofitError error) {
                 NetworkManager.logErrorResponse(TAG, "Sending fb access token", error);
                 mAuthPb.setVisibility(View.GONE);
+                mLoginButton.setVisibility(View.VISIBLE);
+
+                Toast.makeText(getActivity(), getString(R.string.login_failure_toast),
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -164,6 +169,8 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
                     NetworkManager.logErrorResponse(TAG, "Creating a user", error);
                     mLoginButton.setVisibility(View.VISIBLE);
                     mAuthPb.setVisibility(View.GONE);
+
+                    Toast.makeText(getActivity(), getString(R.string.login_failure_toast), Toast.LENGTH_SHORT).show();
                 }
             });
         }

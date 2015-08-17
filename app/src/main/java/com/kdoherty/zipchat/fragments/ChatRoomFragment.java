@@ -19,6 +19,7 @@ import com.kdoherty.zipchat.activities.ZipChatApplication;
 import com.kdoherty.zipchat.adapters.MessageAdapter;
 import com.kdoherty.zipchat.events.AddFavoriteEvent;
 import com.kdoherty.zipchat.events.RemoveFavoriteEvent;
+import com.kdoherty.zipchat.events.TalkConfirmationEvent;
 import com.kdoherty.zipchat.events.TalkEvent;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.services.BusProvider;
@@ -39,6 +40,7 @@ import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.squareup.otto.Subscribe;
 
 import java.util.List;
+import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit.Callback;
@@ -62,7 +64,6 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     private RecyclerView mMessagesRv;
     private EditText mMessageBoxEt;
 
-    private ChatService mChatService;
     private RoomSocket mRoomSocket;
 
     private int mMessageOffset = 0;
@@ -126,15 +127,8 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         mIsPublicRoom = args.getBoolean(ARG_IS_PUBLIC_ROOM);
 
         ChatService.RoomType roomType = mIsPublicRoom ? ChatService.RoomType.PUBLIC : ChatService.RoomType.PRIVATE;
-        mChatService = new ChatService(mSelfId, mRoomId, roomType, UserManager.getAuthToken(activity), this);
-
-        mRoomSocket = new RoomSocket(activity, new RoomSocket.ReconnectCallback() {
-            @Override
-            public void reconnect() {
-                mChatService.cancel();
-                mChatService = new ChatService(mChatService);
-            }
-        });
+        ChatService chatService = new ChatService(mSelfId, mRoomId, roomType, UserManager.getAuthToken(activity), this);
+        mRoomSocket = new RoomSocket(activity, chatService);
     }
 
     @Override
@@ -200,29 +194,6 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        if (mMessageAdapter != null) {
-            mMessageAdapter.sendPendingEvents();
-        }
-        mRoomSocket.onPause();
-        BusProvider.getInstance().unregister(this);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mRoomSocket.onResume();
-        BusProvider.getInstance().register(this);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        AnimateFirstDisplayListener.clearImages();
-    }
-
-    @Override
     public void onClick(View view) {
         int id = view.getId();
         switch (id) {
@@ -238,15 +209,6 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
                             options, mAnimateFirstListener);
                 }
                 break;
-        }
-    }
-
-    private void sendMessage() {
-        String messageContent = mMessageBoxEt.getText().toString().trim();
-        if (!messageContent.isEmpty()) {
-            mRoomSocket.sendTalk(messageContent, mIsAnon);
-            Utils.hideKeyboard(getActivity(), mMessageBoxEt);
-            mMessageBoxEt.setText("");
         }
     }
 
@@ -337,12 +299,39 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void addMessage(final TalkEvent talkEvent) {
+    public void onTalkConfirmation(TalkConfirmationEvent event) {
+        mMessageAdapter.confirmMessage(event.getUuid(), event.getMessage());
+    }
+
+    private void sendMessage() {
+        String messageContent = mMessageBoxEt.getText().toString().trim();
+        if (!messageContent.isEmpty()) {
+            String uuid = UUID.randomUUID().toString();
+            addMessageLocally(messageContent, uuid);
+            mRoomSocket.sendTalk(messageContent, mIsAnon, uuid);
+            Utils.hideKeyboard(getActivity(), mMessageBoxEt);
+            mMessageBoxEt.setText("");
+        }
+    }
+
+    private void addMessageLocally(String messageContent, String uuid) {
+        Message userMessage = new Message(messageContent,
+                UserManager.getSelf(getActivity()), mIsAnon, uuid);
+        addMessage(userMessage);
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onTalkEvent(final TalkEvent talkEvent) {
+        addMessage(talkEvent.getMessage());
+    }
+
+    private void addMessage(final Message message) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if (mMessageAdapter != null) {
-                    mMessageAdapter.addMessageToEnd(talkEvent.getMessage());
+                    mMessageAdapter.addMessageToEnd(message);
                     mMessagesRv.scrollToPosition(mMessageAdapter.getItemCount() - 1);
                     mMessageOffset++;
                 } else {
@@ -365,5 +354,28 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         }
         Utils.debugToast(getActivity(), "Connected to the socket!");
         mRoomSocket.setWebSocket(webSocket);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mMessageAdapter != null) {
+            mMessageAdapter.sendPendingEvents();
+        }
+        mRoomSocket.onPause();
+        BusProvider.getInstance().unregister(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mRoomSocket.onResume();
+        BusProvider.getInstance().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        AnimateFirstDisplayListener.clearImages();
     }
 }

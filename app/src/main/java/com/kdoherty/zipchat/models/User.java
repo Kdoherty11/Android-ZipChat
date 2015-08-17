@@ -2,6 +2,9 @@ package com.kdoherty.zipchat.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
+
+import java.util.Objects;
 
 /**
  * Created by kdoherty on 12/18/14.
@@ -21,6 +24,12 @@ public class User implements Parcelable {
             return new User[size];
         }
     };
+
+    public User(User user) {
+        this.userId = user.getUserId();
+        this.facebookId = user.getFacebookId();
+        this.name = user.getName();
+    }
 
     public User(String name, String facebookId, long userId) {
         this.name = name;
@@ -59,6 +68,11 @@ public class User implements Parcelable {
         dest.writeString(name);
         dest.writeString(facebookId);
     }
+
+    public void setFacebookId(String facebookId) {
+        this.facebookId = facebookId;
+    }
+    public void setName(String name) { this.name = name; }
 
     @Override
     public boolean equals(Object o) {

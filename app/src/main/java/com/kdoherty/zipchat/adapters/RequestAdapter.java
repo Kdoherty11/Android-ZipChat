@@ -43,7 +43,6 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     private RequestFilter mFilter = new RequestFilter();
     private List<Request> mFilteredRequests;
 
-
     public RequestAdapter(Context context, List<Request> requests) {
         mInflater = LayoutInflater.from(context);
         mContext = context;
@@ -70,7 +69,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     public void onBindViewHolder(RequestViewHolder holder, final int position) {
         Request request = getRequest(position);
         holder.timeStamp.setText(DateUtils.getRelativeTimeSpanString(
-                request.getTimeStamp() * 1000));
+                request.getCreatedAt() * 1000));
 
         final User sender = request.getSender();
         holder.senderTv.setText(sender.getName());

@@ -76,5 +76,7 @@
     <string name="drawer_user_location_pin_title">My Location</string>
     <string name="action_flag_message">Flag Message</string>
 
+    <string name="login_failure_toast">"Could not login… Please try again later"</string>
+
 
 </resources>

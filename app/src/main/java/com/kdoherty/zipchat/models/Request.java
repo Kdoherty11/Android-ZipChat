@@ -7,7 +7,7 @@ public class Request {
 
     private long requestId;
     private User sender;
-    private long timeStamp;
+    private long createdAt;
 
     public enum Status {
         accepted,
@@ -15,17 +15,12 @@ public class Request {
         pending
     }
 
-    public Request(User sender, long timeStamp) {
-        this.sender = sender;
-        this.timeStamp = timeStamp;
-    }
-
     public User getSender() {
         return this.sender;
     }
 
-    public long getTimeStamp() {
-        return this.timeStamp;
+    public long getCreatedAt() {
+        return this.createdAt;
     }
 
     public long getRequestId() {

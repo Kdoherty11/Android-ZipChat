@@ -12,8 +12,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.MessageDetailsActivity;
@@ -23,6 +25,7 @@ import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.FacebookManager;
 import com.kdoherty.zipchat.utils.UserManager;
+import com.kdoherty.zipchat.utils.Utils;
 import com.kdoherty.zipchat.views.AnimateFirstDisplayListener;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
@@ -110,6 +113,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
     @Override
     public MessageCellViewHolder onCreateViewHolder(ViewGroup viewGroup, final int position) {
         View view = mInflater.inflate(R.layout.cell_message, viewGroup, false);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "MessageAdapter: " + getMessage(position));
+                Intent intent = MessageDetailsActivity.getIntent(mContext, getMessage(position));
+                mContext.startActivity(intent);
+            }
+        });
         return new MessageCellViewHolder(view);
     }
 
@@ -138,32 +149,35 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         messageCellViewHolder.message.setText(message.getMessage());
 
         long userId = UserManager.getId(mContext);
-        messageCellViewHolder.favorite.setOnClickListener(new FavoriteClickListener(message, userId));
+        if (message.isConfirmed()) {
+            messageCellViewHolder.unconfirmedMsgPb.setVisibility(View.GONE);
+            messageCellViewHolder.favoriteLayout.setVisibility(View.VISIBLE);
 
-        Message.FavoriteState favoriteState = message.getFavoriteState(userId);
+            messageCellViewHolder.favorite.setOnClickListener(new FavoriteClickListener(message, userId));
 
-        Drawable favoriteDrawable = getMessageDrawable(favoriteState);
-        messageCellViewHolder.favorite.setImageDrawable(favoriteDrawable);
+            Message.FavoriteState favoriteState = message.getFavoriteState(userId);
 
-        int favoriteCount = message.getFavoriteCount();
+            Drawable favoriteDrawable = getMessageDrawable(favoriteState);
+            messageCellViewHolder.favorite.setImageDrawable(favoriteDrawable);
 
-        if (favoriteCount > 0) {
-            messageCellViewHolder.favoriteCount.setVisibility(View.VISIBLE);
-        } else if (messageCellViewHolder.favoriteCount.getVisibility() == View.VISIBLE) {
-            messageCellViewHolder.favoriteCount.setVisibility(View.GONE);
+            int favoriteCount = message.getFavoriteCount();
+
+            if (favoriteCount > 0) {
+                messageCellViewHolder.favoriteCount.setVisibility(View.VISIBLE);
+            } else if (messageCellViewHolder.favoriteCount.getVisibility() == View.VISIBLE) {
+                messageCellViewHolder.favoriteCount.setVisibility(View.GONE);
+            }
+
+            messageCellViewHolder.favoriteCount.setText(String.valueOf(message.getFavoriteCount()));
+        } else {
+            // not yet confirmed
+            messageCellViewHolder.unconfirmedMsgPb.setVisibility(View.VISIBLE);
+            messageCellViewHolder.favoriteLayout.setVisibility(View.GONE);
         }
-
-        messageCellViewHolder.favoriteCount.setText(String.valueOf(message.getFavoriteCount()));
 
         CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(
                 message.getCreatedAt() * 1000);
         messageCellViewHolder.timestamp.setText(timeAgo);
-        messageCellViewHolder.layout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mContext.startActivity(MessageDetailsActivity.getIntent(mContext, message));
-            }
-        });
     }
 
     @Override
@@ -201,6 +215,30 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
 
     private Drawable getMessageDrawable(Message.FavoriteState state) {
         return mContext.getResources().getDrawable(getMessageDrawableId(state));
+    }
+
+    public void confirmMessage(String uuid, Message msg) {
+        int msgIndex = findUnconfirmedMsgIndex(uuid);
+        if (msgIndex > 0) {
+            Log.d(TAG, "Confirming message at index: " + msgIndex);
+            mMessages.set(msgIndex, msg);
+            notifyItemChanged(msgIndex);
+        } else {
+            Log.w(TAG, "Message: " + msg + " couldn't be found to be confirmed");
+            Utils.debugToast(mContext, "Message: " + msg + " couldn't be found to be confirmed");
+        }
+    }
+
+    private int findUnconfirmedMsgIndex(String uuid) {
+        int numMessages = mMessages.size();
+        for (int i = 0; i < numMessages; i++) {
+            Message message = mMessages.get(i);
+            if (!message.isConfirmed() && uuid.equals(message.getUuid())) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     public void favoriteMessage(User user, long messageId, long selfId) {
@@ -297,17 +335,19 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         private ImageView favorite;
         private TextView favoriteCount;
         private TextView timestamp;
-        private RelativeLayout layout;
+        private LinearLayout favoriteLayout;
+        private ProgressBar unconfirmedMsgPb;
 
         public MessageCellViewHolder(View itemView) {
             super(itemView);
-            layout = (RelativeLayout) itemView;
             profilePicture = (ImageView) itemView.findViewById(R.id.message_picture);
             name = (TextView) itemView.findViewById(R.id.message_sender);
             message = (TextView) itemView.findViewById(R.id.message_text);
-            favorite = (ImageView) itemView.findViewById(R.id.message_favorite);
-            favoriteCount = (TextView) itemView.findViewById(R.id.message_favorite_count);
+            favoriteLayout = (LinearLayout) itemView.findViewById(R.id.favorite_container);
+            favorite = (ImageView) favoriteLayout.findViewById(R.id.message_favorite);
+            favoriteCount = (TextView) favoriteLayout.findViewById(R.id.message_favorite_count);
             timestamp = (TextView) itemView.findViewById(R.id.message_timestamp);
+            unconfirmedMsgPb = (ProgressBar) itemView.findViewById(R.id.unconfirmed_msg_pb);
         }
     }
 }

@@ -1,6 +1,8 @@
 package com.kdoherty.zipchat.services;
 
 import android.content.Context;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
@@ -12,6 +14,7 @@ import com.kdoherty.zipchat.events.MemberJoinEvent;
 import com.kdoherty.zipchat.events.MemberLeaveEvent;
 import com.kdoherty.zipchat.events.ReceivedRoomMembersEvent;
 import com.kdoherty.zipchat.events.RemoveFavoriteEvent;
+import com.kdoherty.zipchat.events.TalkConfirmationEvent;
 import com.kdoherty.zipchat.events.TalkEvent;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
@@ -33,19 +36,15 @@ public class RoomSocket {
 
     private static final String TAG = RoomSocket.class.getSimpleName();
     public static final String KEEP_ALIVE_MSG = "Beat";
-
-    public interface ReconnectCallback {
-        void reconnect();
-    }
+    private static final long INITIAL_BACKOFF_MILLIS = 500;
+    private static final long MAX_BACKOFF_DELAY_MILLIS = 64 * 1000;
 
     private final CompletedCallback closedCallback = new CompletedCallback() {
         @Override
         public void onCompleted(Exception ex) {
-            Utils.debugToast(mContext, "Closed websocket. Exception: " + ex);
             if (ex != null) {
                 Log.w(TAG, "Attempting to recover from " + ex.getMessage());
-                Utils.debugToast(mContext, "Attempting to recover from " + ex.getMessage());
-                mReconnectCallback.reconnect();
+                reconnect();
             }
         }
     };
@@ -58,17 +57,21 @@ public class RoomSocket {
                 JSONObject stringJson = new JSONObject(s);
 
                 String event = stringJson.getString("event");
-                String message = stringJson.getString("message");
 
                 switch (event) {
                     case "talk":
-                        // This will still allow
-                        if (!KEEP_ALIVE_MSG.equals(message)) {
-                            Message msg = gson.fromJson(message, Message.class);
+                        String talk = stringJson.getString("message");
+                        if (!KEEP_ALIVE_MSG.equals(talk)) {
+                            Message msg = gson.fromJson(talk, Message.class);
                             BusProvider.getInstance().post(new TalkEvent(msg));
                         } else {
                             Log.d(TAG, "Received heartbeat from socket");
                         }
+                        break;
+                    case "talk-confirmation":
+                        String uuid = stringJson.getString("uuid");
+                        Message msg = gson.fromJson(stringJson.getString("message"), Message.class);
+                        BusProvider.getInstance().post(new TalkConfirmationEvent(uuid, msg));
                         break;
                     case "join":
                         User joinedUser = gson.fromJson(stringJson.getString("user"), User.class);
@@ -83,7 +86,7 @@ public class RoomSocket {
                         }
                         break;
                     case "joinSuccess":
-                        JSONObject joinJson = new JSONObject(message);
+                        JSONObject joinJson = new JSONObject(stringJson.getString("message"));
                         if (joinJson.has("isSubscribed")) {
                             BusProvider.getInstance().post(new IsSubscribedEvent(joinJson.getBoolean("isSubscribed")));
                         }
@@ -93,18 +96,18 @@ public class RoomSocket {
                     case "favorite":
                         User msgFavoritor = gson.fromJson(stringJson.getString("user"), User.class);
                         if (msgFavoritor.getUserId() != userId) {
-                            BusProvider.getInstance().post(new AddFavoriteEvent(msgFavoritor, Long.parseLong(message)));
+                            BusProvider.getInstance().post(new AddFavoriteEvent(msgFavoritor, Long.parseLong(stringJson.getString("message"))));
                         }
                         break;
                     case "removeFavorite":
                         User msgUnfavoritor = gson.fromJson(stringJson.getString("user"), User.class);
                         if (msgUnfavoritor.getUserId() != userId) {
-                            BusProvider.getInstance().post(new RemoveFavoriteEvent(msgUnfavoritor, Long.parseLong(message)));
+                            BusProvider.getInstance().post(new RemoveFavoriteEvent(msgUnfavoritor, Long.parseLong(stringJson.getString("message"))));
                         }
                         break;
                     case "error":
-                        Log.e(TAG, "Error: " + message);
-                        Utils.debugToast(mContext, "Error: " + message);
+                        Log.e(TAG, "Error: " + stringJson.getString("message"));
+                        Utils.debugToast(mContext, "Error: " + stringJson.getString("message"));
                         break;
                     default:
                         Utils.debugToast(mContext, "Default socket event " + s);
@@ -116,24 +119,38 @@ public class RoomSocket {
         }
     };
 
-    private ReconnectCallback mReconnectCallback;
+    private Runnable mReconnectRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (socketIsAvailable()) {
+                mIsReconnecting = false;
+                mBackoffDelay = INITIAL_BACKOFF_MILLIS;
+            } else {
+                mBackoffDelay *= 2;
+
+                if (mBackoffDelay <= MAX_BACKOFF_DELAY_MILLIS) {
+                    reconnectWithRetry();
+                }
+            }
+        }
+    };
 
     private Queue<JSONObject> mSocketEventQueue = new ArrayDeque<>();
 
     private final long userId;
 
+    private boolean mIsReconnecting = false;
+    private ChatService mChatService;
     private Context mContext;
     private WebSocket mWebSocket;
+    private Handler mHandler = new Handler();
 
-    public RoomSocket(Context context, WebSocket webSocket, ReconnectCallback reconnectCallback) {
+    private long mBackoffDelay = INITIAL_BACKOFF_MILLIS;
+
+    public RoomSocket(@NonNull Context context, @NonNull ChatService chatService) {
         this.mContext = context;
-        this.mReconnectCallback = reconnectCallback;
         this.userId = UserManager.getId(context);
-        setWebSocket(webSocket);
-    }
-
-    public RoomSocket(Context context, ReconnectCallback reconnectCallback) {
-        this(context, null, reconnectCallback);
+        this.mChatService = chatService;
     }
 
     public void setWebSocket(@Nullable WebSocket webSocket) {
@@ -145,14 +162,13 @@ public class RoomSocket {
         }
     }
 
-    public void sendTalk(String message, boolean isAnon) {
+    public void sendTalk(String message, boolean isAnon, String uuid) {
         JSONObject talkEvent = new JSONObject();
         try {
             talkEvent.put("event", "talk");
             talkEvent.put("message", message);
-            if (isAnon) {
-                talkEvent.put("isAnon", true);
-            }
+            talkEvent.put("isAnon", isAnon);
+            talkEvent.put("uuid", uuid);
         } catch (JSONException e) {
             Log.e(TAG, "Problem creating the chat message JSON: " + e.getMessage());
             return;
@@ -166,8 +182,7 @@ public class RoomSocket {
         try {
             favoriteEvent.put("event", "FavoriteNotification");
             favoriteEvent.put("messageId", messageId);
-            String action = isFavorite ? "add" : "remove";
-            favoriteEvent.put("action", action);
+            favoriteEvent.put("action", isFavorite ? "add" : "remove");
         } catch (JSONException e) {
             Log.e(TAG, "Problem creating the favorite event JSON: " + e.getMessage());
             return;
@@ -195,8 +210,26 @@ public class RoomSocket {
         Log.w(TAG, err);
         mSocketEventQueue.add(event);
 
-        mReconnectCallback.reconnect();
+        reconnect();
+
         Utils.debugToast(mContext, "ChatService is not currently connecting... Attempting to reconnect");
+    }
+
+    private void reconnect() {
+        if (!mIsReconnecting) {
+            mIsReconnecting = true;
+            reconnectWithRetry();
+        }
+    }
+
+    private void reconnectWithRetry() {
+        mWebSocket = null;
+        mChatService.cancel();
+        mChatService = new ChatService(mChatService);
+
+        Utils.debugToast(mContext, "Reconnect with " + mBackoffDelay + " delay", Toast.LENGTH_SHORT);
+
+        mHandler.postDelayed(mReconnectRunnable, mBackoffDelay);
     }
 
     private void sendQueuedEvents() {

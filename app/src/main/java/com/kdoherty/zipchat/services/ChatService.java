@@ -29,7 +29,7 @@ public class ChatService extends Thread {
         }
     }
 
-    public ChatService(ChatService other) {
+    ChatService(ChatService other) {
         this.mUrl = other.mUrl;
         this.mCallback = other.mCallback;
         this.start();
