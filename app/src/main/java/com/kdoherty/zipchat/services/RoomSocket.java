@@ -246,6 +246,7 @@ public class RoomSocket {
             Log.i(TAG, "Pausing socket!");
             Utils.debugToast(mContext, "Pausing socket in on pause", Toast.LENGTH_SHORT);
             mWebSocket.pause();
+            mHandler.removeCallbacksAndMessages(null);
         }
     }
 

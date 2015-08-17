@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -113,14 +114,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
     @Override
     public MessageCellViewHolder onCreateViewHolder(ViewGroup viewGroup, final int position) {
         View view = mInflater.inflate(R.layout.cell_message, viewGroup, false);
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "MessageAdapter: " + getMessage(position));
-                Intent intent = MessageDetailsActivity.getIntent(mContext, getMessage(position));
-                mContext.startActivity(intent);
-            }
-        });
         return new MessageCellViewHolder(view);
     }
 
@@ -169,6 +162,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
             }
 
             messageCellViewHolder.favoriteCount.setText(String.valueOf(message.getFavoriteCount()));
+
+            messageCellViewHolder.layout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = MessageDetailsActivity.getIntent(mContext, message);
+                    mContext.startActivity(intent);
+                }
+            });
         } else {
             // not yet confirmed
             messageCellViewHolder.unconfirmedMsgPb.setVisibility(View.VISIBLE);
@@ -329,6 +330,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
 
     public class MessageCellViewHolder extends RecyclerView.ViewHolder {
 
+        private RelativeLayout layout;
         private ImageView profilePicture;
         private TextView name;
         private TextView message;
@@ -340,6 +342,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
 
         public MessageCellViewHolder(View itemView) {
             super(itemView);
+            layout = (RelativeLayout) itemView;
             profilePicture = (ImageView) itemView.findViewById(R.id.message_picture);
             name = (TextView) itemView.findViewById(R.id.message_sender);
             message = (TextView) itemView.findViewById(R.id.message_text);
