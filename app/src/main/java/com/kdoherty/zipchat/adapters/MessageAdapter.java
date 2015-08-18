@@ -220,12 +220,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
 
     public void confirmMessage(String uuid, Message msg) {
         int msgIndex = findUnconfirmedMsgIndex(uuid);
-        if (msgIndex > 0) {
+        if (msgIndex > -1) {
             Log.d(TAG, "Confirming message at index: " + msgIndex);
             mMessages.set(msgIndex, msg);
             notifyItemChanged(msgIndex);
         } else {
-            Log.w(TAG, "Message: " + msg + " couldn't be found to be confirmed");
+            Log.w(TAG, "Message " + msg + " couldn't be found to be confirmed." +
+                    " uuid=" + uuid + " messages= " + mMessages);
             Utils.debugToast(mContext, "Message: " + msg + " couldn't be found to be confirmed");
         }
     }
