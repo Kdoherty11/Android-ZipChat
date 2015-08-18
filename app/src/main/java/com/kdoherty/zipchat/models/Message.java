@@ -181,6 +181,8 @@ public class Message implements Parcelable {
         sb.append("messageId=").append(messageId);
         sb.append(", message='").append(message).append('\'');
         sb.append(", sender=").append(sender);
+        sb.append(", confirmed=").append(isConfirmed);
+        sb.append(", uuid=").append(uuid);
         sb.append(", score=").append(score);
         sb.append(", createdAt=").append(createdAt);
         sb.append(", createdAtDate=").append(createdAtDate);
