@@ -1,6 +1,7 @@
 package com.kdoherty.zipchat.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
@@ -13,6 +14,7 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.kdoherty.zipchat.R;
+import com.kdoherty.zipchat.activities.UserDetailsActivity;
 import com.kdoherty.zipchat.events.RequestAcceptedEvent;
 import com.kdoherty.zipchat.models.Request;
 import com.kdoherty.zipchat.models.User;
@@ -67,7 +69,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
     @Override
     public void onBindViewHolder(RequestViewHolder holder, final int position) {
-        Request request = getRequest(position);
+        final Request request = getRequest(position);
         holder.timeStamp.setText(DateUtils.getRelativeTimeSpanString(
                 request.getCreatedAt() * 1000));
 
@@ -76,6 +78,13 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         FacebookManager.displayProfilePicture(sender.getFacebookId(), holder.senderPicture);
         holder.acceptButton.setOnClickListener(new ResponseClickListener(Request.Status.accepted, position));
         holder.denyButton.setOnClickListener(new ResponseClickListener(Request.Status.denied, position));
+        holder.senderPicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = UserDetailsActivity.getIntent(mContext, sender);
+                mContext.startActivity(intent);
+            }
+        });
     }
 
     @Override

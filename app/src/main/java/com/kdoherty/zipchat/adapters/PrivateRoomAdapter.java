@@ -1,6 +1,7 @@
 package com.kdoherty.zipchat.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
@@ -11,9 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.kdoherty.zipchat.R;
+import com.kdoherty.zipchat.activities.PrivateRoomActivity;
+import com.kdoherty.zipchat.activities.UserDetailsActivity;
 import com.kdoherty.zipchat.activities.ZipChatApplication;
 import com.kdoherty.zipchat.models.PrivateRoom;
 import com.kdoherty.zipchat.models.User;
@@ -55,19 +59,41 @@ public class PrivateRoomAdapter extends RecyclerView.Adapter<PrivateRoomAdapter.
 
     @Override
     public void onBindViewHolder(PrivateChatViewHolder roomCellViewHolder, int position) {
-        PrivateRoom privateRoom = getPrivateChat(position);
+        final PrivateRoom privateRoom = getPrivateChat(position);
 
         User other = privateRoom.getOther();
         if (other == null) {
             other = privateRoom.getAndSetOther(UserManager.getId(mContext));
         }
 
-        FacebookManager.displayProfilePicture(other.getFacebookId(), roomCellViewHolder.circleProfilePictureView);
-        roomCellViewHolder.title.setText(other.getName());
+        final User finalOther = other;
+
+        FacebookManager.displayProfilePicture(finalOther.getFacebookId(), roomCellViewHolder.circleProfilePictureView);
+        roomCellViewHolder.title.setText(finalOther.getName());
 
         CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(
                 privateRoom.getLastActivity() * 1000);
         roomCellViewHolder.lastActivity.setText(timeAgo);
+
+        roomCellViewHolder.circleProfilePictureView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = UserDetailsActivity.getIntent(mContext, finalOther);
+                mContext.startActivity(intent);
+            }
+        });
+
+        roomCellViewHolder.layout.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                long roomId = privateRoom.getId();
+                String userName = privateRoom.getOther().getName();
+                String facebookId = privateRoom.getOther().getFacebookId();
+                Intent intent = PrivateRoomActivity.getIntent(mContext, roomId, userName, facebookId);
+                mContext.startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -89,9 +115,11 @@ public class PrivateRoomAdapter extends RecyclerView.Adapter<PrivateRoomAdapter.
         private CircleImageView circleProfilePictureView;
         private TextView title;
         private TextView lastActivity;
+        private RelativeLayout layout;
 
         public PrivateChatViewHolder(View itemView) {
             super(itemView);
+            layout = (RelativeLayout) itemView;
             title = (TextView) itemView.findViewById(R.id.private_chat_title);
             lastActivity = (TextView) itemView.findViewById(R.id.private_chat_last_activity);
             circleProfilePictureView = (CircleImageView) itemView.findViewById(R.id.private_chat_picture);

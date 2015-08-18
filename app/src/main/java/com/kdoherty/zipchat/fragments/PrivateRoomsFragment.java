@@ -77,19 +77,6 @@ public class PrivateRoomsFragment extends Fragment implements Filterable, SwipeR
         });
 
         populateList();
-
-        mPrivateChatsRv.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(),
-                new RecyclerItemClickListener.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(View view, int position) {
-                        PrivateRoom privateRoom = mAdapter.getPrivateChat(position);
-                        long roomId = privateRoom.getId();
-                        String userName = privateRoom.getOther().getName();
-                        String facebookId = privateRoom.getOther().getFacebookId();
-                        Intent intent = PrivateRoomActivity.getIntent(getActivity(), roomId, userName, facebookId);
-                        startActivity(intent);
-                    }
-                }));
     }
 
     public void populateList() {
