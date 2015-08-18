@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.models.User;
@@ -41,6 +42,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     private String mReceiverFbId;
 
     private Button mRequestButton;
+    private ProgressBar mRequestStatusLoadingPb;
     private String mReceiverName;
 
     public static Intent getIntent(Context context, User user) {
@@ -75,6 +77,8 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         mRequestButton = (Button) findViewById(R.id.chat_request_button);
         mRequestButton.setOnClickListener(this);
 
+        mRequestStatusLoadingPb = (ProgressBar) findViewById(R.id.request_status_loading_pb);
+
         final ImageView profilePictureView = (ImageView) findViewById(R.id.chat_request_profile_picture);
         FacebookManager.displayProfilePicture(mReceiverFbId, profilePictureView, "large");
 
@@ -102,8 +106,22 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
     }
 
+    private void startLoading() {
+        Utils.debugToast(this, "Starting loading");
+        mRequestButton.setVisibility(View.GONE);
+        mRequestStatusLoadingPb.setVisibility(View.VISIBLE);
+    }
+
+    private void stopLoading() {
+        mRequestStatusLoadingPb.setVisibility(View.GONE);
+        mRequestButton.setVisibility(View.VISIBLE);
+        Utils.debugToast(this, "Stopped loading");
+    }
+
     private void setButtonText() {
+        startLoading();
         if (!NetworkManager.checkOnline(this)) {
+            stopLoading();
             return;
         }
 
@@ -114,10 +132,8 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
                 final Long privateRoomId = Utils.tryParse(status);
 
-                Utils.debugToast(UserDetailsActivity.this, "Status: " + status + "PrivateRoomId: " + privateRoomId);
-
                 if (privateRoomId != null) {
-                    mRequestButton.setText("Already chatting");
+                    mRequestButton.setText(getString(R.string.request_status_already_chatting));
                     mRequestButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -130,12 +146,13 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
                     mRequestButton.setEnabled(false);
                 }
 
-                mRequestButton.setVisibility(View.VISIBLE);
+                stopLoading();
             }
 
             @Override
             public void failure(RetrofitError error) {
                 NetworkManager.logErrorResponse(TAG, "Getting request status", error);
+                stopLoading();
             }
         });
     }
