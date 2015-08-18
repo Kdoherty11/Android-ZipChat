@@ -97,14 +97,14 @@ public class Utils {
 
     public static void debugToast(final Context context, final String message, final int duration) {
         if (BuildConfig.DEBUG) {
-//            if (context instanceof Activity) {
-//                ((Activity) context).runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        Toast.makeText(context, message, duration).show();
-//                    }
-//                });
-//            }
+            if (context instanceof Activity) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, message, duration).show();
+                    }
+                });
+            }
         }
     }
 
