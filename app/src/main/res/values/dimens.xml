@@ -32,7 +32,7 @@
     <!-- Home screen private chat cell -->
     <dimen name="private_chat_margins">8dp</dimen>
     <dimen name="private_chat_favorite_margins">6dp</dimen>
-    <dimen name="private_chat_picture_margins">4dp</dimen>
+    <dimen name="private_chat_picture_margins">12dp</dimen>
 
     <!-- Home screen chat request cell -->
     <dimen name="chat_request_picture_margins">8dp</dimen>

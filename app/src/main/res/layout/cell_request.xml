@@ -2,7 +2,7 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="96dp"
     android:background="@color/white">
 
     <LinearLayout
@@ -35,42 +35,36 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/chat_request_pic_and_time_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/chat_request_sender_picture"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:layout_margin="@dimen/chat_request_margins"
-        android:orientation="vertical">
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/chat_request_sender_picture"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_centerVertical="true"
-            android:layout_marginBottom="@dimen/chat_request_picture_margins"
-            android:layout_marginRight="@dimen/chat_request_picture_margins"
-            android:layout_marginTop="@dimen/chat_request_picture_margins"
-            android:src="@drawable/profile_pic" />
-
-        <TextView
-            android:id="@+id/chat_request_time_stamp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/zipchat_blue"
-            android:textSize="@dimen/home_screen_cell_last_activity_text_size" />
-
-    </LinearLayout>
+        android:layout_marginBottom="@dimen/private_chat_picture_margins"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="@dimen/private_chat_picture_margins"
+        android:layout_marginTop="@dimen/private_chat_picture_margins"
+        android:src="@drawable/profile_pic" />
 
     <TextView
         android:id="@+id/chat_request_sender_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:layout_toLeftOf="@id/chat_request_accept_deny_layout"
-        android:layout_toRightOf="@id/chat_request_pic_and_time_layout"
+        android:layout_toRightOf="@id/chat_request_sender_picture"
         android:textColor="@color/black"
         android:textSize="@dimen/home_screen_cell_name_text_size" />
+
+    <TextView
+        android:id="@+id/chat_request_time_stamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="4dp"
+        android:layout_marginStart="6dp"
+        android:textColor="@color/zipchat_blue"
+        android:textSize="@dimen/home_screen_cell_last_activity_text_size" />
 
 </RelativeLayout>
