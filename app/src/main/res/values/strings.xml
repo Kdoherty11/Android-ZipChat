@@ -58,7 +58,8 @@
 
     <!-- ***** Toast error messages ***** -->
     <string name="default_no_internet_toast">Internet connection not found. Please try again.</string>
-    <string name="create_room_no_name_toast">Please enter the room name and try again</string>
+    <string name="create_room_no_name_toast">Please enter a room name and try again</string>
+    <string name="create_room_name_too_long_toast">Please keep the room name to 50 or less characters</string>
 
     <!-- ***** App IDs ***** -->
     <!-- Facebook -->

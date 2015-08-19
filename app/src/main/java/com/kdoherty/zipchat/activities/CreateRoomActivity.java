@@ -39,6 +39,7 @@ import retrofit.client.Response;
 public class CreateRoomActivity extends AbstractLocationActivity implements SeekBar.OnSeekBarChangeListener, View.OnClickListener, OnMapReadyCallback, GoogleMap.OnMapLoadedCallback {
 
     private static final String TAG = CreateRoomActivity.class.getSimpleName();
+    private static final int MAX_ROOM_NAME_CHARS = 50;
 
     private EditText mRoomNameEt;
     private boolean mDisableButton = false;
@@ -108,15 +109,22 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
                 mDisableButton = true;
                 Utils.hideKeyboard(this, mRoomNameEt);
                 final String roomName = mRoomNameEt.getText().toString().trim();
-                if (!roomName.isEmpty()) {
-                    if (NetworkManager.checkOnline(this)) {
-                        new CreateRoomTask(roomName).execute();
-                        finish();
-                    }
-                } else {
+                final int roomNameLength = roomName.length();
+                if (roomNameLength == 0) {
                     Toast.makeText(getApplicationContext(), getString(R.string.create_room_no_name_toast), Toast.LENGTH_SHORT).show();
                     mDisableButton = false;
+                    break;
                 }
+                if (roomNameLength > MAX_ROOM_NAME_CHARS) {
+                    Toast.makeText(getApplicationContext(), getString(R.string.create_room_name_too_long_toast), Toast.LENGTH_SHORT).show();
+                    mDisableButton = false;
+                    break;
+                }
+                if (NetworkManager.checkOnline(this)) {
+                    new CreateRoomTask(roomName).execute();
+                    finish();
+                }
+
                 break;
             default:
                 Log.e(TAG, "Default case in onClick");
