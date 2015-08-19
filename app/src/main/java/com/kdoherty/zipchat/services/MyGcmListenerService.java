@@ -26,6 +26,7 @@ import com.kdoherty.zipchat.activities.PublicRoomActivity;
 import com.kdoherty.zipchat.events.ReceivedRequestEvent;
 import com.kdoherty.zipchat.events.RequestAcceptedEvent;
 import com.kdoherty.zipchat.models.Request;
+import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.FacebookManager;
 import com.kdoherty.zipchat.utils.LocationManager;
 
@@ -53,6 +54,7 @@ public class MyGcmListenerService extends GcmListenerService {
         public static final String ROOM_RADIUS = "roomRadius";
         public static final String ROOM_LATITUDE = "roomLatitude";
         public static final String ROOM_LONGITUDE = "roomLongitude";
+        public static final String USER_ID = "userId";
     }
 
     public static final class Event {
@@ -81,6 +83,8 @@ public class MyGcmListenerService extends GcmListenerService {
                 long roomId = Long.parseLong(data.getString(Key.ROOM_ID));
                 String senderName = data.getString(Key.FACEBOOK_NAME);
                 String senderFacebookId = data.getString(Key.FACEBOOK_ID);
+                long senderId = Long.parseLong(data.getString(Key.USER_ID));
+                User sender = new User(senderName, senderFacebookId, senderId);
                 String message = data.getString(Key.MESSAGE);
 
                 if (Value.PUBLIC_ROOM_TYPE.equals(roomType)) {
@@ -90,23 +94,25 @@ public class MyGcmListenerService extends GcmListenerService {
                     double roomLon = Double.parseDouble(data.getString(Key.ROOM_LONGITUDE));
                     receivePublicChatMessage(roomId, roomName, roomRadius, roomLat, roomLon, senderName, senderFacebookId, message);
                 } else {
-                    receivePrivateChatMessage(roomId, senderName, senderFacebookId, message);
+                    receivePrivateChatMessage(roomId, sender, message);
                 }
                 break;
             case Event.MESSAGE_FAVORITED:
                 String favoritorName = data.getString(Key.FACEBOOK_NAME);
-                long messageRoomId = Long.parseLong(data.getString(Key.ROOM_ID));
+                long messageRoomId = Long.parseLong(data.getString(Key.ROOM_ID, ""));
                 String messageText = data.getString(Key.MESSAGE);
                 String type = data.getString(Key.ROOM_TYPE);
                 if (Value.PUBLIC_ROOM_TYPE.equals(type)) {
                     String roomName = data.getString(Key.ROOM_NAME);
-                    int roomRadius = Integer.parseInt(data.getString(Key.ROOM_RADIUS));
-                    double roomLat = Double.parseDouble(data.getString(Key.ROOM_LATITUDE));
-                    double roomLon = Double.parseDouble(data.getString(Key.ROOM_LONGITUDE));
+                    int roomRadius = Integer.parseInt(data.getString(Key.ROOM_RADIUS, ""));
+                    double roomLat = Double.parseDouble(data.getString(Key.ROOM_LATITUDE, ""));
+                    double roomLon = Double.parseDouble(data.getString(Key.ROOM_LONGITUDE, ""));
                     receivePublicRoomMessageFavorited(favoritorName, messageRoomId, messageText, roomName, roomRadius, roomLat, roomLon);
                 } else {
                     String favoritorFacebookId = data.getString(Key.FACEBOOK_ID);
-                    receivePrivateRoomMessageFavorited(favoritorName, favoritorFacebookId, messageRoomId, messageText);
+                    long favoritorUserId = Long.parseLong(data.getString(Key.USER_ID));
+                    User favoritor = new User(favoritorName, favoritorFacebookId, favoritorUserId);
+                    receivePrivateRoomMessageFavorited(messageRoomId, favoritor, messageText);
                 }
                 break;
             case Event.CHAT_REQUEST:
@@ -126,10 +132,9 @@ public class MyGcmListenerService extends GcmListenerService {
         Log.i(TAG, "Received notification extras: " + data.toString());
     }
 
-    private void receivePrivateRoomMessageFavorited(String userName, String facebookId,
-                                                    long roomId, String message) {
-        PendingIntent contentIntent = getPrivateRoomIntent(roomId, userName, facebookId);
-        notifyMessageFavorited(contentIntent, userName, message);
+    private void receivePrivateRoomMessageFavorited(long roomId,User user, String message) {
+        PendingIntent contentIntent = getPrivateRoomIntent(roomId, user);
+        notifyMessageFavorited(contentIntent, user.getName(), message);
     }
 
     private void receivePublicRoomMessageFavorited(String userName, long roomId, String message,
@@ -167,8 +172,8 @@ public class MyGcmListenerService extends GcmListenerService {
                 .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    private PendingIntent getPrivateRoomIntent(long roomId, String otherUserName, String otherUserFacebookId) {
-        Intent intent = PrivateRoomActivity.getIntent(this, roomId, otherUserName, otherUserFacebookId);
+    private PendingIntent getPrivateRoomIntent(long roomId, User user) {
+        Intent intent = PrivateRoomActivity.getIntent(this, roomId, user);
 
         return TaskStackBuilder.create(this)
                 .addParentStack(HomeActivity.class)
@@ -176,13 +181,13 @@ public class MyGcmListenerService extends GcmListenerService {
                 .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    private void receivePrivateChatMessage(long roomId, String senderName, String senderFacebookId, String message) {
-        PendingIntent contentIntent = getPrivateRoomIntent(roomId, senderName, senderFacebookId);
+    private void receivePrivateChatMessage(long roomId, User sender, String message) {
+        PendingIntent contentIntent = getPrivateRoomIntent(roomId, sender);
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_zipchat)
-                        .setContentTitle(senderName)
+                        .setContentTitle(sender.getName())
                         .setAutoCancel(true)
                         .setLights(Color.argb(0, 93, 188, 210), LIGHT_ON_MS, LIGHT_OFF_MS)
                         .setStyle(new NotificationCompat.BigTextStyle()
@@ -190,7 +195,7 @@ public class MyGcmListenerService extends GcmListenerService {
                         .setContentIntent(contentIntent)
                         .setContentText(message);
 
-        Bitmap facebookPicture = FacebookManager.getFacebookProfilePicture(senderFacebookId);
+        Bitmap facebookPicture = FacebookManager.getFacebookProfilePicture(sender.getFacebookId());
         if (facebookPicture != null) {
             builder.setLargeIcon(facebookPicture);
         }

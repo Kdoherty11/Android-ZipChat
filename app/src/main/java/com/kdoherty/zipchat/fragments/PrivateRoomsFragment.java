@@ -18,7 +18,9 @@ import android.widget.Filterable;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.PrivateRoomActivity;
 import com.kdoherty.zipchat.adapters.PrivateRoomAdapter;
+import com.kdoherty.zipchat.events.LeaveRoomEvent;
 import com.kdoherty.zipchat.events.RequestAcceptedEvent;
+import com.kdoherty.zipchat.events.RoomCreatedEvent;
 import com.kdoherty.zipchat.models.PrivateRoom;
 import com.kdoherty.zipchat.models.PrivateRoomComparator;
 import com.kdoherty.zipchat.services.BusProvider;
@@ -129,6 +131,12 @@ public class PrivateRoomsFragment extends Fragment implements Filterable, SwipeR
             return mAdapter.getFilter();
         }
         return null;
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onRoomCreated(LeaveRoomEvent event) {
+        populateList();
     }
 
     @Override

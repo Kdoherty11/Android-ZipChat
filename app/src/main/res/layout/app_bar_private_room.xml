@@ -9,7 +9,6 @@
         android:id="@+id/other_user_pic"
         android:layout_width="@dimen/private_chat_room_pic_side"
         android:layout_height="@dimen/private_chat_room_pic_side"
-        android:visibility="gone"
         android:layout_gravity="end|center_vertical"
         android:layout_margin="@dimen/private_chat_room_pic_margins" />
 

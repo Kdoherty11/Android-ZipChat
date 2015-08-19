@@ -87,10 +87,7 @@ public class PrivateRoomAdapter extends RecyclerView.Adapter<PrivateRoomAdapter.
 
             @Override
             public void onClick(View v) {
-                long roomId = privateRoom.getId();
-                String userName = privateRoom.getOther().getName();
-                String facebookId = privateRoom.getOther().getFacebookId();
-                Intent intent = PrivateRoomActivity.getIntent(mContext, roomId, userName, facebookId);
+                Intent intent = PrivateRoomActivity.getIntent(mContext, privateRoom.getId(), privateRoom.getOther());
                 mContext.startActivity(intent);
             }
         });
@@ -110,7 +107,7 @@ public class PrivateRoomAdapter extends RecyclerView.Adapter<PrivateRoomAdapter.
         return mFilter;
     }
 
-    static class PrivateChatViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
+    static class PrivateChatViewHolder extends RecyclerView.ViewHolder {
 
         private CircleImageView circleProfilePictureView;
         private TextView title;
@@ -123,12 +120,6 @@ public class PrivateRoomAdapter extends RecyclerView.Adapter<PrivateRoomAdapter.
             title = (TextView) itemView.findViewById(R.id.private_chat_title);
             lastActivity = (TextView) itemView.findViewById(R.id.private_chat_last_activity);
             circleProfilePictureView = (CircleImageView) itemView.findViewById(R.id.private_chat_picture);
-            itemView.setOnCreateContextMenuListener(this);
-        }
-
-        @Override
-        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            menu.add(Menu.NONE, v.getId(), Menu.NONE, "Leave");
         }
 
     }

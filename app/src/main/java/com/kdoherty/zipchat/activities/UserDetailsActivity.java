@@ -34,22 +34,16 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
     private static final String TAG = UserDetailsActivity.class.getSimpleName();
 
-    private static final String EXTRA_RECEIVER_FB_ID = "UserDetailsActivityFacebookIdKey";
-    private static final String EXTRA_RECEIVER_USER_ID = "UserDetailsActivityReceiverIdKey";
-    private static final String EXTRA_RECEIVER_NAME = "UserDetailsActivityReceiverNameKey";
-
-    private long mReceiverUserId;
-    private String mReceiverFbId;
+    private static final String EXTRA_USER = "UserDetailsActivityUserKey";
 
     private Button mRequestButton;
     private ProgressBar mRequestStatusLoadingPb;
-    private String mReceiverName;
+
+    private User mUser;
 
     public static Intent getIntent(Context context, User user) {
         Intent userDetailsIntent = new Intent(context, UserDetailsActivity.class);
-        userDetailsIntent.putExtra(EXTRA_RECEIVER_USER_ID, user.getUserId());
-        userDetailsIntent.putExtra(EXTRA_RECEIVER_NAME, user.getName());
-        userDetailsIntent.putExtra(EXTRA_RECEIVER_FB_ID, user.getFacebookId());
+        userDetailsIntent.putExtra(EXTRA_USER, user);
         return userDetailsIntent;
     }
 
@@ -60,9 +54,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         final Intent intent = getIntent();
-        mReceiverUserId = intent.getExtras().getLong(EXTRA_RECEIVER_USER_ID);
-        mReceiverName = intent.getStringExtra(EXTRA_RECEIVER_NAME);
-        mReceiverFbId = intent.getStringExtra(EXTRA_RECEIVER_FB_ID);
+        mUser = intent.getParcelableExtra(EXTRA_USER);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.user_details_app_bar);
         setSupportActionBar(toolbar);
@@ -71,7 +63,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
-            actionBar.setTitle(mReceiverName);
+            actionBar.setTitle(mUser.getName());
         }
 
         mRequestButton = (Button) findViewById(R.id.chat_request_button);
@@ -80,7 +72,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         mRequestStatusLoadingPb = (ProgressBar) findViewById(R.id.request_status_loading_pb);
 
         final ImageView profilePictureView = (ImageView) findViewById(R.id.chat_request_profile_picture);
-        FacebookManager.displayProfilePicture(mReceiverFbId, profilePictureView, "large");
+        FacebookManager.displayProfilePicture(mUser.getFacebookId(), profilePictureView, "large");
 
         setButtonText();
 
@@ -125,7 +117,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
             return;
         }
 
-        ZipChatApi.INSTANCE.getStatus(UserManager.getAuthToken(this), UserManager.getId(this), mReceiverUserId, new Callback<Response>() {
+        ZipChatApi.INSTANCE.getStatus(UserManager.getAuthToken(this), UserManager.getId(this), mUser.getUserId(), new Callback<Response>() {
             @Override
             public void success(Response result, Response response) {
                 String status = NetworkManager.responseToString(result);
@@ -137,7 +129,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
                     mRequestButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent intent = PrivateRoomActivity.getIntent(UserDetailsActivity.this, privateRoomId, mReceiverName, mReceiverFbId);
+                            Intent intent = PrivateRoomActivity.getIntent(UserDetailsActivity.this, privateRoomId, mUser);
                             startActivity(intent);
                         }
                     });
@@ -158,13 +150,6 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_chat_request, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -172,12 +157,8 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
+            Utils.debugToast(this, "Finishing UserDetailsActivity because home was clicked");
             finish();
-            return true;
-        }
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
             return true;
         }
 
@@ -188,9 +169,9 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         if (!NetworkManager.checkOnline(this)) {
             return;
         }
-        Log.d(TAG, "Sending chat request to user " + mReceiverUserId);
+        Log.d(TAG, "Sending chat request to user " + mUser.getUserId());
         long userId = UserManager.getId(this);
-        ZipChatApi.INSTANCE.sendChatRequest(UserManager.getAuthToken(this), userId, mReceiverUserId, new Callback<Response>() {
+        ZipChatApi.INSTANCE.sendChatRequest(UserManager.getAuthToken(this), userId, mUser.getUserId(), new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
                 finish();
