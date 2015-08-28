@@ -13,6 +13,9 @@ import android.view.MenuInflater;
 import android.widget.Filter;
 import android.widget.ImageView;
 
+import com.google.android.gms.location.LocationAvailability;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.events.LocationAvailableEvent;
 import com.kdoherty.zipchat.events.TabChangeEvent;
@@ -92,26 +95,9 @@ public class HomeActivity extends AbstractLocationActivity implements SearchView
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         getSupportFragmentManager().putFragment(outState, HomeTabsFragment.TAG, mTabsFragment);
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        BusProvider.getInstance().post(new LocationAvailableEvent());
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        BusProvider.getInstance().unregister(this);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        BusProvider.getInstance().register(this);
     }
 
     public Filter getFilter() {

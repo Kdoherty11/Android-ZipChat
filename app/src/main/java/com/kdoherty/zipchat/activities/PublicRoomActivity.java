@@ -236,16 +236,4 @@ public class PublicRoomActivity extends AbstractLocationActivity {
         Log.d(TAG, "Received member quit event");
         mDrawerFragment.removeRoomMember(event.getUser());
     }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        BusProvider.getInstance().register(this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        BusProvider.getInstance().unregister(this);
-    }
 }
