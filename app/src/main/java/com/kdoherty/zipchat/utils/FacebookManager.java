@@ -33,7 +33,8 @@ public class FacebookManager {
             .considerExifParams(true)
             .build();
 
-    private FacebookManager() { }
+    private FacebookManager() {
+    }
 
     public static void saveFacebookInformation(Context context, String facebookName, String facebookId) {
         PrefsHelper.saveToPreferences(context, FACEBOOK_PREFERENCES, PREFS_FACEBOOK_NAME_KEY, facebookName);

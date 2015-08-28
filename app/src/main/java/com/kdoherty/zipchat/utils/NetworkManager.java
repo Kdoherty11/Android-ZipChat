@@ -24,7 +24,8 @@ public final class NetworkManager {
 
     private static final String TAG = NetworkManager.class.getSimpleName();
 
-    private NetworkManager() { }
+    private NetworkManager() {
+    }
 
 
     public static boolean isOnline(Context context) {

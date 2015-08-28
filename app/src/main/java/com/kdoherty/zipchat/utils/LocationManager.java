@@ -21,7 +21,8 @@ import com.kdoherty.zipchat.R;
  */
 public final class LocationManager {
 
-    private LocationManager() { }
+    private LocationManager() {
+    }
 
 
     public static void checkLocation(final Activity activity) {

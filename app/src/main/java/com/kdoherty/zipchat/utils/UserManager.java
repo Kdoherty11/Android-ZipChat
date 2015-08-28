@@ -18,7 +18,8 @@ public class UserManager {
     private static final String DEFAULT_AUTH_TOKEN = "";
     private static final long DEFAULT_DEVICE_ID = -1;
 
-    private UserManager() { }
+    private UserManager() {
+    }
 
     public static void storeId(Context context, long userId) {
         PrefsHelper.saveToPreferences(context, PREFS_FILE, PREFS_USER_ID, userId);

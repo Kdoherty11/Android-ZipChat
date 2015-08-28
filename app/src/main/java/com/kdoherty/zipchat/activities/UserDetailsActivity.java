@@ -186,7 +186,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case(R.id.chat_request_button):
+            case (R.id.chat_request_button):
                 sendChatRequest();
                 break;
             default:

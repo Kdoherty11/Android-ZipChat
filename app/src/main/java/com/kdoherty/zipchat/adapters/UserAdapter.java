@@ -13,7 +13,6 @@ import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.UserDetailsActivity;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.FacebookManager;
-import com.kdoherty.zipchat.utils.UserManager;
 
 import java.util.List;
 

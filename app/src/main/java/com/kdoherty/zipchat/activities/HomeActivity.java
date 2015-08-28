@@ -13,14 +13,9 @@ import android.view.MenuInflater;
 import android.widget.Filter;
 import android.widget.ImageView;
 
-import com.google.android.gms.location.LocationAvailability;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.kdoherty.zipchat.R;
-import com.kdoherty.zipchat.events.LocationAvailableEvent;
 import com.kdoherty.zipchat.events.TabChangeEvent;
 import com.kdoherty.zipchat.fragments.HomeTabsFragment;
-import com.kdoherty.zipchat.services.BusProvider;
 import com.squareup.otto.Subscribe;
 
 public class HomeActivity extends AbstractLocationActivity implements SearchView.OnQueryTextListener {

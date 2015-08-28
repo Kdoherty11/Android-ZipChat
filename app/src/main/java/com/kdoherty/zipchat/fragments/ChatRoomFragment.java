@@ -116,7 +116,8 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         return fragment;
     }
 
-    public ChatRoomFragment() { }
+    public ChatRoomFragment() {
+    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -223,7 +224,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
                 if (mAnonSelf != null) {
                     mMessageAdapter = new MessageAdapter(activity, messageList, mAnonSelf.getUserId(), this);
                 } else {
-                    mMessageAdapter = new MessageAdapter(activity, messageList,  this);
+                    mMessageAdapter = new MessageAdapter(activity, messageList, this);
                 }
                 mMessagesRv.setAdapter(mMessageAdapter);
                 mMessagesRv.scrollToPosition(mMessageAdapter.getItemCount() - 1);

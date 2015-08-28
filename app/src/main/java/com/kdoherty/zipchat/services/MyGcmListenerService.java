@@ -135,7 +135,7 @@ public class MyGcmListenerService extends GcmListenerService {
         Log.i(TAG, "Received notification extras: " + data.toString());
     }
 
-    private void receivePrivateRoomMessageFavorited(long roomId,User user, String message) {
+    private void receivePrivateRoomMessageFavorited(long roomId, User user, String message) {
         PendingIntent contentIntent = getPrivateRoomIntent(roomId, user);
         notifyMessageFavorited(contentIntent, user.getName(), message);
     }

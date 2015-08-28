@@ -9,10 +9,9 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.kdoherty.zipchat.events.AddFavoriteEvent;
-import com.kdoherty.zipchat.events.IsSubscribedEvent;
-import com.kdoherty.zipchat.events.PublicRoomJoinEvent;
 import com.kdoherty.zipchat.events.MemberJoinEvent;
 import com.kdoherty.zipchat.events.MemberLeaveEvent;
+import com.kdoherty.zipchat.events.PublicRoomJoinEvent;
 import com.kdoherty.zipchat.events.RemoveFavoriteEvent;
 import com.kdoherty.zipchat.events.TalkConfirmationEvent;
 import com.kdoherty.zipchat.events.TalkEvent;

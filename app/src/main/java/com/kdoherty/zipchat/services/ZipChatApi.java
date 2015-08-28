@@ -57,9 +57,9 @@ public interface ZipChatApi {
 
     @GET("/publicRooms/{roomId}/messages")
     void getPublicRoomMessages(@Header(AUTH_TOKEN_KEY) String authToken, @Path("roomId") long roomId,
-                         @Query("limit") int limit,
-                         @Query("offset") int offset,
-                         Callback<List<Message>> response);
+                               @Query("limit") int limit,
+                               @Query("offset") int offset,
+                               Callback<List<Message>> response);
 
     @FormUrlEncoded
     @POST("/publicRooms/{roomId}/subscriptions")
@@ -75,9 +75,9 @@ public interface ZipChatApi {
 
     @GET("/privateRooms/{roomId}/messages")
     void getPrivateRoomMessages(@Header(AUTH_TOKEN_KEY) String authToken, @Path("roomId") long roomId,
-                               @Query("limit") int limit,
-                               @Query("offset") int offset,
-                               Callback<List<Message>> response);
+                                @Query("limit") int limit,
+                                @Query("offset") int offset,
+                                Callback<List<Message>> response);
 
     @PUT("/privateRooms/{roomId}/leave")
     void leaveRoom(@Header(AUTH_TOKEN_KEY) String authToken, @Path("roomId") long roomId, @Query("userId") long userId, Callback<Response> response);

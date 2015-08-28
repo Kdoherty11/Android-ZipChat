@@ -19,23 +19,17 @@ import android.view.MenuItem;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.LatLng;
 import com.kdoherty.zipchat.R;
-import com.kdoherty.zipchat.events.IsSubscribedEvent;
 import com.kdoherty.zipchat.events.MemberJoinEvent;
 import com.kdoherty.zipchat.events.MemberLeaveEvent;
 import com.kdoherty.zipchat.events.PublicRoomJoinEvent;
 import com.kdoherty.zipchat.fragments.ChatRoomFragment;
 import com.kdoherty.zipchat.fragments.PublicRoomDrawerFragment;
 import com.kdoherty.zipchat.models.PublicRoom;
-import com.kdoherty.zipchat.models.User;
-import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.NetworkManager;
 import com.kdoherty.zipchat.utils.UserManager;
 import com.kdoherty.zipchat.utils.Utils;
 import com.squareup.otto.Subscribe;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -159,7 +153,7 @@ public class PublicRoomActivity extends AbstractLocationActivity {
     }
 
     public void setNotificationsIcon() {
-        int iconId = mNotificationsOn ? R.drawable.ic_notifications_on_white_24dp: R.drawable.ic_notifications_white_24dp;
+        int iconId = mNotificationsOn ? R.drawable.ic_notifications_on_white_24dp : R.drawable.ic_notifications_white_24dp;
         if (mNotificationsToggle != null) {
             mNotificationsToggle.setIcon(iconId);
         } else {

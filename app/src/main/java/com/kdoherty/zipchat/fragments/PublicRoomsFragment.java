@@ -323,17 +323,17 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
 
             ZipChatApi.INSTANCE.getPublicRooms(UserManager.getAuthToken(getActivity()),
                     location.getLatitude(), location.getLongitude(), new Callback<List<PublicRoom>>() {
-                @Override
-                public void success(List<PublicRoom> publicRooms, Response response) {
-                    populateList(publicRooms);
-                }
+                        @Override
+                        public void success(List<PublicRoom> publicRooms, Response response) {
+                            populateList(publicRooms);
+                        }
 
-                @Override
-                public void failure(RetrofitError error) {
-                    NetworkManager.logErrorResponse(TAG, "Getting public rooms", error);
-                    mSwipeRefreshLayout.setRefreshing(false);
-                }
-            });
+                        @Override
+                        public void failure(RetrofitError error) {
+                            NetworkManager.logErrorResponse(TAG, "Getting public rooms", error);
+                            mSwipeRefreshLayout.setRefreshing(false);
+                        }
+                    });
         } else {
             mAdapter = new PublicRoomAdapter(getActivity(), new ArrayList<PublicRoom>());
             Log.w(TAG, "Last location is null");

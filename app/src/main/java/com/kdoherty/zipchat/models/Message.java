@@ -92,7 +92,9 @@ public class Message implements Parcelable {
         return uuid;
     }
 
-    public boolean isConfirmed() { return isConfirmed; }
+    public boolean isConfirmed() {
+        return isConfirmed;
+    }
 
     public void confirm() {
         this.isConfirmed = true;

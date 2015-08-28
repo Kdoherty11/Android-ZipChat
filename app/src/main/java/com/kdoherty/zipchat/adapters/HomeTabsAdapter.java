@@ -22,7 +22,7 @@ import com.kdoherty.zipchat.fragments.RequestsFragment;
  */
 public class HomeTabsAdapter extends FragmentPagerAdapter {
 
-    private static final String TAG  = HomeTabsAdapter.class.getSimpleName();
+    private static final String TAG = HomeTabsAdapter.class.getSimpleName();
 
     private PublicRoomsFragment mPublicRoomsFragment = new PublicRoomsFragment();
 
