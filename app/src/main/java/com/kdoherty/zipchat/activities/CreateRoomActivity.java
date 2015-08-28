@@ -39,7 +39,7 @@ import retrofit.client.Response;
 public class CreateRoomActivity extends AbstractLocationActivity implements SeekBar.OnSeekBarChangeListener, View.OnClickListener, OnMapReadyCallback, GoogleMap.OnMapLoadedCallback {
 
     private static final String TAG = CreateRoomActivity.class.getSimpleName();
-    private static final int MAX_ROOM_NAME_CHARS = 50;
+    private static final int MAX_ROOM_NAME_CHARS = 28;
     private static final int DEFAULT_RADIUS = 250;
 
     private EditText mRoomNameEt;
