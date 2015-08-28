@@ -135,14 +135,11 @@ public class Message implements Parcelable {
     public Message() {
     }
 
-    public Message(String message, User sender, boolean isAnon, String uuid) {
+    public Message(String message, User sender, String uuid) {
         this.messageId = -1;
         this.message = message;
+        // TODO is this necessary
         this.sender = new User(sender);
-        if (isAnon) {
-            this.sender.setFacebookId(null);
-            this.sender.setName("");
-        }
         this.isConfirmed = false;
         this.uuid = uuid;
     }

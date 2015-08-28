@@ -22,7 +22,7 @@ import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.events.IsSubscribedEvent;
 import com.kdoherty.zipchat.events.MemberJoinEvent;
 import com.kdoherty.zipchat.events.MemberLeaveEvent;
-import com.kdoherty.zipchat.events.ReceivedRoomMembersEvent;
+import com.kdoherty.zipchat.events.PublicRoomJoinEvent;
 import com.kdoherty.zipchat.fragments.ChatRoomFragment;
 import com.kdoherty.zipchat.fragments.PublicRoomDrawerFragment;
 import com.kdoherty.zipchat.models.PublicRoom;
@@ -170,10 +170,11 @@ public class PublicRoomActivity extends AbstractLocationActivity {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void onIsSubscribedEvent(IsSubscribedEvent event) {
-        Log.d(TAG, "Is Subscribed event received: " + event.isSubscribed());
+    public void onJoinSuccess(PublicRoomJoinEvent event) {
         mNotificationsOn = event.isSubscribed();
         setNotificationsIcon();
+
+        mDrawerFragment.setupRoomMembers(event.getRoomMembers());
     }
 
     private void subscribe() {
@@ -234,14 +235,6 @@ public class PublicRoomActivity extends AbstractLocationActivity {
     public void onUserQuitEvent(MemberLeaveEvent event) {
         Log.d(TAG, "Received member quit event");
         mDrawerFragment.removeRoomMember(event.getUser());
-    }
-
-    @Subscribe
-    @SuppressWarnings("unused")
-    public void onRoomMembersReceived(ReceivedRoomMembersEvent event) {
-        User[] users = event.getUsers();
-        Log.d(TAG, "Received room member event with " + users.length + " users");
-        mDrawerFragment.setupRoomMembers(new ArrayList<>(Arrays.asList(users)));
     }
 
     @Override

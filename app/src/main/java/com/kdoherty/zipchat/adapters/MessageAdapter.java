@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 /**
  * Created by kdoherty on 12/26/14.
  */
@@ -55,6 +57,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
 
     private static final Semaphore sendFavoriteLock = new Semaphore(1);
     private static final int SEND_FAVORITE_LOCK_TIMEOUT_SECONDS = 1;
+    private long mSelfUserId;
 
     private ImageLoadingListener mAnimateFirstListener = new AnimateFirstDisplayListener();
 
@@ -93,10 +96,17 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
     }
 
     private Context mContext;
+    private int mSelfBorderColorId;
+    private int mOtherBoarderColor;
+    private long mAnonUserId;
 
     private static final long SEND_FAVORITE_EVENT_DELAY = 1000; // MS
 
     public MessageAdapter(Context context, List<Message> messages, MessageFavoriteListener messageFavoriteListener) {
+        this(context, messages, 0, messageFavoriteListener);
+    }
+
+    public MessageAdapter(Context context, List<Message> messages, long anonUserId, MessageFavoriteListener messageFavoriteListener) {
         if (context == null) {
             throw new IllegalArgumentException("Context is null");
         }
@@ -106,8 +116,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         mInflater = LayoutInflater.from(context);
         mMessages = messages;
         mContext = context;
+        mAnonUserId = anonUserId;
         mMessageFavListener = messageFavoriteListener;
         ZipChatApplication.initImageLoader(mContext);
+        mSelfUserId = UserManager.getId(mContext);
+        mSelfBorderColorId = mContext.getResources().getColor(R.color.orange);
+        mOtherBoarderColor = mContext.getResources().getColor(R.color.zipchat_blue);
     }
 
     @Override
@@ -126,6 +140,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         } else {
             ImageLoader.getInstance().displayImage(FacebookManager.getProfilePicUrl(sender.getFacebookId()), messageCellViewHolder.profilePicture,
                     FacebookManager.displayProfPicOpts, mAnimateFirstListener);
+        }
+
+        if (sender.getUserId() == mSelfUserId || sender.getUserId() == mAnonUserId) {
+            messageCellViewHolder.profilePicture.setBorderColor(mSelfBorderColorId);
+        } else {
+            messageCellViewHolder.profilePicture.setBorderColor(mOtherBoarderColor);
         }
 
         messageCellViewHolder.name.setText(sender.getName());
@@ -183,6 +203,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
     @Override
     public int getItemCount() {
         return mMessages.size();
+    }
+
+    public void setAnonUserId(long anonUserId) {
+        this.mAnonUserId = anonUserId;
     }
 
     public void addMessageToEnd(Message message) {
@@ -331,7 +355,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
     public class MessageCellViewHolder extends RecyclerView.ViewHolder {
 
         private RelativeLayout layout;
-        private ImageView profilePicture;
+        private CircleImageView profilePicture;
         private TextView name;
         private TextView message;
         private ImageView favorite;
@@ -343,7 +367,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         public MessageCellViewHolder(View itemView) {
             super(itemView);
             layout = (RelativeLayout) itemView;
-            profilePicture = (ImageView) itemView.findViewById(R.id.message_picture);
+            profilePicture = (CircleImageView) itemView.findViewById(R.id.message_picture);
             name = (TextView) itemView.findViewById(R.id.message_sender);
             message = (TextView) itemView.findViewById(R.id.message_text);
             favoriteLayout = (LinearLayout) itemView.findViewById(R.id.favorite_container);

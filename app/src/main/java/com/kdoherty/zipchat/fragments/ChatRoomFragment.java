@@ -18,10 +18,12 @@ import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.ZipChatApplication;
 import com.kdoherty.zipchat.adapters.MessageAdapter;
 import com.kdoherty.zipchat.events.AddFavoriteEvent;
+import com.kdoherty.zipchat.events.PublicRoomJoinEvent;
 import com.kdoherty.zipchat.events.RemoveFavoriteEvent;
 import com.kdoherty.zipchat.events.TalkConfirmationEvent;
 import com.kdoherty.zipchat.events.TalkEvent;
 import com.kdoherty.zipchat.models.Message;
+import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ChatService;
 import com.kdoherty.zipchat.services.RoomSocket;
@@ -80,6 +82,8 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     private long mRoomId;
     private boolean mIsAnon;
     private String mProfilePicUrl;
+
+    private User mAnonSelf;
 
     private Callback<List<Message>> mGetMessagesCallback = new Callback<List<Message>>() {
         @Override
@@ -216,7 +220,11 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         if (mMessageAdapter == null) {
             Activity activity = getActivity();
             if (activity != null) {
-                mMessageAdapter = new MessageAdapter(activity, messageList, this);
+                if (mAnonSelf != null) {
+                    mMessageAdapter = new MessageAdapter(activity, messageList, mAnonSelf.getUserId(), this);
+                } else {
+                    mMessageAdapter = new MessageAdapter(activity, messageList,  this);
+                }
                 mMessagesRv.setAdapter(mMessageAdapter);
                 mMessagesRv.scrollToPosition(mMessageAdapter.getItemCount() - 1);
             }
@@ -315,8 +323,8 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     }
 
     private void addMessageLocally(String messageContent, String uuid) {
-        Message userMessage = new Message(messageContent,
-                UserManager.getSelf(getActivity()), mIsAnon, uuid);
+        User sender = mIsAnon ? mAnonSelf : UserManager.getSelf(getActivity());
+        Message userMessage = new Message(messageContent, sender, uuid);
         addMessage(userMessage);
     }
 
@@ -354,6 +362,15 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         }
         Utils.debugToast(getActivity(), "Connected to the socket!");
         mRoomSocket.setWebSocket(webSocket);
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onPublicRoomJoinSuccess(PublicRoomJoinEvent event) {
+        mAnonSelf = event.getAnonUser();
+        if (mMessageAdapter != null) {
+            mMessageAdapter.setAnonUserId(mAnonSelf.getUserId());
+        }
     }
 
     @Override

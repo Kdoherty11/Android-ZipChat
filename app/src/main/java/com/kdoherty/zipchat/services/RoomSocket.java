@@ -10,9 +10,9 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.kdoherty.zipchat.events.AddFavoriteEvent;
 import com.kdoherty.zipchat.events.IsSubscribedEvent;
+import com.kdoherty.zipchat.events.PublicRoomJoinEvent;
 import com.kdoherty.zipchat.events.MemberJoinEvent;
 import com.kdoherty.zipchat.events.MemberLeaveEvent;
-import com.kdoherty.zipchat.events.ReceivedRoomMembersEvent;
 import com.kdoherty.zipchat.events.RemoveFavoriteEvent;
 import com.kdoherty.zipchat.events.TalkConfirmationEvent;
 import com.kdoherty.zipchat.events.TalkEvent;
@@ -27,6 +27,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Queue;
 
 /**
@@ -86,12 +89,18 @@ public class RoomSocket {
                         }
                         break;
                     case "joinSuccess":
-                        JSONObject joinJson = new JSONObject(stringJson.getString("message"));
-                        if (joinJson.has("isSubscribed")) {
-                            BusProvider.getInstance().post(new IsSubscribedEvent(joinJson.getBoolean("isSubscribed")));
+
+                        if (stringJson.has("message")) {
+                            JSONObject joinJson = new JSONObject(stringJson.getString("message"));
+
+                            User[] roomMembers = gson.fromJson(joinJson.getString("roomMembers"), User[].class);
+                            List<User> roomMemberList = new ArrayList<>(Arrays.asList(roomMembers));
+                            boolean isSubscribed = joinJson.getBoolean("isSubscribed");
+                            User anonUser = gson.fromJson(joinJson.getString("anonUser"), User.class);
+
+                            BusProvider.getInstance().post(new PublicRoomJoinEvent(roomMemberList, anonUser, isSubscribed));
                         }
-                        User[] roomMembers = gson.fromJson(joinJson.getString("roomMembers"), User[].class);
-                        BusProvider.getInstance().post(new ReceivedRoomMembersEvent(roomMembers));
+
                         break;
                     case "favorite":
                         User msgFavoritor = gson.fromJson(stringJson.getString("user"), User.class);
