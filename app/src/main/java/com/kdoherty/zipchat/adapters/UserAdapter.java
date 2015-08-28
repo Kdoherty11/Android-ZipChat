@@ -20,26 +20,27 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
- * Created by kdoherty on 12/26/14.
+ * Created by kdoherty on 8/28/15.
  */
-public class PublicRoomDrawerAdapter extends RecyclerView.Adapter<PublicRoomDrawerAdapter.UserCellViewHolder> {
+public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserCellViewHolder> {
 
-    private static final String TAG = PublicRoomDrawerAdapter.class.getSimpleName();
+    private static final String TAG = UserAdapter.class.getSimpleName();
 
     private final LayoutInflater mInflater;
     private final List<User> mRoomMembers;
     private Context mContext;
+    private int mCellLayoutId;
 
-    public PublicRoomDrawerAdapter(Context context, List<User> roomMembers) {
+    public UserAdapter(Context context, int cellLayoutId, List<User> roomMembers) {
         mContext = context;
         mInflater = LayoutInflater.from(mContext);
+        mCellLayoutId = cellLayoutId;
         mRoomMembers = roomMembers;
-        addUser(0, UserManager.getSelf(context));
     }
 
     @Override
     public UserCellViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View view = mInflater.inflate(R.layout.cell_user, viewGroup, false);
+        View view = mInflater.inflate(mCellLayoutId, viewGroup, false);
         return new UserCellViewHolder(view);
     }
 

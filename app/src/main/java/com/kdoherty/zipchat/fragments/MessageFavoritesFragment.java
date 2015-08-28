@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.kdoherty.zipchat.R;
-import com.kdoherty.zipchat.adapters.MessageFavoritorAdapter;
+import com.kdoherty.zipchat.adapters.UserAdapter;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.MyGcmListenerService;
 
@@ -31,7 +31,7 @@ public class MessageFavoritesFragment extends Fragment {
     private static final String TAG = MessageFavoritesFragment.class.getSimpleName();
     private RecyclerView mMessageFavorites;
     private List<User> mMessageFavoritors = new ArrayList<>();
-    private MessageFavoritorAdapter mFavoriteAdapter;
+    private UserAdapter mFavoriteAdapter;
 
     private static final String ARG_MESSAGE = "MessageFavoritesFragmentMessage";
 
@@ -80,7 +80,7 @@ public class MessageFavoritesFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         mMessageFavorites = (RecyclerView) view.findViewById(R.id.message_favoritor_list);
         mMessageFavorites.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mFavoriteAdapter = new MessageFavoritorAdapter(getActivity(), mMessageFavoritors);
+        mFavoriteAdapter = new UserAdapter(getActivity(), R.layout.cell_user, mMessageFavoritors);
         mMessageFavorites.setAdapter(mFavoriteAdapter);
     }
 

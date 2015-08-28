@@ -65,7 +65,7 @@ public class RoomSocket {
                             Message msg = gson.fromJson(talk, Message.class);
                             BusProvider.getInstance().post(new TalkEvent(msg));
                         } else {
-                            Log.d(TAG, "Received heartbeat from socket");
+                            Log.v(TAG, "Received heartbeat from socket");
                         }
                         break;
                     case "talk-confirmation":

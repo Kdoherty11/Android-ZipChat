@@ -179,8 +179,6 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
         mTabHost.setup();
         setupTab(mTabHost, new TextView(getActivity()), mSortByDistanceTab);
         setupTab(mTabHost, new TextView(getActivity()), mSortByActivityTab);
-        //mTabHost.getTabWidget().setShowDividers(TabWidget.SHOW_DIVIDER_MIDDLE);
-        //mTabHost.getTabWidget().setDividerDrawable(R.drawable.home_screen_tabs_divider);
 
         mDotIndicatorMap.get(mCurrentTabTitle).setVisibility(View.VISIBLE);
 

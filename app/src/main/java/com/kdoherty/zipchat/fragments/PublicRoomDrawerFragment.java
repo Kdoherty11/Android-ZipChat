@@ -23,11 +23,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.kdoherty.zipchat.R;
-import com.kdoherty.zipchat.adapters.PublicRoomDrawerAdapter;
+import com.kdoherty.zipchat.adapters.UserAdapter;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.LocationManager;
 import com.kdoherty.zipchat.utils.PrefsHelper;
+import com.kdoherty.zipchat.utils.UserManager;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -51,7 +54,7 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
     private Marker mRoomCenterMarker;
 
     private RecyclerView mRoomMembersRv;
-    PublicRoomDrawerAdapter mRoomMembersAdapter;
+    private UserAdapter mRoomMembersAdapter;
 
     private int mRoomRadius;
     private LatLng mRoomCenter;
@@ -115,7 +118,8 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
     public void setupRoomMembers(List<User> roomMembers) {
         FragmentActivity activity = getActivity();
         if (activity != null) {
-            mRoomMembersAdapter = new PublicRoomDrawerAdapter(activity, roomMembers);
+            roomMembers.add(UserManager.getSelf(activity));
+            mRoomMembersAdapter = new UserAdapter(activity, R.layout.cell_user, roomMembers);
             mRoomMembersRv.setAdapter(mRoomMembersAdapter);
         }
     }
@@ -179,7 +183,8 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
         if (mRoomMembersAdapter != null) {
             mRoomMembersAdapter.addUser(user);
         } else if (getActivity() != null) {
-            mRoomMembersAdapter = new PublicRoomDrawerAdapter(getActivity(), Collections.singletonList(user));
+            List<User> users = new ArrayList<>(Arrays.asList(UserManager.getSelf(getActivity()), user));
+            mRoomMembersAdapter = new UserAdapter(getActivity(), R.layout.cell_user, users);
         }
     }
 
