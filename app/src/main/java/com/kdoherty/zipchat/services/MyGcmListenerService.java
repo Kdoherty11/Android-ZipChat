@@ -42,34 +42,6 @@ public class MyGcmListenerService extends GcmListenerService {
     private static final int LIGHT_ON_MS = 1000;
     private static final int LIGHT_OFF_MS = 4000;
     private static final int LIGHT_COLOR = Color.argb(0, 93, 188, 210);
-
-    public static final class Key {
-        public static final String EVENT = "event";
-        public static final String FACEBOOK_NAME = "name";
-        public static final String CHAT_REQUEST_RESPONSE = "response";
-        public static final String FACEBOOK_ID = "facebookId";
-        public static final String MESSAGE = "message";
-        public static final String ROOM_NAME = "roomName";
-        public static final String ROOM_ID = "roomId";
-        public static final String ROOM_TYPE = "roomType";
-        public static final String ROOM_RADIUS = "roomRadius";
-        public static final String ROOM_LATITUDE = "roomLatitude";
-        public static final String ROOM_LONGITUDE = "roomLongitude";
-        public static final String USER_ID = "userId";
-    }
-
-    public static final class Event {
-        public static final String CHAT_REQUEST = "Chat Request";
-        public static final String CHAT_REQUEST_RESPONSE = "Chat Request Response";
-        public static final String CHAT_MESSAGE = "Chat Message";
-        public static final String MESSAGE_FAVORITED = "Message Favorited";
-    }
-
-    private static class Value {
-        public static final String PRIVATE_ROOM_TYPE = "PrivateRoom";
-        public static final String PUBLIC_ROOM_TYPE = "PublicRoom";
-    }
-
     private NotificationManager mNotificationManager;
 
     @Override
@@ -332,5 +304,32 @@ public class MyGcmListenerService extends GcmListenerService {
         }
 
         notify(builder.build());
+    }
+
+    public static final class Key {
+        public static final String EVENT = "event";
+        public static final String FACEBOOK_NAME = "name";
+        public static final String CHAT_REQUEST_RESPONSE = "response";
+        public static final String FACEBOOK_ID = "facebookId";
+        public static final String MESSAGE = "message";
+        public static final String ROOM_NAME = "roomName";
+        public static final String ROOM_ID = "roomId";
+        public static final String ROOM_TYPE = "roomType";
+        public static final String ROOM_RADIUS = "roomRadius";
+        public static final String ROOM_LATITUDE = "roomLatitude";
+        public static final String ROOM_LONGITUDE = "roomLongitude";
+        public static final String USER_ID = "userId";
+    }
+
+    public static final class Event {
+        public static final String CHAT_REQUEST = "Chat Request";
+        public static final String CHAT_REQUEST_RESPONSE = "Chat Request Response";
+        public static final String CHAT_MESSAGE = "Chat Message";
+        public static final String MESSAGE_FAVORITED = "Message Favorited";
+    }
+
+    private static class Value {
+        public static final String PRIVATE_ROOM_TYPE = "PrivateRoom";
+        public static final String PUBLIC_ROOM_TYPE = "PublicRoom";
     }
 }

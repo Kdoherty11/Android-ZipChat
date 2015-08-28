@@ -25,12 +25,9 @@ public class HomeTabsAdapter extends FragmentPagerAdapter {
     private static final String TAG = HomeTabsAdapter.class.getSimpleName();
 
     private PublicRoomsFragment mPublicRoomsFragment = new PublicRoomsFragment();
-
-    private Resources mResources;
-
     private final Fragment[] tabFragments = {mPublicRoomsFragment, new PrivateRoomsFragment(),
             new RequestsFragment()};
-
+    private Resources mResources;
     private int[] imageResId = {
             R.drawable.ic_pin_drop_grey600_36dp,
             R.drawable.ic_chat_grey600_36dp,

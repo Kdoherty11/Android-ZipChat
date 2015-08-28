@@ -36,21 +36,15 @@ import java.util.Queue;
  */
 public class RoomSocket {
 
-    private static final String TAG = RoomSocket.class.getSimpleName();
     public static final String KEEP_ALIVE_MSG = "Beat";
+    private static final String TAG = RoomSocket.class.getSimpleName();
     private static final long INITIAL_BACKOFF_MILLIS = 500;
     private static final long MAX_BACKOFF_DELAY_MILLIS = 64 * 1000;
-
-    private final CompletedCallback closedCallback = new CompletedCallback() {
-        @Override
-        public void onCompleted(Exception ex) {
-            if (ex != null) {
-                Log.w(TAG, "Attempting to recover from " + ex.getMessage());
-                reconnect();
-            }
-        }
-    };
-
+    private final long userId;
+    private Queue<JSONObject> mSocketEventQueue = new ArrayDeque<>();
+    private boolean mIsReconnecting = false;
+    private ChatService mChatService;
+    private Context mContext;
     private final WebSocket.StringCallback stringCallback = new WebSocket.StringCallback() {
         @Override
         public void onStringAvailable(String s) {
@@ -126,7 +120,9 @@ public class RoomSocket {
             }
         }
     };
-
+    private WebSocket mWebSocket;
+    private Handler mHandler = new Handler();
+    private long mBackoffDelay = INITIAL_BACKOFF_MILLIS;
     private Runnable mReconnectRunnable = new Runnable() {
         @Override
         public void run() {
@@ -142,18 +138,15 @@ public class RoomSocket {
             }
         }
     };
-
-    private Queue<JSONObject> mSocketEventQueue = new ArrayDeque<>();
-
-    private final long userId;
-
-    private boolean mIsReconnecting = false;
-    private ChatService mChatService;
-    private Context mContext;
-    private WebSocket mWebSocket;
-    private Handler mHandler = new Handler();
-
-    private long mBackoffDelay = INITIAL_BACKOFF_MILLIS;
+    private final CompletedCallback closedCallback = new CompletedCallback() {
+        @Override
+        public void onCompleted(Exception ex) {
+            if (ex != null) {
+                Log.w(TAG, "Attempting to recover from " + ex.getMessage());
+                reconnect();
+            }
+        }
+    };
 
     public RoomSocket(@NonNull Context context, @NonNull ChatService chatService) {
         this.mContext = context;

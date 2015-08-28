@@ -8,10 +8,6 @@ import android.os.Parcelable;
  */
 public class User implements Parcelable {
 
-    private long userId;
-    private String name;
-    private String facebookId;
-
     public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
         public User createFromParcel(Parcel in) {
             return new User(in);
@@ -21,6 +17,9 @@ public class User implements Parcelable {
             return new User[size];
         }
     };
+    private long userId;
+    private String name;
+    private String facebookId;
 
     public User(User user) {
         this.userId = user.getUserId();
@@ -48,8 +47,16 @@ public class User implements Parcelable {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getFacebookId() {
         return facebookId;
+    }
+
+    public void setFacebookId(String facebookId) {
+        this.facebookId = facebookId;
     }
 
     public long getUserId() {
@@ -66,14 +73,6 @@ public class User implements Parcelable {
         dest.writeLong(userId);
         dest.writeString(name);
         dest.writeString(facebookId);
-    }
-
-    public void setFacebookId(String facebookId) {
-        this.facebookId = facebookId;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     @Override

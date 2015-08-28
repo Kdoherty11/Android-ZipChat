@@ -106,6 +106,9 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         }
     };
 
+    public ChatRoomFragment() {
+    }
+
     public static ChatRoomFragment newInstance(long roomId, boolean isPublicRoom) {
         Bundle args = new Bundle();
         args.putLong(ARG_ROOM_ID, roomId);
@@ -114,9 +117,6 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         ChatRoomFragment fragment = new ChatRoomFragment();
         fragment.setArguments(args);
         return fragment;
-    }
-
-    public ChatRoomFragment() {
     }
 
     @Override
@@ -248,32 +248,6 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         }
     }
 
-    private class MessagesScrollListener extends RecyclerView.OnScrollListener {
-
-        private LinearLayoutManager mLayoutManager;
-        private int pastVisiblesItems;
-        private int visibleItemCount;
-        private int totalItemCount;
-
-        private MessagesScrollListener(LinearLayoutManager mLayoutManager) {
-            this.mLayoutManager = mLayoutManager;
-        }
-
-        @Override
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-            visibleItemCount = mLayoutManager.getChildCount();
-            totalItemCount = mLayoutManager.getItemCount();
-            pastVisiblesItems = mLayoutManager.findFirstVisibleItemPosition();
-
-            if (mMessagesLoading) {
-                if (!mLoadedAllMessages && (visibleItemCount + pastVisiblesItems) >= totalItemCount) {
-                    mMessagesLoading = false;
-                    populateMessageList();
-                }
-            }
-        }
-    }
-
     @Subscribe
     @SuppressWarnings("unused")
     public void onAddFavoriteEvent(final AddFavoriteEvent event) {
@@ -395,5 +369,31 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     public void onDestroy() {
         super.onDestroy();
         AnimateFirstDisplayListener.clearImages();
+    }
+
+    private class MessagesScrollListener extends RecyclerView.OnScrollListener {
+
+        private LinearLayoutManager mLayoutManager;
+        private int pastVisiblesItems;
+        private int visibleItemCount;
+        private int totalItemCount;
+
+        private MessagesScrollListener(LinearLayoutManager mLayoutManager) {
+            this.mLayoutManager = mLayoutManager;
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            visibleItemCount = mLayoutManager.getChildCount();
+            totalItemCount = mLayoutManager.getItemCount();
+            pastVisiblesItems = mLayoutManager.findFirstVisibleItemPosition();
+
+            if (mMessagesLoading) {
+                if (!mLoadedAllMessages && (visibleItemCount + pastVisiblesItems) >= totalItemCount) {
+                    mMessagesLoading = false;
+                    populateMessageList();
+                }
+            }
+        }
     }
 }

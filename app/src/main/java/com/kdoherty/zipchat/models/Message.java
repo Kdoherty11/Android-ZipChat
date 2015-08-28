@@ -12,25 +12,49 @@ import java.util.List;
  */
 public class Message implements Parcelable {
 
+    public static final Creator<Message> CREATOR = new Creator<Message>() {
+        public Message createFromParcel(Parcel source) {
+            return new Message(source);
+        }
+
+        public Message[] newArray(int size) {
+            return new Message[size];
+        }
+    };
     private long messageId;
     private String message;
     private User sender;
-
     private String uuid;
-
     private int score;
-
     private long createdAt = new Date().getTime() / 1000;
     private Date createdAtDate;
-
     private List<User> favorites = new ArrayList<>();
-
     private FavoriteState favoriteState;
-
     private boolean isConfirmed = true;
 
-    public enum FavoriteState {
-        USER_FAVORITED, FAVORITED, UNFAVORITED
+    public Message() {
+    }
+
+    public Message(String message, User sender, String uuid) {
+        this.messageId = -1;
+        this.message = message;
+        // TODO is this necessary
+        this.sender = new User(sender);
+        this.isConfirmed = false;
+        this.uuid = uuid;
+    }
+
+    protected Message(Parcel in) {
+        this.messageId = in.readLong();
+        this.message = in.readString();
+        this.sender = in.readParcelable(User.class.getClassLoader());
+        this.score = in.readInt();
+        this.createdAt = in.readLong();
+        long tmpCreatedAtDate = in.readLong();
+        this.createdAtDate = tmpCreatedAtDate == -1 ? null : new Date(tmpCreatedAtDate);
+        this.favorites = in.createTypedArrayList(User.CREATOR);
+        int tmpFavoriteState = in.readInt();
+        this.favoriteState = tmpFavoriteState == -1 ? null : FavoriteState.values()[tmpFavoriteState];
     }
 
     public int getFavoriteCount() {
@@ -116,7 +140,6 @@ public class Message implements Parcelable {
         return favoriteState;
     }
 
-
     @Override
     public int describeContents() {
         return 0;
@@ -134,42 +157,6 @@ public class Message implements Parcelable {
         dest.writeInt(this.favoriteState == null ? -1 : this.favoriteState.ordinal());
     }
 
-    public Message() {
-    }
-
-    public Message(String message, User sender, String uuid) {
-        this.messageId = -1;
-        this.message = message;
-        // TODO is this necessary
-        this.sender = new User(sender);
-        this.isConfirmed = false;
-        this.uuid = uuid;
-    }
-
-    protected Message(Parcel in) {
-        this.messageId = in.readLong();
-        this.message = in.readString();
-        this.sender = in.readParcelable(User.class.getClassLoader());
-        this.score = in.readInt();
-        this.createdAt = in.readLong();
-        long tmpCreatedAtDate = in.readLong();
-        this.createdAtDate = tmpCreatedAtDate == -1 ? null : new Date(tmpCreatedAtDate);
-        this.favorites = in.createTypedArrayList(User.CREATOR);
-        int tmpFavoriteState = in.readInt();
-        this.favoriteState = tmpFavoriteState == -1 ? null : FavoriteState.values()[tmpFavoriteState];
-    }
-
-    public static final Creator<Message> CREATOR = new Creator<Message>() {
-        public Message createFromParcel(Parcel source) {
-            return new Message(source);
-        }
-
-        public Message[] newArray(int size) {
-            return new Message[size];
-        }
-    };
-
-
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Message{");
@@ -185,5 +172,10 @@ public class Message implements Parcelable {
         sb.append(", favoriteState=").append(favoriteState);
         sb.append('}');
         return sb.toString();
+    }
+
+
+    public enum FavoriteState {
+        USER_FAVORITED, FAVORITED, UNFAVORITED
     }
 }

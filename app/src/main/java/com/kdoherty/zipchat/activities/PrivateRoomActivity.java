@@ -34,12 +34,9 @@ import retrofit.client.Response;
 public class PrivateRoomActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = PrivateRoomActivity.class.getSimpleName();
-
-    private ChatRoomFragment mChatRoomFragment;
-
     private static final String EXTRA_ROOM_ID = "PrivateChatActivityRoomId";
     private static final String EXTRA_USER = "PrivateChatActivityUser";
-
+    private ChatRoomFragment mChatRoomFragment;
     private User mUser;
     private long mRoomId;
 

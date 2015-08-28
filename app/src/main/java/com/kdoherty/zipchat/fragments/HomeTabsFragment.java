@@ -23,15 +23,13 @@ public class HomeTabsFragment extends Fragment implements ViewPager.OnPageChange
 
     public static final String PREFS_TAB_POSITION = "tabPositionKey";
     public static final String PREFS_FILE_NAME = "HomeScreenTabsFragmentPrefs";
-
+    public static final int PRIVATE_ROOMS_TAB_INDEX = 1;
+    public static final int REQUESTS_TAB_INDEX = 2;
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
     private HomeTabsAdapter mAdapter;
     private String[] mTabTitles;
     private int mTabPosition;
-
-    public static final int PRIVATE_ROOMS_TAB_INDEX = 1;
-    public static final int REQUESTS_TAB_INDEX = 2;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

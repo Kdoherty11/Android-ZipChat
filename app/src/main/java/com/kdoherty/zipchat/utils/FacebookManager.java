@@ -18,12 +18,6 @@ import java.net.URL;
  */
 public class FacebookManager {
 
-    private static final String TAG = FacebookManager.class.getSimpleName();
-
-    private static final String FACEBOOK_PREFERENCES = "facebookPreferences";
-    private static final String PREFS_USER_ID_KEY = "facebookUserIdKey";
-    private static final String PREFS_FACEBOOK_NAME_KEY = "facebookUsernameKey";
-
     public static final DisplayImageOptions displayProfPicOpts = new DisplayImageOptions.Builder()
             .showImageOnLoading(R.drawable.com_facebook_profile_picture_blank_portrait)
             .showImageForEmptyUri(R.drawable.com_facebook_profile_picture_blank_portrait)
@@ -32,6 +26,10 @@ public class FacebookManager {
             .cacheOnDisk(true)
             .considerExifParams(true)
             .build();
+    private static final String TAG = FacebookManager.class.getSimpleName();
+    private static final String FACEBOOK_PREFERENCES = "facebookPreferences";
+    private static final String PREFS_USER_ID_KEY = "facebookUserIdKey";
+    private static final String PREFS_FACEBOOK_NAME_KEY = "facebookUsernameKey";
 
     private FacebookManager() {
     }

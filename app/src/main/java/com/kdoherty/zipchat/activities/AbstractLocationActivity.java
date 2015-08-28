@@ -22,12 +22,9 @@ public abstract class AbstractLocationActivity extends AppCompatActivity impleme
 
     private static final String TAG = AbstractLocationActivity.class.getSimpleName();
     private static final String LOCATION_KEY = "com.kdoherty.zipchat.activities.AbstractLocationActivity.LOCATION";
-
-    protected GoogleApiClient mGoogleApiClient;
-
-    private Location mCurrentLocation;
-
     private static final float ACCEPTABLE_LOC_ACCURACY_THRESH = 20f;
+    protected GoogleApiClient mGoogleApiClient;
+    private Location mCurrentLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

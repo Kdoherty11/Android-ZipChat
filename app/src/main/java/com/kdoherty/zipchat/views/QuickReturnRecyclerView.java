@@ -20,11 +20,10 @@ import android.widget.FrameLayout;
  */
 public class QuickReturnRecyclerView extends RecyclerView {
     private static final String TAG = QuickReturnRecyclerView.class.getName();
-
-    private View mReturningView;
     private static final int STATE_ONSCREEN = 0;
     private static final int STATE_OFFSCREEN = 1;
     private static final int STATE_RETURNING = 2;
+    private View mReturningView;
     private int mState = STATE_ONSCREEN;
     private int mMinRawY = 0;
     private int mReturningViewHeight;

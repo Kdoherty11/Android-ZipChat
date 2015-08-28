@@ -10,24 +10,11 @@ import com.koushikdutta.async.http.WebSocket;
 public class ChatService extends Thread {
 
     private static final String TAG = ChatService.class.getSimpleName();
-    private AsyncHttpClient.WebSocketConnectCallback mCallback;
-
     private static final String WEBSOCKET_ENDPOINT = "ws://zipchatapp.herokuapp.com/";
-
+    private AsyncHttpClient.WebSocketConnectCallback mCallback;
     private String mUrl;
 
     private Future<WebSocket> mWebSocketFuture;
-
-    public enum RoomType {
-        PUBLIC("publicRooms"),
-        PRIVATE("privateRooms");
-
-        private String resourceUrl;
-
-        RoomType(String resourceUrl) {
-            this.resourceUrl = resourceUrl;
-        }
-    }
 
     ChatService(ChatService other) {
         this.mUrl = other.mUrl;
@@ -57,5 +44,16 @@ public class ChatService extends Thread {
     @Override
     public void run() {
         mWebSocketFuture = AsyncHttpClient.getDefaultInstance().websocket(mUrl, null, mCallback);
+    }
+
+    public enum RoomType {
+        PUBLIC("publicRooms"),
+        PRIVATE("privateRooms");
+
+        private String resourceUrl;
+
+        RoomType(String resourceUrl) {
+            this.resourceUrl = resourceUrl;
+        }
     }
 }

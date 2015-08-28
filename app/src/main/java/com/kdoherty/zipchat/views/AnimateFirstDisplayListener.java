@@ -15,6 +15,10 @@ public class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
 
     static final List<String> displayedImages = Collections.synchronizedList(new LinkedList<String>());
 
+    public static void clearImages() {
+        displayedImages.clear();
+    }
+
     @Override
     public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
         if (loadedImage != null) {
@@ -25,9 +29,5 @@ public class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
                 displayedImages.add(imageUri);
             }
         }
-    }
-
-    public static void clearImages() {
-        displayedImages.clear();
     }
 }

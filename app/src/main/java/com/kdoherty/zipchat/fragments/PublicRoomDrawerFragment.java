@@ -38,31 +38,27 @@ import java.util.List;
  */
 public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMapLoadedCallback {
 
-    private static final String TAG = PublicRoomDrawerFragment.class.getSimpleName();
-
-    private static final String PREFS_FILE_NAME = "chat_room_shared_preferences";
     public static final String KEY_USER_LEARNED_DRAWER = "chat_room_user_learned_drawer";
-
-    private DrawerLayout mDrawerLayout;
-    private View mContainerView;
-
-    private boolean mUserLearnedDrawer;
-
-    private GoogleMap mGoogleMap;
-    private Marker mUserMarker;
-    private Marker mRoomCenterMarker;
-
-    private RecyclerView mRoomMembersRv;
-    private UserAdapter mRoomMembersAdapter;
-
-    private int mRoomRadius;
-    private LatLng mRoomCenter;
-
-    private String mRoomName;
-
+    private static final String TAG = PublicRoomDrawerFragment.class.getSimpleName();
+    private static final String PREFS_FILE_NAME = "chat_room_shared_preferences";
     private static final String ARG_ROOM_NAME = "RoomName";
     private static final String ARG_ROOM_CENTER = "RoomCenterLocation";
     private static final String ARG_ROOM_RADIUS = "RoomRadius";
+    private DrawerLayout mDrawerLayout;
+    private View mContainerView;
+    private boolean mUserLearnedDrawer;
+    private GoogleMap mGoogleMap;
+    private Marker mUserMarker;
+    private Marker mRoomCenterMarker;
+    private RecyclerView mRoomMembersRv;
+    private UserAdapter mRoomMembersAdapter;
+    private int mRoomRadius;
+    private LatLng mRoomCenter;
+    private String mRoomName;
+
+    public PublicRoomDrawerFragment() {
+        // Required empty public constructor
+    }
 
     public static PublicRoomDrawerFragment newInstance(String roomName, LatLng roomCenter, int roomRadius) {
         Bundle args = new Bundle();
@@ -73,10 +69,6 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
         PublicRoomDrawerFragment fragment = new PublicRoomDrawerFragment();
         fragment.setArguments(args);
         return fragment;
-    }
-
-    public PublicRoomDrawerFragment() {
-        // Required empty public constructor
     }
 
     @Override

@@ -174,6 +174,35 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
         showRoom();
     }
 
+    private void addToWaitList(String roomName) {
+        waitListRoom = roomName;
+    }
+
+    private void showRoom() {
+        if (mLocation == null) {
+            return;
+        }
+
+        if (!mMapLoaded) {
+            return;
+        }
+
+        if (mMapCircle != null) {
+            mMapCircle.remove();
+        }
+
+        if (mMarker != null) {
+            mMarker.remove();
+        }
+
+        LatLng userLatLng = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
+
+        mMarker = mGoogleMap.addMarker(new MarkerOptions().position(userLatLng)
+                .title("My Location"));
+
+        mMapCircle = LocationManager.setRoomCircle(this, mGoogleMap, userLatLng, mRadius);
+    }
+
     private class CreateRoomTask extends AsyncTask<Void, Void, Location> {
 
         private String name;
@@ -223,34 +252,5 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
             }
 
         }
-    }
-
-    private void addToWaitList(String roomName) {
-        waitListRoom = roomName;
-    }
-
-    private void showRoom() {
-        if (mLocation == null) {
-            return;
-        }
-
-        if (!mMapLoaded) {
-            return;
-        }
-
-        if (mMapCircle != null) {
-            mMapCircle.remove();
-        }
-
-        if (mMarker != null) {
-            mMarker.remove();
-        }
-
-        LatLng userLatLng = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
-
-        mMarker = mGoogleMap.addMarker(new MarkerOptions().position(userLatLng)
-                .title("My Location"));
-
-        mMapCircle = LocationManager.setRoomCircle(this, mGoogleMap, userLatLng, mRadius);
     }
 }

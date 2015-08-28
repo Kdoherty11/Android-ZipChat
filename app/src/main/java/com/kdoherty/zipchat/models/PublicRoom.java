@@ -10,9 +10,17 @@ import java.util.List;
  */
 public class PublicRoom implements Parcelable {
 
+    public static final Parcelable.Creator<PublicRoom> CREATOR = new Parcelable.Creator<PublicRoom>() {
+        public PublicRoom createFromParcel(Parcel source) {
+            return new PublicRoom(source);
+        }
+
+        public PublicRoom[] newArray(int size) {
+            return new PublicRoom[size];
+        }
+    };
     private int position;
     private List<Message> messages;
-
     private double latitude;
     private double longitude;
     private int radius;
@@ -28,6 +36,19 @@ public class PublicRoom implements Parcelable {
         this.radius = radius;
         this.latitude = latitude;
         this.longitude = longitude;
+    }
+
+    protected PublicRoom(Parcel in) {
+        this.position = in.readInt();
+        this.messages = in.createTypedArrayList(Message.CREATOR);
+        this.latitude = in.readDouble();
+        this.longitude = in.readDouble();
+        this.radius = in.readInt();
+        this.timeStamp = in.readLong();
+        this.distance = in.readInt();
+        this.roomId = in.readLong();
+        this.name = in.readString();
+        this.lastActivity = in.readLong();
     }
 
     public long getLastActivity() {
@@ -124,27 +145,4 @@ public class PublicRoom implements Parcelable {
         dest.writeString(this.name);
         dest.writeLong(this.lastActivity);
     }
-
-    protected PublicRoom(Parcel in) {
-        this.position = in.readInt();
-        this.messages = in.createTypedArrayList(Message.CREATOR);
-        this.latitude = in.readDouble();
-        this.longitude = in.readDouble();
-        this.radius = in.readInt();
-        this.timeStamp = in.readLong();
-        this.distance = in.readInt();
-        this.roomId = in.readLong();
-        this.name = in.readString();
-        this.lastActivity = in.readLong();
-    }
-
-    public static final Parcelable.Creator<PublicRoom> CREATOR = new Parcelable.Creator<PublicRoom>() {
-        public PublicRoom createFromParcel(Parcel source) {
-            return new PublicRoom(source);
-        }
-
-        public PublicRoom[] newArray(int size) {
-            return new PublicRoom[size];
-        }
-    };
 }

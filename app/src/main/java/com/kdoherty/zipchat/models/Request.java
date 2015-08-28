@@ -9,12 +9,6 @@ public class Request {
     private User sender;
     private long createdAt;
 
-    public enum Status {
-        accepted,
-        denied,
-        pending
-    }
-
     public User getSender() {
         return this.sender;
     }
@@ -29,5 +23,11 @@ public class Request {
 
     public void setRequestId(long requestId) {
         this.requestId = requestId;
+    }
+
+    public enum Status {
+        accepted,
+        denied,
+        pending
     }
 }

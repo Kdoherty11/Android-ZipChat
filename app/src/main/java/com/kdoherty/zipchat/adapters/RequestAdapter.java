@@ -40,8 +40,8 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     private static final String TAG = RequestAdapter.class.getSimpleName();
 
     private final LayoutInflater mInflater;
-    private Context mContext;
     private final List<Request> mRequests;
+    private Context mContext;
     private RequestFilter mFilter = new RequestFilter();
     private List<Request> mFilteredRequests;
 
@@ -90,6 +90,11 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     @Override
     public int getItemCount() {
         return mFilteredRequests.size();
+    }
+
+    @Override
+    public Filter getFilter() {
+        return mFilter;
     }
 
     class RequestViewHolder extends RecyclerView.ViewHolder {
@@ -142,11 +147,6 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
             deleteChatRequest(position);
         }
-    }
-
-    @Override
-    public Filter getFilter() {
-        return mFilter;
     }
 
     private class RequestFilter extends Filter {

@@ -29,12 +29,10 @@ public class MessageFavoritesFragment extends Fragment {
     private static final String GCM_RECEIVER_NAME = "MessageFavoritesFragmentGcmReceiver";
 
     private static final String TAG = MessageFavoritesFragment.class.getSimpleName();
+    private static final String ARG_MESSAGE = "MessageFavoritesFragmentMessage";
     private RecyclerView mMessageFavorites;
     private List<User> mMessageFavoritors = new ArrayList<>();
     private UserAdapter mFavoriteAdapter;
-
-    private static final String ARG_MESSAGE = "MessageFavoritesFragmentMessage";
-
     //This is the handler that will manager to process the broadcast intent
     private BroadcastReceiver mGcmFavoriteReceiver = new BroadcastReceiver() {
         @Override
@@ -52,6 +50,9 @@ public class MessageFavoritesFragment extends Fragment {
     };
 
 
+    public MessageFavoritesFragment() {
+    }
+
     public static MessageFavoritesFragment newInstance(List<User> messageFavorites) {
         Bundle args = new Bundle();
         args.putParcelableArrayList(ARG_MESSAGE, new ArrayList<>(messageFavorites));
@@ -59,9 +60,6 @@ public class MessageFavoritesFragment extends Fragment {
         MessageFavoritesFragment fragment = new MessageFavoritesFragment();
         fragment.setArguments(args);
         return fragment;
-    }
-
-    public MessageFavoritesFragment() {
     }
 
     @Override

@@ -40,29 +40,10 @@ import com.kdoherty.zipchat.R;
 public class SlidingTabLayout extends HorizontalScrollView {
 
     private static final String TAG = "Sliding Tab Layout";
-
-    /**
-     * Allows complete control over the colors drawn in the tab layout. Set with
-     * {@link #setCustomTabColorizer(TabColorizer)}.
-     */
-    public interface TabColorizer {
-
-        /**
-         * @return return the color of the indicator used when {@code position} is selected.
-         */
-        int getIndicatorColor(int position);
-
-        /**
-         * @return return the color of the divider drawn to the right of {@code position}.
-         */
-        int getDividerColor(int position);
-
-    }
-
     private static final int TITLE_OFFSET_DIPS = 24;
     private static final int TAB_VIEW_PADDING_DIPS = 16;
     private static final int TAB_VIEW_TEXT_SIZE_SP = 14;
-
+    private final SlidingTabStrip mTabStrip;
     private int mTitleOffset;
 
     private int mTabViewLayoutId;
@@ -71,8 +52,6 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
     private ViewPager mViewPager;
     private ViewPager.OnPageChangeListener mViewPagerPageChangeListener;
-
-    private final SlidingTabStrip mTabStrip;
 
     public SlidingTabLayout(Context context) {
         this(context, null);
@@ -265,6 +244,52 @@ public class SlidingTabLayout extends HorizontalScrollView {
         }
     }
 
+    public void setActiveTabTextColor(int newTabPosition, int oldTabPosition, int activeColor, int inactiveColor) {
+
+        if (oldTabPosition == newTabPosition) {
+            Log.e(TAG, "Old tab position and new tab position are both " + newTabPosition);
+        }
+
+        setTabTextColor(newTabPosition, activeColor);
+        setTabTextColor(oldTabPosition, inactiveColor);
+    }
+
+    public void setTabTextColor(int position, int color) {
+
+        if (position >= mTabStrip.getChildCount()) {
+            Log.e(TAG, "Trying to get tab at position " + position + " but there are only " + mTabStrip.getChildCount() + " tabs");
+            return;
+        }
+
+        View tab = mTabStrip.getChildAt(position);
+        if (TextView.class.isInstance(tab)) {
+            TextView tabTitle = (TextView) tab;
+            tabTitle.setTextColor(color);
+        }
+    }
+
+    public void setDistributeEvenly(boolean distributeEvenly) {
+        mDistributeEvenly = distributeEvenly;
+    }
+
+    /**
+     * Allows complete control over the colors drawn in the tab layout. Set with
+     * {@link #setCustomTabColorizer(TabColorizer)}.
+     */
+    public interface TabColorizer {
+
+        /**
+         * @return return the color of the indicator used when {@code position} is selected.
+         */
+        int getIndicatorColor(int position);
+
+        /**
+         * @return return the color of the divider drawn to the right of {@code position}.
+         */
+        int getDividerColor(int position);
+
+    }
+
     private class InternalViewPagerListener implements ViewPager.OnPageChangeListener {
         private int mScrollState;
 
@@ -322,34 +347,6 @@ public class SlidingTabLayout extends HorizontalScrollView {
                 }
             }
         }
-    }
-
-    public void setActiveTabTextColor(int newTabPosition, int oldTabPosition, int activeColor, int inactiveColor) {
-
-        if (oldTabPosition == newTabPosition) {
-            Log.e(TAG, "Old tab position and new tab position are both " + newTabPosition);
-        }
-
-        setTabTextColor(newTabPosition, activeColor);
-        setTabTextColor(oldTabPosition, inactiveColor);
-    }
-
-    public void setTabTextColor(int position, int color) {
-
-        if (position >= mTabStrip.getChildCount()) {
-            Log.e(TAG, "Trying to get tab at position " + position + " but there are only " + mTabStrip.getChildCount() + " tabs");
-            return;
-        }
-
-        View tab = mTabStrip.getChildAt(position);
-        if (TextView.class.isInstance(tab)) {
-            TextView tabTitle = (TextView) tab;
-            tabTitle.setTextColor(color);
-        }
-    }
-
-    public void setDistributeEvenly(boolean distributeEvenly) {
-        mDistributeEvenly = distributeEvenly;
     }
 
 }

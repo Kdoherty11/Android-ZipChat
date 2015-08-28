@@ -20,14 +20,13 @@ import com.kdoherty.zipchat.utils.Utils;
 public class MessageDetailsActivity extends AppCompatActivity {
 
     private static final String EXTRA_MESSAGE = "MessageDetailMessage";
+    private MessageFavoritesFragment mMessageFavoritesFragment;
 
     public static Intent getIntent(Context context, Message message) {
         Intent messageDetail = new Intent(context, MessageDetailsActivity.class);
         messageDetail.putExtra(EXTRA_MESSAGE, message);
         return messageDetail;
     }
-
-    private MessageFavoritesFragment mMessageFavoritesFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

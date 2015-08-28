@@ -41,67 +41,24 @@ import de.hdodenhof.circleimageview.CircleImageView;
  */
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageCellViewHolder> {
 
-    public interface MessageFavoriteListener {
-        void sendFavoriteEvent(long messageId, boolean isFavorite);
-    }
-
     private static final String TAG = MessageAdapter.class.getSimpleName();
-
+    private static final Semaphore sendFavoriteLock = new Semaphore(1);
+    private static final int SEND_FAVORITE_LOCK_TIMEOUT_SECONDS = 1;
+    private static final long SEND_FAVORITE_EVENT_DELAY = 1000; // MS
     private final LayoutInflater mInflater;
     private final List<Message> mMessages;
-    private MessageFavoriteListener mMessageFavListener;
     private final Handler mFavoriteEventHandler = new Handler();
+    private MessageFavoriteListener mMessageFavListener;
     private boolean mHasPendingFavorite;
     private SendFavoriteEventRunnable mSendFavoriteEvent;
     private Message.FavoriteState mInitialFavoriteState;
-
-    private static final Semaphore sendFavoriteLock = new Semaphore(1);
-    private static final int SEND_FAVORITE_LOCK_TIMEOUT_SECONDS = 1;
     private long mSelfUserId;
 
     private ImageLoadingListener mAnimateFirstListener = new AnimateFirstDisplayListener();
-
-    private class SendFavoriteEventRunnable implements Runnable {
-
-        private long messageId;
-        private boolean isAddFavorite;
-
-        private SendFavoriteEventRunnable(long messageId, boolean isAddFavorite) {
-            this.messageId = messageId;
-            this.isAddFavorite = isAddFavorite;
-        }
-
-        @Override
-        public void run() {
-            try {
-                boolean lockAquired = sendFavoriteLock.tryAcquire(SEND_FAVORITE_LOCK_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-                if (!lockAquired) {
-                    Log.d(TAG, "Timed out while aquiring send favorite lock in runnable");
-                    return;
-                }
-            } catch (InterruptedException e) {
-                Log.e(TAG, "Interrupted while aquiring the send favorite lock in runnable: " + e);
-                return;
-            }
-
-            boolean userFavorited = mInitialFavoriteState == Message.FavoriteState.USER_FAVORITED;
-            if (isAddFavorite != userFavorited) {
-                mMessageFavListener.sendFavoriteEvent(messageId, isAddFavorite);
-            }
-
-            mInitialFavoriteState = null;
-            mHasPendingFavorite = false;
-            sendFavoriteLock.release();
-        }
-    }
-
     private Context mContext;
     private int mSelfBorderColorId;
     private int mOtherBoarderColor;
     private long mAnonUserId;
-
-    private static final long SEND_FAVORITE_EVENT_DELAY = 1000; // MS
-
     public MessageAdapter(Context context, List<Message> messages, MessageFavoriteListener messageFavoriteListener) {
         this(context, messages, 0, messageFavoriteListener);
     }
@@ -122,6 +79,19 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         mSelfUserId = UserManager.getId(mContext);
         mSelfBorderColorId = mContext.getResources().getColor(R.color.orange);
         mOtherBoarderColor = mContext.getResources().getColor(R.color.zipchat_blue);
+    }
+
+    private static int getMessageDrawableId(Message.FavoriteState state) {
+        switch (state) {
+            case FAVORITED:
+                return R.drawable.ic_favorite_grey600_24dp;
+            case USER_FAVORITED:
+                return R.drawable.ic_favorite_red600_24dp;
+            case UNFAVORITED:
+                return R.drawable.ic_favorite_outline_grey600_24dp;
+            default:
+                throw new AssertionError("Default switch case on Message.FavoriteState");
+        }
     }
 
     @Override
@@ -220,19 +190,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         notifyItemRangeInserted(0, messageList.size());
     }
 
-    private static int getMessageDrawableId(Message.FavoriteState state) {
-        switch (state) {
-            case FAVORITED:
-                return R.drawable.ic_favorite_grey600_24dp;
-            case USER_FAVORITED:
-                return R.drawable.ic_favorite_red600_24dp;
-            case UNFAVORITED:
-                return R.drawable.ic_favorite_outline_grey600_24dp;
-            default:
-                throw new AssertionError("Default switch case on Message.FavoriteState");
-        }
-    }
-
     public Message getMessage(int position) {
         return mMessages.get(position);
     }
@@ -299,6 +256,51 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         return -1;
     }
 
+    public void sendPendingEvents() {
+        if (mHasPendingFavorite) {
+            mFavoriteEventHandler.removeCallbacks(mSendFavoriteEvent);
+            mSendFavoriteEvent.run();
+        }
+    }
+
+    public interface MessageFavoriteListener {
+        void sendFavoriteEvent(long messageId, boolean isFavorite);
+    }
+
+    private class SendFavoriteEventRunnable implements Runnable {
+
+        private long messageId;
+        private boolean isAddFavorite;
+
+        private SendFavoriteEventRunnable(long messageId, boolean isAddFavorite) {
+            this.messageId = messageId;
+            this.isAddFavorite = isAddFavorite;
+        }
+
+        @Override
+        public void run() {
+            try {
+                boolean lockAquired = sendFavoriteLock.tryAcquire(SEND_FAVORITE_LOCK_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                if (!lockAquired) {
+                    Log.d(TAG, "Timed out while aquiring send favorite lock in runnable");
+                    return;
+                }
+            } catch (InterruptedException e) {
+                Log.e(TAG, "Interrupted while aquiring the send favorite lock in runnable: " + e);
+                return;
+            }
+
+            boolean userFavorited = mInitialFavoriteState == Message.FavoriteState.USER_FAVORITED;
+            if (isAddFavorite != userFavorited) {
+                mMessageFavListener.sendFavoriteEvent(messageId, isAddFavorite);
+            }
+
+            mInitialFavoriteState = null;
+            mHasPendingFavorite = false;
+            sendFavoriteLock.release();
+        }
+    }
+
     private class FavoriteClickListener implements View.OnClickListener {
         private final Message message;
         private final long userId;
@@ -342,13 +344,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
             }
 
             sendFavoriteLock.release();
-        }
-    }
-
-    public void sendPendingEvents() {
-        if (mHasPendingFavorite) {
-            mFavoriteEventHandler.removeCallbacks(mSendFavoriteEvent);
-            mSendFavoriteEvent.run();
         }
     }
 
