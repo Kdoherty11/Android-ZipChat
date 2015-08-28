@@ -1,13 +1,16 @@
 package com.kdoherty.zipchat.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import com.devspark.robototextview.widget.RobotoTextView;
 import com.kdoherty.zipchat.R;
+import com.kdoherty.zipchat.activities.UserDetailsActivity;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.FacebookManager;
 import com.kdoherty.zipchat.utils.UserManager;
@@ -25,9 +28,11 @@ public class PublicRoomDrawerAdapter extends RecyclerView.Adapter<PublicRoomDraw
 
     private final LayoutInflater mInflater;
     private final List<User> mRoomMembers;
+    private Context mContext;
 
     public PublicRoomDrawerAdapter(Context context, List<User> roomMembers) {
-        mInflater = LayoutInflater.from(context);
+        mContext = context;
+        mInflater = LayoutInflater.from(mContext);
         mRoomMembers = roomMembers;
         addUser(0, UserManager.getSelf(context));
     }
@@ -41,10 +46,18 @@ public class PublicRoomDrawerAdapter extends RecyclerView.Adapter<PublicRoomDraw
     @Override
     public void onBindViewHolder(UserCellViewHolder drawerCellViewHolder, int i) {
 
-        User user = mRoomMembers.get(i);
+        final User user = mRoomMembers.get(i);
 
         drawerCellViewHolder.text.setText(user.getName());
         FacebookManager.displayProfilePicture(user.getFacebookId(), drawerCellViewHolder.profilePicture);
+
+        drawerCellViewHolder.layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = UserDetailsActivity.getIntent(mContext, user);
+                mContext.startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -80,9 +93,11 @@ public class PublicRoomDrawerAdapter extends RecyclerView.Adapter<PublicRoomDraw
 
         private CircleImageView profilePicture;
         private RobotoTextView text;
+        private RelativeLayout layout;
 
         public UserCellViewHolder(View itemView) {
             super(itemView);
+            layout = (RelativeLayout) itemView;
             profilePicture = (CircleImageView) itemView.findViewById(R.id.drawer_cell_icon);
             text = (RobotoTextView) itemView.findViewById(R.id.drawer_cell_text);
         }

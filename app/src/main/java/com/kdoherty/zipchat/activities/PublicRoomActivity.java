@@ -25,6 +25,7 @@ import com.kdoherty.zipchat.events.MemberLeaveEvent;
 import com.kdoherty.zipchat.events.ReceivedRoomMembersEvent;
 import com.kdoherty.zipchat.fragments.ChatRoomFragment;
 import com.kdoherty.zipchat.fragments.PublicRoomDrawerFragment;
+import com.kdoherty.zipchat.models.PublicRoom;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
@@ -45,31 +46,20 @@ public class PublicRoomActivity extends AbstractLocationActivity {
 
     private static final String TAG = PublicRoomActivity.class.getSimpleName();
 
-    private static final String EXTRA_ROOM_NAME = "ChatRoomNameExtra";
-    private static final String EXTRA_ROOM_ID = "ChatRoomIdExtra";
+    private static final String EXTRA_ROOM = "PublicRoomActivityRoomExtra";
 
-    private static final String EXTRA_ROOM_RADIUS = "ChatRoomDrawerFragmentArgRoomRadius";
-    private static final String EXTRA_ROOM_LATITUDE = "ChatRoomDrawerFragmentArgRoomLatitude";
-    private static final String EXTRA_ROOM_LONGITUDE = "ChatRoomDrawerFragmentArgRoomLongitude";
-
-    public static final int DEFAULT_ROOM_RADIUS = -1;
-    public static final double DEFAULT_ROOM_LATITUDE = -1;
-    public static final double DEFAULT_ROOM_LONGITUDE = -1;
 
     private PublicRoomDrawerFragment mDrawerFragment;
     private ChatRoomFragment mChatRoomFragment;
-    private long mRoomId;
+
+    private PublicRoom mPublicRoom;
 
     private MenuItem mNotificationsToggle;
     private boolean mNotificationsOn;
 
-    public static Intent getIntent(Context context, long roomId, String name, double lat, double lon, int radius) {
+    public static Intent getIntent(Context context, PublicRoom publicRoom) {
         Intent publicRoomIntent = new Intent(context, PublicRoomActivity.class);
-        publicRoomIntent.putExtra(EXTRA_ROOM_ID, roomId);
-        publicRoomIntent.putExtra(EXTRA_ROOM_NAME, name);
-        publicRoomIntent.putExtra(EXTRA_ROOM_LATITUDE, lat);
-        publicRoomIntent.putExtra(EXTRA_ROOM_LONGITUDE, lon);
-        publicRoomIntent.putExtra(EXTRA_ROOM_RADIUS, radius);
+        publicRoomIntent.putExtra(EXTRA_ROOM, publicRoom);
         return publicRoomIntent;
     }
 
@@ -80,7 +70,7 @@ public class PublicRoomActivity extends AbstractLocationActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         final Intent intent = getIntent();
-        String roomName = intent.getStringExtra(EXTRA_ROOM_NAME);
+        mPublicRoom = intent.getParcelableExtra(EXTRA_ROOM);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.chat_room_app_bar);
         setSupportActionBar(toolbar);
@@ -89,7 +79,7 @@ public class PublicRoomActivity extends AbstractLocationActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
-            actionBar.setTitle(roomName);
+            actionBar.setTitle(mPublicRoom.getName());
         }
 
         MapsInitializer.initialize(this);
@@ -100,12 +90,12 @@ public class PublicRoomActivity extends AbstractLocationActivity {
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-                int radius = intent.getIntExtra(EXTRA_ROOM_RADIUS, DEFAULT_ROOM_RADIUS);
-                double latitude = intent.getDoubleExtra(EXTRA_ROOM_LATITUDE, DEFAULT_ROOM_LATITUDE);
-                double longitude = intent.getDoubleExtra(EXTRA_ROOM_LONGITUDE, DEFAULT_ROOM_LONGITUDE);
+                int radius = mPublicRoom.getRadius();
+                double latitude = mPublicRoom.getLatitude();
+                double longitude = mPublicRoom.getLongitude();
 
                 mDrawerFragment = PublicRoomDrawerFragment.newInstance(
-                        roomName,
+                        mPublicRoom.getName(),
                         new LatLng(latitude, longitude),
                         radius);
 
@@ -122,8 +112,7 @@ public class PublicRoomActivity extends AbstractLocationActivity {
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-                mRoomId = intent.getExtras().getLong(EXTRA_ROOM_ID);
-                mChatRoomFragment = ChatRoomFragment.newInstance(mRoomId, true);
+                mChatRoomFragment = ChatRoomFragment.newInstance(mPublicRoom.getRoomId(), true);
 
                 fragmentTransaction.add(R.id.chat_room_fragment_container, mChatRoomFragment);
                 fragmentTransaction.commit();
@@ -191,15 +180,16 @@ public class PublicRoomActivity extends AbstractLocationActivity {
         if (!NetworkManager.checkOnline(this)) {
             return;
         }
-        ZipChatApi.INSTANCE.subscribe(UserManager.getAuthToken(this), mRoomId, UserManager.getId(this), new Callback<Response>() {
+        final long roomId = mPublicRoom.getRoomId();
+        ZipChatApi.INSTANCE.subscribe(UserManager.getAuthToken(this), roomId, UserManager.getId(this), new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
-                Log.d(TAG, "Subscribed to room " + mRoomId);
+                Log.d(TAG, "Subscribed to room " + roomId);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                NetworkManager.logErrorResponse(TAG, "Subscribing to room with id " + mRoomId, error);
+                NetworkManager.logErrorResponse(TAG, "Subscribing to room with id " + roomId, error);
             }
         });
     }
@@ -208,15 +198,16 @@ public class PublicRoomActivity extends AbstractLocationActivity {
         if (!NetworkManager.checkOnline(this)) {
             return;
         }
-        ZipChatApi.INSTANCE.removeSubscription(UserManager.getAuthToken(this), mRoomId, UserManager.getId(this), new Callback<Response>() {
+        final long roomId = mPublicRoom.getRoomId();
+        ZipChatApi.INSTANCE.removeSubscription(UserManager.getAuthToken(this), roomId, UserManager.getId(this), new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
-                Log.d(TAG, "Removed subscription from room " + mRoomId);
+                Log.d(TAG, "Removed subscription from room " + roomId);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                NetworkManager.logErrorResponse(TAG, "Removing subscription from room with id " + mRoomId, error);
+                NetworkManager.logErrorResponse(TAG, "Removing subscription from room with id " + roomId, error);
             }
         });
     }

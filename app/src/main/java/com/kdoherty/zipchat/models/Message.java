@@ -2,11 +2,7 @@ package com.kdoherty.zipchat.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
-import com.kdoherty.zipchat.utils.UserManager;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

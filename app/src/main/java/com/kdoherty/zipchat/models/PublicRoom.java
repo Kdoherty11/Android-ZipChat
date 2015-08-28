@@ -1,12 +1,14 @@
 package com.kdoherty.zipchat.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by kdoherty on 12/14/14.
  */
-public class PublicRoom {
+public class PublicRoom implements Parcelable {
 
     private int position;
     private List<Message> messages;
@@ -20,23 +22,12 @@ public class PublicRoom {
     private String name;
     private long lastActivity;
 
-    private Set<Long> subscribers;
-
-    public PublicRoom(String name, int position, long lastActivity, List<Message> messages) {
-        this.name = name;
-        this.lastActivity = lastActivity;
-        this.position = position;
-        this.messages = messages;
-    }
-
-    public PublicRoom(long roomId, String name, int radius, double latitude, double longitude, long timeStamp, long lastActivity) {
-        this.name = name;
-        this.lastActivity = lastActivity;
+    public PublicRoom(long roomId, String name, int radius, double latitude, double longitude) {
         this.roomId = roomId;
+        this.name = name;
         this.radius = radius;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.timeStamp = timeStamp;
     }
 
     public long getLastActivity() {
@@ -115,7 +106,45 @@ public class PublicRoom {
         return name;
     }
 
-    public void addSubscriber(long id) {
-        subscribers.add(id);
+    @Override
+    public int describeContents() {
+        return 0;
     }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.position);
+        dest.writeTypedList(messages);
+        dest.writeDouble(this.latitude);
+        dest.writeDouble(this.longitude);
+        dest.writeInt(this.radius);
+        dest.writeLong(this.timeStamp);
+        dest.writeInt(this.distance);
+        dest.writeLong(this.roomId);
+        dest.writeString(this.name);
+        dest.writeLong(this.lastActivity);
+    }
+
+    protected PublicRoom(Parcel in) {
+        this.position = in.readInt();
+        this.messages = in.createTypedArrayList(Message.CREATOR);
+        this.latitude = in.readDouble();
+        this.longitude = in.readDouble();
+        this.radius = in.readInt();
+        this.timeStamp = in.readLong();
+        this.distance = in.readInt();
+        this.roomId = in.readLong();
+        this.name = in.readString();
+        this.lastActivity = in.readLong();
+    }
+
+    public static final Parcelable.Creator<PublicRoom> CREATOR = new Parcelable.Creator<PublicRoom>() {
+        public PublicRoom createFromParcel(Parcel source) {
+            return new PublicRoom(source);
+        }
+
+        public PublicRoom[] newArray(int size) {
+            return new PublicRoom[size];
+        }
+    };
 }

@@ -9,7 +9,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,9 +16,6 @@ import android.widget.ImageView;
 
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.events.LeaveRoomEvent;
-import com.kdoherty.zipchat.events.MemberJoinEvent;
-import com.kdoherty.zipchat.events.MemberLeaveEvent;
-import com.kdoherty.zipchat.events.ReceivedRoomMembersEvent;
 import com.kdoherty.zipchat.fragments.ChatRoomFragment;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.BusProvider;
@@ -27,9 +23,7 @@ import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.FacebookManager;
 import com.kdoherty.zipchat.utils.NetworkManager;
 import com.kdoherty.zipchat.utils.UserManager;
-import com.squareup.otto.Subscribe;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -45,8 +39,6 @@ public class PrivateRoomActivity extends AppCompatActivity implements View.OnCli
 
     private static final String EXTRA_ROOM_ID = "PrivateChatActivityRoomId";
     private static final String EXTRA_USER = "PrivateChatActivityUser";
-
-    private CircleImageView mActiveUserCircle;
 
     private User mUser;
     private long mRoomId;
@@ -69,7 +61,6 @@ public class PrivateRoomActivity extends AppCompatActivity implements View.OnCli
 
         ZipChatApplication.initImageLoader(this);
 
-        mActiveUserCircle = (CircleImageView) findViewById(R.id.active_user_circle);
         Toolbar toolbar = (Toolbar) findViewById(R.id.private_chat_room_app_bar);
         ImageView otherMembersPic = (ImageView) toolbar.findViewById(R.id.other_user_pic);
         FacebookManager.displayProfilePicture(mUser.getFacebookId(), otherMembersPic);
@@ -95,44 +86,6 @@ public class PrivateRoomActivity extends AppCompatActivity implements View.OnCli
             fragmentTransaction.add(R.id.chat_room_fragment_container, mChatRoomFragment);
             fragmentTransaction.commit();
         }
-    }
-
-    @Subscribe
-    @SuppressWarnings("unused")
-    public void onRoomMembersReceived(ReceivedRoomMembersEvent event) {
-        User[] users = event.getUsers();
-        if (users.length > 0) {
-            mActiveUserCircle.setVisibility(View.VISIBLE);
-        }
-    }
-
-    @Subscribe
-    @SuppressWarnings("unused")
-    public void onUserJoinEvent(MemberJoinEvent event) {
-        User joined = event.getUser();
-        if (joined.getUserId() == UserManager.getId(this)) {
-            Log.e(TAG, "Received own join event");
-            return;
-        }
-        mActiveUserCircle.setVisibility(View.VISIBLE);
-    }
-
-    @Subscribe
-    @SuppressWarnings("unused")
-    public void onUserQuitEvent(MemberLeaveEvent event) {
-        mActiveUserCircle.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        BusProvider.getInstance().register(this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        BusProvider.getInstance().unregister(this);
     }
 
     @Override

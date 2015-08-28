@@ -1,6 +1,7 @@
 package com.kdoherty.zipchat.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
@@ -11,9 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.kdoherty.zipchat.R;
+import com.kdoherty.zipchat.activities.PublicRoomActivity;
 import com.kdoherty.zipchat.models.PublicRoom;
 import com.kdoherty.zipchat.models.PublicRoomComparators;
 import com.kdoherty.zipchat.models.SortingTabs;
@@ -32,11 +35,13 @@ public class PublicRoomAdapter extends RecyclerView.Adapter<PublicRoomAdapter.Ch
     private final LayoutInflater mInflater;
     private List<PublicRoom> mPublicRooms;
     private List<PublicRoom> mFilteredPublicRooms;
+    private Context mContext;
 
     private ChatRoomFilter mFilter = new ChatRoomFilter();
 
     public PublicRoomAdapter(Context context, List<PublicRoom> publicRooms) {
-        mInflater = LayoutInflater.from(context);
+        mContext = context;
+        mInflater = LayoutInflater.from(mContext);
         mPublicRooms = publicRooms;
         mFilteredPublicRooms = publicRooms;
     }
@@ -49,7 +54,7 @@ public class PublicRoomAdapter extends RecyclerView.Adapter<PublicRoomAdapter.Ch
 
     @Override
     public void onBindViewHolder(ChatRoomViewHolder chatRoomViewHolder, int position) {
-        PublicRoom publicRoom = getPublicRoom(position);
+        final PublicRoom publicRoom = getPublicRoom(position);
 
         chatRoomViewHolder.nameTv.setText(publicRoom.getName());
         chatRoomViewHolder.distanceTv.setText(publicRoom.getDistance() + "m");
@@ -58,6 +63,14 @@ public class PublicRoomAdapter extends RecyclerView.Adapter<PublicRoomAdapter.Ch
                 publicRoom.getLastActivity() * 1000);
 
         chatRoomViewHolder.lastActivityTv.setText(timeAgo);
+        chatRoomViewHolder.layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent publicRoomIntent = PublicRoomActivity.getIntent(mContext, publicRoom);
+                mContext.startActivity(publicRoomIntent);
+            }
+        });
+
     }
 
     @Override
@@ -91,9 +104,11 @@ public class PublicRoomAdapter extends RecyclerView.Adapter<PublicRoomAdapter.Ch
         TextView nameTv;
         TextView distanceTv;
         TextView lastActivityTv;
+        RelativeLayout layout;
 
         public ChatRoomViewHolder(View itemView) {
             super(itemView);
+            layout = (RelativeLayout) itemView;
             nameTv = (TextView) itemView.findViewById(R.id.chat_room_name);
             distanceTv = (TextView) itemView.findViewById(R.id.chat_room_distance);
             lastActivityTv = (TextView) itemView.findViewById(R.id.chat_room_last_activity);

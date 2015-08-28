@@ -28,7 +28,6 @@ import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.AbstractLocationActivity;
 import com.kdoherty.zipchat.activities.CreateRoomActivity;
-import com.kdoherty.zipchat.activities.PublicRoomActivity;
 import com.kdoherty.zipchat.adapters.PublicRoomAdapter;
 import com.kdoherty.zipchat.events.LocationAvailableEvent;
 import com.kdoherty.zipchat.events.RoomCreatedEvent;
@@ -41,7 +40,6 @@ import com.kdoherty.zipchat.utils.NetworkManager;
 import com.kdoherty.zipchat.utils.UserManager;
 import com.kdoherty.zipchat.views.DividerItemDecoration;
 import com.kdoherty.zipchat.views.QuickReturnRecyclerView;
-import com.kdoherty.zipchat.views.RecyclerItemClickListener;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
@@ -53,7 +51,7 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, Filterable, RecyclerItemClickListener.OnItemClickListener {
+public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, Filterable {
 
     private static final String TAG = PublicRoomsFragment.class.getSimpleName();
 
@@ -114,7 +112,6 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
         mChatRoomsRv.setItemAnimator(new DefaultItemAnimator());
         mChatRoomsRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         mChatRoomsRv.addItemDecoration(new DividerItemDecoration(getResources().getDrawable(R.drawable.message_list_divider), true, true));
-        mChatRoomsRv.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), this));
         registerForContextMenu(mChatRoomsRv);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
@@ -351,13 +348,5 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
             return mAdapter.getFilter();
         }
         return null;
-    }
-
-    @Override
-    public void onItemClick(View view, int position) {
-        PublicRoom room = mAdapter.getPublicRoom(position);
-        Intent publicRoomIntent = PublicRoomActivity.getIntent(getActivity(), room.getRoomId(), room.getName(),
-                room.getLatitude(), room.getLongitude(), room.getRadius());
-        startActivity(publicRoomIntent);
     }
 }

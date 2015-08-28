@@ -2,16 +2,15 @@ package com.kdoherty.zipchat.fragments;
 
 
 import android.app.Activity;
-import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,12 +23,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.kdoherty.zipchat.R;
-import com.kdoherty.zipchat.activities.UserDetailsActivity;
 import com.kdoherty.zipchat.adapters.PublicRoomDrawerAdapter;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.LocationManager;
 import com.kdoherty.zipchat.utils.PrefsHelper;
-import com.kdoherty.zipchat.views.RecyclerItemClickListener;
 
 import java.util.Collections;
 import java.util.List;
@@ -102,23 +99,14 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
     public void onViewCreated(View view, Bundle savedInstanceState) {
 
         mRoomMembersRv = (RecyclerView) view.findViewById(R.id.chat_room_drawer_list);
-        mRoomMembersRv.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(View view, int position) {
-                        User user = mRoomMembersAdapter.getUser(position);
-                        Intent intent = UserDetailsActivity.getIntent(getActivity(), user);
-                        startActivity(intent);
-                    }
-                })
-        );
         mRoomMembersRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
     }
 
 
     public void toggleDrawer() {
-        if (mDrawerLayout.isDrawerOpen(Gravity.END)) {
-            mDrawerLayout.closeDrawer(Gravity.END);
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.END)) {
+            mDrawerLayout.closeDrawer(GravityCompat.END);
         } else {
             mDrawerLayout.openDrawer(mContainerView);
         }

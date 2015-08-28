@@ -16,7 +16,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.MessageDetailsActivity;

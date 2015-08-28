@@ -25,6 +25,7 @@ import com.kdoherty.zipchat.activities.PrivateRoomActivity;
 import com.kdoherty.zipchat.activities.PublicRoomActivity;
 import com.kdoherty.zipchat.events.ReceivedRequestEvent;
 import com.kdoherty.zipchat.events.RequestAcceptedEvent;
+import com.kdoherty.zipchat.models.PublicRoom;
 import com.kdoherty.zipchat.models.Request;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.FacebookManager;
@@ -92,7 +93,8 @@ public class MyGcmListenerService extends GcmListenerService {
                     int roomRadius = Integer.parseInt(data.getString(Key.ROOM_RADIUS));
                     double roomLat = Double.parseDouble(data.getString(Key.ROOM_LATITUDE));
                     double roomLon = Double.parseDouble(data.getString(Key.ROOM_LONGITUDE));
-                    receivePublicChatMessage(roomId, roomName, roomRadius, roomLat, roomLon, senderName, senderFacebookId, message);
+                    PublicRoom publicRoom = new PublicRoom(roomId, roomName, roomRadius, roomLat, roomLon);
+                    receivePublicChatMessage(publicRoom, senderName, senderFacebookId, message);
                 } else {
                     receivePrivateChatMessage(roomId, sender, message);
                 }
@@ -107,7 +109,8 @@ public class MyGcmListenerService extends GcmListenerService {
                     int roomRadius = Integer.parseInt(data.getString(Key.ROOM_RADIUS, ""));
                     double roomLat = Double.parseDouble(data.getString(Key.ROOM_LATITUDE, ""));
                     double roomLon = Double.parseDouble(data.getString(Key.ROOM_LONGITUDE, ""));
-                    receivePublicRoomMessageFavorited(favoritorName, messageRoomId, messageText, roomName, roomRadius, roomLat, roomLon);
+                    PublicRoom publicRoom = new PublicRoom(messageRoomId, roomName, roomRadius, roomLat, roomLon);
+                    receivePublicRoomMessageFavorited(favoritorName, messageText, publicRoom);
                 } else {
                     String favoritorFacebookId = data.getString(Key.FACEBOOK_ID);
                     long favoritorUserId = Long.parseLong(data.getString(Key.USER_ID));
@@ -137,14 +140,13 @@ public class MyGcmListenerService extends GcmListenerService {
         notifyMessageFavorited(contentIntent, user.getName(), message);
     }
 
-    private void receivePublicRoomMessageFavorited(String userName, long roomId, String message,
-                                                   String roomName, int roomRadius, double roomLat, double roomLon) {
+    private void receivePublicRoomMessageFavorited(String userName, String message, PublicRoom publicRoom) {
 
-        if (!isInArea(roomLat, roomLon, roomRadius)) {
+        if (!isInArea(publicRoom)) {
             return;
         }
 
-        PendingIntent contentIntent = getPublicRoomPendingIntent(roomId, roomName, roomRadius, roomLat, roomLon);
+        PendingIntent contentIntent = getPublicRoomPendingIntent(publicRoom);
         notifyMessageFavorited(contentIntent, userName, message);
     }
 
@@ -163,8 +165,8 @@ public class MyGcmListenerService extends GcmListenerService {
         notify(builder.build());
     }
 
-    private PendingIntent getPublicRoomPendingIntent(long roomId, String roomName, int roomRadius, double roomLat, double roomLon) {
-        Intent publicRoomIntent = PublicRoomActivity.getIntent(this, roomId, roomName, roomLat, roomLon, roomRadius);
+    private PendingIntent getPublicRoomPendingIntent(PublicRoom publicRoom) {
+        Intent publicRoomIntent = PublicRoomActivity.getIntent(this, publicRoom);
 
         return TaskStackBuilder.create(this)
                 .addParentStack(HomeActivity.class)
@@ -203,7 +205,7 @@ public class MyGcmListenerService extends GcmListenerService {
         notify(builder.build());
     }
 
-    private boolean isInArea(double lat, double lon, int radius) {
+    private boolean isInArea(PublicRoom publicRoom) {
 
         GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).build();
 
@@ -215,9 +217,9 @@ public class MyGcmListenerService extends GcmListenerService {
                 // No location could be found
                 return false;
             }
-            double distance = LocationManager.getDistance(currentLocation.getLatitude(), currentLocation.getLongitude(), lat, lon);
-            Log.d(TAG, "Distance from the center of the room: " + distance + " and radius is: " + radius);
-            return distance <= radius;
+            double distance = LocationManager.getDistance(currentLocation.getLatitude(), currentLocation.getLongitude(), publicRoom.getLatitude(), publicRoom.getLongitude());
+            Log.d(TAG, "Distance from the center of the room: " + distance + " and radius is: " + publicRoom.getRadius());
+            return distance <= publicRoom.getRadius();
         }
 
         Log.e(TAG, "isInArea returning false because Google api client could not connect...");
@@ -226,18 +228,17 @@ public class MyGcmListenerService extends GcmListenerService {
         return false;
     }
 
-    private void receivePublicChatMessage(long roomId, String roomName, int roomRadius,
-                                          double roomLat, double roomLon,
+    private void receivePublicChatMessage(PublicRoom publicRoom,
                                           String senderName, String senderFacebookId, String message) {
 
         Log.d(TAG, "Receive public chat message");
 
-        if (!isInArea(roomLat, roomLon, roomRadius)) {
+        if (!isInArea(publicRoom)) {
             Log.d(TAG, "Not showing notification because not in the room radius");
             return;
         }
 
-        PendingIntent contentIntent = getPublicRoomPendingIntent(roomId, roomName, roomRadius, roomLat, roomLon);
+        PendingIntent contentIntent = getPublicRoomPendingIntent(publicRoom);
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)

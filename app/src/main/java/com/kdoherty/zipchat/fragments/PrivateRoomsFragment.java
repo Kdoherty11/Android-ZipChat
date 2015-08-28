@@ -1,7 +1,6 @@
 package com.kdoherty.zipchat.fragments;
 
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -16,11 +15,9 @@ import android.widget.Filter;
 import android.widget.Filterable;
 
 import com.kdoherty.zipchat.R;
-import com.kdoherty.zipchat.activities.PrivateRoomActivity;
 import com.kdoherty.zipchat.adapters.PrivateRoomAdapter;
 import com.kdoherty.zipchat.events.LeaveRoomEvent;
 import com.kdoherty.zipchat.events.RequestAcceptedEvent;
-import com.kdoherty.zipchat.events.RoomCreatedEvent;
 import com.kdoherty.zipchat.models.PrivateRoom;
 import com.kdoherty.zipchat.models.PrivateRoomComparator;
 import com.kdoherty.zipchat.services.BusProvider;
@@ -28,7 +25,6 @@ import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.NetworkManager;
 import com.kdoherty.zipchat.utils.UserManager;
 import com.kdoherty.zipchat.views.DividerItemDecoration;
-import com.kdoherty.zipchat.views.RecyclerItemClickListener;
 import com.squareup.otto.Subscribe;
 
 import java.util.Collections;
@@ -135,7 +131,7 @@ public class PrivateRoomsFragment extends Fragment implements Filterable, SwipeR
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void onRoomCreated(LeaveRoomEvent event) {
+    public void onLeftRoom(LeaveRoomEvent event) {
         populateList();
     }
 
