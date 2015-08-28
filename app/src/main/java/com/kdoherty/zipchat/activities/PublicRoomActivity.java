@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NavUtils;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -36,7 +37,7 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 
-public class PublicRoomActivity extends AbstractLocationActivity {
+public class PublicRoomActivity extends AppCompatActivity {
 
     private static final String TAG = PublicRoomActivity.class.getSimpleName();
 
@@ -98,8 +99,6 @@ public class PublicRoomActivity extends AbstractLocationActivity {
 
                 DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.chat_room_drawer_layout);
                 mDrawerFragment.setUp(this, drawerLayout, toolbar, R.id.chat_room_drawer_fragment_container);
-
-                mDrawerFragment.addUserMarker(getLastLocation());
             }
 
             if (mChatRoomFragment == null) {
@@ -205,16 +204,6 @@ public class PublicRoomActivity extends AbstractLocationActivity {
                 NetworkManager.logErrorResponse(TAG, "Removing subscription from room with id " + roomId, error);
             }
         });
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        Location location = getLastLocation();
-        if (mDrawerFragment != null) {
-            mDrawerFragment.addUserMarker(location);
-        } else {
-            Log.e(TAG, "onConnected cb before mDrawerFragment is initialized");
-        }
     }
 
     @Subscribe

@@ -48,7 +48,6 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
     private View mContainerView;
     private boolean mUserLearnedDrawer;
     private GoogleMap mGoogleMap;
-    private Marker mUserMarker;
     private Marker mRoomCenterMarker;
     private RecyclerView mRoomMembersRv;
     private UserAdapter mRoomMembersAdapter;
@@ -121,7 +120,6 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
         }
 
         mRoomCenterMarker = mGoogleMap.addMarker(new MarkerOptions().position(mRoomCenter)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                 .title(mRoomName));
 
         LocationManager.setRoomCircle(getActivity(), mGoogleMap, mRoomCenter, mRoomRadius);
@@ -162,14 +160,6 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
         });
     }
 
-    public void addUserMarker(Location location) {
-        if (mUserMarker != null && location != null) {
-            LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-            mUserMarker = mGoogleMap.addMarker(new MarkerOptions().position(userLocation)
-                    .title(getResources().getString(R.string.drawer_user_location_pin_title)));
-        }
-    }
-
     public void addRoomMember(User user) {
         if (mRoomMembersAdapter != null) {
             mRoomMembersAdapter.addUser(user);
@@ -189,6 +179,7 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
         mGoogleMap.setOnMapLoadedCallback(this);
+        mGoogleMap.setMyLocationEnabled(true);
     }
 
     @Override

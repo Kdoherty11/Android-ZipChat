@@ -81,6 +81,7 @@
     <string name="request_status_already_chatting">"Already chatting"</string>
 
     <string name="action_leave_private_room">Leave Chat</string>
+    <string name="my_location_marker_title">"My Location"</string>
 
 
 </resources>

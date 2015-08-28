@@ -25,6 +25,7 @@ public abstract class AbstractLocationActivity extends AppCompatActivity impleme
     private static final float ACCEPTABLE_LOC_ACCURACY_THRESH = 20f;
     protected GoogleApiClient mGoogleApiClient;
     private Location mCurrentLocation;
+    private boolean mIsRequestingUpdates;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,13 +128,17 @@ public abstract class AbstractLocationActivity extends AppCompatActivity impleme
     }
 
     protected void startLocationUpdates() {
+        mIsRequestingUpdates = true;
         LocationServices.FusedLocationApi.requestLocationUpdates(
                 mGoogleApiClient, createLocationRequest(), this);
     }
 
     protected void stopLocationUpdates() {
-        LocationServices.FusedLocationApi.removeLocationUpdates(
-                mGoogleApiClient, this);
+        if (mIsRequestingUpdates && mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(
+                    mGoogleApiClient, this);
+            mIsRequestingUpdates = false;
+        }
     }
 
     private void updateValuesFromBundle(Bundle savedInstanceState) {

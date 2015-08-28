@@ -73,7 +73,12 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         final ImageView profilePictureView = (ImageView) findViewById(R.id.chat_request_profile_picture);
         FacebookManager.displayProfilePicture(mUser.getFacebookId(), profilePictureView, "large");
 
-        setButtonText();
+        if (!mUser.equals(UserManager.getSelf(this))) {
+            setButtonText();
+        } else {
+            mRequestButton.setVisibility(View.GONE);
+            mRequestStatusLoadingPb.setVisibility(View.GONE);
+        }
 
         profilePictureView.post(new Runnable() {
 

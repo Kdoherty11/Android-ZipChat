@@ -40,6 +40,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
 
     private static final String TAG = CreateRoomActivity.class.getSimpleName();
     private static final int MAX_ROOM_NAME_CHARS = 50;
+    private static final int DEFAULT_RADIUS = 250;
 
     private EditText mRoomNameEt;
     private boolean mDisableButton = false;
@@ -51,7 +52,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
     private GoogleMap mGoogleMap;
     private Circle mMapCircle;
     private Marker mMarker;
-    private int mRadius;
+    private int mRadius = DEFAULT_RADIUS;
     private SeekBar mRadiusSeekBar;
 
     private boolean mMapLoaded = false;
@@ -65,23 +66,6 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
         ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
                 .getMapAsync(this);
 
-        // Fixing Later Map loading Delay
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    MapView mv = new MapView(getApplicationContext());
-//                    mv.onCreate(null);
-//                    mv.onPause();
-//                    mv.onDestroy();
-//                } catch (Exception ignored){
-//
-//                }
-//            }
-//        }).start();
-
-        mRadius = 50;
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.create_room_app_bar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -92,6 +76,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
         }
 
         mRadiusSeekBar = (SeekBar) findViewById(R.id.radius_seek_bar);
+        mRadiusSeekBar.setProgress(DEFAULT_RADIUS);
 
         toolbar.findViewById(R.id.create_room_create_button).setOnClickListener(this);
 
@@ -198,7 +183,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
         LatLng userLatLng = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
 
         mMarker = mGoogleMap.addMarker(new MarkerOptions().position(userLatLng)
-                .title("My Location"));
+                .title(getResources().getString(R.string.my_location_marker_title)));
 
         mMapCircle = LocationManager.setRoomCircle(this, mGoogleMap, userLatLng, mRadius);
     }
