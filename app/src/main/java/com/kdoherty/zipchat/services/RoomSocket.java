@@ -82,7 +82,7 @@ public class RoomSocket {
                         }
                         break;
                     case "joinSuccess":
-
+                        Utils.debugToast(mContext, "Received join sucess: " + stringJson);
                         if (stringJson.has("message")) {
                             JSONObject joinJson = new JSONObject(stringJson.getString("message"));
 

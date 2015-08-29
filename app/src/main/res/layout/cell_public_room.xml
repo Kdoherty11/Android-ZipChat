@@ -9,6 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
+        android:layout_marginStart="6dp"
         android:layout_margin="@dimen/chat_room_margins"
         android:orientation="vertical">
 
@@ -17,6 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
+            android:layout_marginTop="6dp"
             android:textSize="@dimen/home_screen_cell_name_text_size" />
 
         <TextView

@@ -16,17 +16,23 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.google.android.gms.location.LocationAvailability;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.LatLng;
 import com.kdoherty.zipchat.R;
+import com.kdoherty.zipchat.events.LocationAvailableEvent;
 import com.kdoherty.zipchat.events.MemberJoinEvent;
 import com.kdoherty.zipchat.events.MemberLeaveEvent;
 import com.kdoherty.zipchat.events.PublicRoomJoinEvent;
 import com.kdoherty.zipchat.fragments.ChatRoomFragment;
 import com.kdoherty.zipchat.fragments.PublicRoomDrawerFragment;
 import com.kdoherty.zipchat.models.PublicRoom;
+import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
+import com.kdoherty.zipchat.utils.LocationManager;
 import com.kdoherty.zipchat.utils.NetworkManager;
 import com.kdoherty.zipchat.utils.UserManager;
 import com.kdoherty.zipchat.utils.Utils;
@@ -37,7 +43,7 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 
-public class PublicRoomActivity extends AppCompatActivity {
+public class PublicRoomActivity extends AbstractLocationActivity {
 
     private static final String TAG = PublicRoomActivity.class.getSimpleName();
 
@@ -164,6 +170,7 @@ public class PublicRoomActivity extends AppCompatActivity {
     @Subscribe
     @SuppressWarnings("unused")
     public void onJoinSuccess(PublicRoomJoinEvent event) {
+        Utils.debugToast(this, "Join success in public room activity subscribe method");
         mNotificationsOn = event.isSubscribed();
         setNotificationsIcon();
 
@@ -218,5 +225,17 @@ public class PublicRoomActivity extends AppCompatActivity {
     public void onUserQuitEvent(MemberLeaveEvent event) {
         Log.d(TAG, "Received member quit event");
         mDrawerFragment.removeRoomMember(event.getUser());
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        super.onConnected(bundle);
+        mDrawerFragment.displayUserMarker(getLastLocation());
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        super.onLocationChanged(location);
+        mDrawerFragment.displayUserMarker(location);
     }
 }

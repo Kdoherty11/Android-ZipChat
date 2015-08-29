@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -33,6 +34,8 @@ public class MessageFavoritesFragment extends Fragment {
     private RecyclerView mMessageFavorites;
     private List<User> mMessageFavoritors = new ArrayList<>();
     private UserAdapter mFavoriteAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+
     //This is the handler that will manager to process the broadcast intent
     private BroadcastReceiver mGcmFavoriteReceiver = new BroadcastReceiver() {
         @Override
@@ -77,8 +80,10 @@ public class MessageFavoritesFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         mMessageFavorites = (RecyclerView) view.findViewById(R.id.message_favoritor_list);
-        mMessageFavorites.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mFavoriteAdapter = new UserAdapter(getActivity(), R.layout.cell_user, mMessageFavoritors);
+        mMessageFavorites.setHasFixedSize(true);
+        mLayoutManager = new GridLayoutManager(getActivity(), 2);
+        mMessageFavorites.setLayoutManager(mLayoutManager);
+        mFavoriteAdapter = new UserAdapter(getActivity(), R.layout.cell_msg_favoritor, mMessageFavoritors);
         mMessageFavorites.setAdapter(mFavoriteAdapter);
     }
 

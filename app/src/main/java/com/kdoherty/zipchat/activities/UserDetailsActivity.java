@@ -40,6 +40,8 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
     private User mUser;
 
+    private boolean mIsSelf = false;
+
     public static Intent getIntent(Context context, User user) {
         Intent userDetailsIntent = new Intent(context, UserDetailsActivity.class);
         userDetailsIntent.putExtra(EXTRA_USER, user);
@@ -70,10 +72,21 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
         mRequestStatusLoadingPb = (ProgressBar) findViewById(R.id.request_status_loading_pb);
 
-        final ImageView profilePictureView = (ImageView) findViewById(R.id.chat_request_profile_picture);
-        FacebookManager.displayProfilePicture(mUser.getFacebookId(), profilePictureView, "large");
+        mIsSelf = mUser.getUserId() == UserManager.getId(this);
 
-        if (!mUser.equals(UserManager.getSelf(this))) {
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int screenWidth = size.x;
+
+        int width = 800;
+        int height = mIsSelf ? 1200 : 1000;
+
+        final ImageView profilePictureView = (ImageView) findViewById(R.id.chat_request_profile_picture);
+        FacebookManager.displayProfilePicture(mUser.getFacebookId(), profilePictureView, width, height);
+
+
+        if (!mIsSelf) {
             setButtonText();
         } else {
             mRequestButton.setVisibility(View.GONE);

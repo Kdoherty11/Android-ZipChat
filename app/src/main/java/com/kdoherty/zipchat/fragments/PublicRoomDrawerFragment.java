@@ -49,11 +49,13 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
     private boolean mUserLearnedDrawer;
     private GoogleMap mGoogleMap;
     private Marker mRoomCenterMarker;
+    private Marker mUserMarker;
     private RecyclerView mRoomMembersRv;
     private UserAdapter mRoomMembersAdapter;
     private int mRoomRadius;
     private LatLng mRoomCenter;
     private String mRoomName;
+    private Location mBestLocation;
 
     public PublicRoomDrawerFragment() {
         // Required empty public constructor
@@ -123,6 +125,8 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
                 .title(mRoomName));
 
         LocationManager.setRoomCircle(getActivity(), mGoogleMap, mRoomCenter, mRoomRadius);
+
+        displayUserMarker(mBestLocation);
     }
 
     public void setUp(final Activity context, DrawerLayout drawerLayout, final Toolbar toolbar, int drawerFragmentId) {
@@ -166,6 +170,7 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
         } else if (getActivity() != null) {
             List<User> users = new ArrayList<>(Arrays.asList(UserManager.getSelf(getActivity()), user));
             mRoomMembersAdapter = new UserAdapter(getActivity(), R.layout.cell_user, users);
+            mRoomMembersRv.setAdapter(mRoomMembersAdapter);
         }
     }
 
@@ -175,11 +180,30 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
         }
     }
 
+    public void displayUserMarker(Location location) {
+        if (location == null) {
+            return;
+        }
+        mBestLocation = location;
+        if (mGoogleMap == null) {
+            return;
+        }
+        if (mUserMarker != null) {
+            mUserMarker.remove();
+        }
+        LatLng latLng = new LatLng(
+                location.getLatitude(), location.getLongitude());
+        mUserMarker = mGoogleMap.addMarker(
+                new MarkerOptions()
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
+                        .title(getResources().getString(R.string.my_location_marker_title))
+                        .position(latLng));
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
         mGoogleMap.setOnMapLoadedCallback(this);
-        mGoogleMap.setMyLocationEnabled(true);
     }
 
     @Override

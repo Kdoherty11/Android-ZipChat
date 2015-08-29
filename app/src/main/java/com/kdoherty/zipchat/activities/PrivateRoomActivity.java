@@ -60,7 +60,7 @@ public class PrivateRoomActivity extends AppCompatActivity implements View.OnCli
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.private_chat_room_app_bar);
         ImageView otherMembersPic = (ImageView) toolbar.findViewById(R.id.other_user_pic);
-        FacebookManager.displayProfilePicture(mUser.getFacebookId(), otherMembersPic);
+        FacebookManager.displayProfilePicture(mUser.getFacebookId(), otherMembersPic, 300, 300);
         otherMembersPic.setOnClickListener(this);
         setSupportActionBar(toolbar);
 

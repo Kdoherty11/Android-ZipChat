@@ -47,7 +47,8 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:22.2.1'
-    compile 'com.android.support:recyclerview-v7:22.0.0'
+    compile 'com.android.support:cardview-v7:22.2.1'
+    compile 'com.android.support:recyclerview-v7:22.2.1'
     compile('com.crashlytics.sdk.android:crashlytics:2.2.4@aar') {
         transitive = true;
     }

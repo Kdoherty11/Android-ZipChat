@@ -6,17 +6,15 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-import com.devspark.robototextview.widget.RobotoTextView;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.UserDetailsActivity;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.FacebookManager;
 
 import java.util.List;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by kdoherty on 8/28/15.
@@ -25,16 +23,28 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserCellViewHo
 
     private static final String TAG = UserAdapter.class.getSimpleName();
 
+    private static final int DEFAULT_WIDTH = 500;
+    private static final int DEFAULT_HEIGHT = 500;
+
     private final LayoutInflater mInflater;
     private final List<User> mRoomMembers;
     private Context mContext;
     private int mCellLayoutId;
 
+    int mWidth;
+    int mHeight;
+
     public UserAdapter(Context context, int cellLayoutId, List<User> roomMembers) {
+        this(context, cellLayoutId, roomMembers, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    }
+
+    public UserAdapter(Context context, int cellLayoutId, List<User> roomMembers, int width, int height) {
         mContext = context;
         mInflater = LayoutInflater.from(mContext);
         mCellLayoutId = cellLayoutId;
         mRoomMembers = roomMembers;
+        mWidth = width;
+        mHeight = height;
     }
 
     @Override
@@ -49,7 +59,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserCellViewHo
         final User user = mRoomMembers.get(i);
 
         drawerCellViewHolder.text.setText(user.getName());
-        FacebookManager.displayProfilePicture(user.getFacebookId(), drawerCellViewHolder.profilePicture);
+        FacebookManager.displayProfilePicture(user.getFacebookId(), drawerCellViewHolder.profilePicture, mWidth, mHeight);
 
         drawerCellViewHolder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,15 +101,15 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserCellViewHo
 
     class UserCellViewHolder extends RecyclerView.ViewHolder {
 
-        private CircleImageView profilePicture;
-        private RobotoTextView text;
-        private RelativeLayout layout;
+        private ImageView profilePicture;
+        private TextView text;
+        private View layout;
 
         public UserCellViewHolder(View itemView) {
             super(itemView);
-            layout = (RelativeLayout) itemView;
-            profilePicture = (CircleImageView) itemView.findViewById(R.id.drawer_cell_icon);
-            text = (RobotoTextView) itemView.findViewById(R.id.drawer_cell_text);
+            layout = itemView;
+            profilePicture = (ImageView) itemView.findViewById(R.id.user_prof_pic);
+            text = (TextView) itemView.findViewById(R.id.user_fb_name);
         }
     }
 }

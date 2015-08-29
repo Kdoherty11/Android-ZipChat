@@ -59,6 +59,10 @@ public class FacebookManager {
         return "https://graph.facebook.com/" + userId + "/picture?type=" + type;
     }
 
+    public static String getProfilePicUrl(String userId, int width, int height) {
+        return "https://graph.facebook.com/" + userId + "/picture?width=" + width + "&height=" + height;
+    }
+
     public static void displayProfilePicture(String userId, ImageView imageView) {
         ImageLoader.getInstance().displayImage(getProfilePicUrl(userId), imageView, displayProfPicOpts);
     }
@@ -66,6 +70,12 @@ public class FacebookManager {
     public static void displayProfilePicture(String userId, ImageView imageView, String type) {
         ImageLoader.getInstance().displayImage(getProfilePicUrl(userId, type), imageView, displayProfPicOpts);
     }
+
+    public static void displayProfilePicture(String userId, ImageView imageView, int width, int height) {
+        ImageLoader.getInstance().displayImage(getProfilePicUrl(userId, width, height), imageView, displayProfPicOpts);
+    }
+
+
 
     public static Bitmap getFacebookProfilePicture(String userId) {
         try {
