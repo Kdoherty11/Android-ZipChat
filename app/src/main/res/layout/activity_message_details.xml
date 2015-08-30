@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/white"
+    android:orientation="vertical"
     tools:context="com.kdoherty.zipchat.activities.MessageDetailsActivity">
 
     <include
@@ -27,8 +27,8 @@
         android:id="@+id/message_timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/message_picture"
         android:layout_alignParentLeft="true"
+        android:layout_below="@id/message_picture"
         android:layout_marginBottom="4dp"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="4dp"
@@ -115,13 +115,13 @@
 
     <TextView
         android:id="@+id/favorites_title"
-        android:text="@string/favorites"
-        android:textSize="16sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@id/divider_line"
         android:layout_centerHorizontal="true"
+        android:text="@string/favorites"
         android:textColor="@color/black"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:textSize="16sp" />
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/message_favorites_placeholder"

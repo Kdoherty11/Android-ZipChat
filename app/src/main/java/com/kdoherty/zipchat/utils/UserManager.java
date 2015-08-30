@@ -8,11 +8,11 @@ public class UserManager {
 
     private static final String TAG = UserManager.class.getSimpleName();
 
-    private static final String PREFS_FILE = "UserInfoPrefsFile";
+    private static final String PREFS_FILE = "utils.UserManager.prefs.FILE";
 
-    private static final String PREFS_USER_ID = "userId";
-    private static final String PREFS_AUTH_TOKEN = "authTokenKey";
-    private static final String PREFS_DEVICE_ID = "deviceId";
+    private static final String PREFS_USER_ID = "utils.UserManager.prefs.USER_ID";
+    private static final String PREFS_AUTH_TOKEN = "utils.UserManager.prefs.AUTH_TOKEN";
+    private static final String PREFS_DEVICE_ID = "utils.UserManager.prefs.DEVICE_ID";
 
     private static final long DEFAULT_USER_ID = -1;
     private static final String DEFAULT_AUTH_TOKEN = "";

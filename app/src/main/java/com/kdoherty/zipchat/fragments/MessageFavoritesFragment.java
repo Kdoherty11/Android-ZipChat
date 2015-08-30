@@ -1,25 +1,16 @@
 package com.kdoherty.zipchat.fragments;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.adapters.UserAdapter;
-import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
-import com.kdoherty.zipchat.services.MyGcmListenerService;
-import com.kdoherty.zipchat.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,30 +20,16 @@ import java.util.List;
  */
 public class MessageFavoritesFragment extends Fragment {
 
-    private static final String GCM_RECEIVER_NAME = "fragments.MessageFavoritesFragment.GCM_RECEIVER";
     private static final String TAG = MessageFavoritesFragment.class.getSimpleName();
-    private static final String ARG_MESSAGE = "fragments.MessageFavoritesFragment.MESSAGE";
+    private static final String ARG_MESSAGE = "fragments.MessageFavoritesFragment.arg.MESSAGE";
     private static final int NUM_COLS = 4;
     private RecyclerView mMessageFavorites;
     private List<User> mMessageFavoritors = new ArrayList<>();
     private UserAdapter mFavoriteAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    private BroadcastReceiver mGcmFavoriteReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String event = intent.getStringExtra(MyGcmListenerService.Key.EVENT);
-
-            if (MyGcmListenerService.Event.MESSAGE_FAVORITED.equals(event)) {
-                Log.i(TAG, "Received message favorited event!!!: " + intent.getDataString());
-                Utils.debugToast(getActivity(), "Received message favorited event!!!: " + intent.getDataString());
-            } else {
-                // Let GCM intent service deal with it
-            }
-        }
-    };
-
-    public MessageFavoritesFragment() { }
+    public MessageFavoritesFragment() {
+    }
 
     public static MessageFavoritesFragment newInstance(List<User> messageFavorites) {
         Bundle args = new Bundle();
@@ -85,23 +62,11 @@ public class MessageFavoritesFragment extends Fragment {
         mMessageFavorites.setAdapter(mFavoriteAdapter);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        getActivity().registerReceiver(mGcmFavoriteReceiver, new IntentFilter(GCM_RECEIVER_NAME));
+    public void addFavorite(User user) {
+        mFavoriteAdapter.addUser(user);
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        getActivity().unregisterReceiver(mGcmFavoriteReceiver);
-    }
-
-    public void addFavorite(User favoritor) {
-        mFavoriteAdapter.addUser(favoritor);
-    }
-
-    public void removeFavorite(User favoritor) {
-        mFavoriteAdapter.removeByUserId(favoritor.getUserId());
+    public void removeFavorite(User user) {
+        mFavoriteAdapter.removeByUserId(user.getUserId());
     }
 }

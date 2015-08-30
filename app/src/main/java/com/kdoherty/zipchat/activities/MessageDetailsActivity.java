@@ -12,11 +12,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -48,8 +46,8 @@ public class MessageDetailsActivity extends AppCompatActivity {
     public static final String RESULT_KEY_MESSAGE_CHANGED = "activities.MessageDetailsActivity.result.MESSAGE_CHANGED";
     public static final String RESULT_KEY_MESSAGE = "activities.MessageDetailsActivity.result.MESSAGE";
     private static final String TAG = MessageDetailsActivity.class.getSimpleName();
-    private static final String EXTRA_MESSAGE = "activities.MessageDetailsActivity.MESSAGE";
-    private static final String EXTRA_ANON_USER_ID = "activities.MessageDetailsActivity.ANON_USER_ID";
+    private static final String EXTRA_MESSAGE = "activities.MessageDetailsActivity.extra.MESSAGE";
+    private static final String EXTRA_ANON_USER_ID = "activities.MessageDetailsActivity.extra.ANON_USER_ID";
     private MessageFavoritesFragment mMessageFavoritesFragment;
 
     private Message mMessage;
@@ -63,7 +61,6 @@ public class MessageDetailsActivity extends AppCompatActivity {
     private LinearLayout mFavoriteContainer;
     private TextView mFavoritesTitleTv;
     private View mFavoritesDividerLine;
-    private FrameLayout mMessageFavoritesPlaceholder;
     private List<User> mInitialFavorites;
 
     public static Intent getIntent(Context context, Message message, long anonUserId) {
@@ -151,14 +148,6 @@ public class MessageDetailsActivity extends AppCompatActivity {
         }
     }
 
-    private List<Long> getFavoriteUserIds() {
-        List<Long> userIds = new ArrayList<>();
-        for (User user : mMessage.getFavorites()) {
-            userIds.add(user.getUserId());
-        }
-        return userIds;
-    }
-
     private void addFavorite() {
         User self = UserManager.getSelf(this);
         mMessage.addFavorite(self, self.getUserId());
@@ -231,51 +220,6 @@ public class MessageDetailsActivity extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
-    private class OnFavoriteClickListener implements View.OnClickListener {
-
-        @Override
-        public void onClick(View v) {
-            if (!NetworkManager.checkOnline(MessageDetailsActivity.this)) {
-                return;
-            }
-            showFavoriteLoading();
-            if (mMessage.getFavoriteState() != Message.FavoriteState.USER_FAVORITED) {
-                // favorite message
-                ZipChatApi.INSTANCE.favoriteMessage(UserManager.getAuthToken(MessageDetailsActivity.this),
-                        mMessage.getMessageId(), UserManager.getId(MessageDetailsActivity.this), new Callback<Response>() {
-                            @Override
-                            public void success(Response response, Response response2) {
-                                stopFavoriteLoading();
-                                addFavorite();
-                            }
-
-                            @Override
-                            public void failure(RetrofitError error) {
-                                stopFavoriteLoading();
-                                NetworkManager.logErrorResponse(TAG, "Removing a favorite from MessageDetails", error);
-                                Toast.makeText(MessageDetailsActivity.this, getResources().getString(R.string.msg_favorite_failed_toast), Toast.LENGTH_SHORT).show();
-                            }
-                        });
-            } else {
-                ZipChatApi.INSTANCE.removeFavorite(UserManager.getAuthToken(MessageDetailsActivity.this),
-                        mMessage.getMessageId(), UserManager.getId(MessageDetailsActivity.this), new Callback<Response>() {
-                            @Override
-                            public void success(Response response, Response response2) {
-                                stopFavoriteLoading();
-                                removeFavorite();
-                            }
-
-                            @Override
-                            public void failure(RetrofitError error) {
-                                stopFavoriteLoading();
-                                NetworkManager.logErrorResponse(TAG, "Removing a favorite from MessageDetails", error);
-                                Toast.makeText(MessageDetailsActivity.this, getResources().getString(R.string.remove_msg_favorite_failed_toast), Toast.LENGTH_SHORT).show();
-                            }
-                        });
-            }
-        }
-    }
-
     @Override
     public void onBackPressed() {
         setResult();
@@ -339,5 +283,50 @@ public class MessageDetailsActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+    private class OnFavoriteClickListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            if (!NetworkManager.checkOnline(MessageDetailsActivity.this)) {
+                return;
+            }
+            showFavoriteLoading();
+            if (mMessage.getFavoriteState() != Message.FavoriteState.USER_FAVORITED) {
+                // favorite message
+                ZipChatApi.INSTANCE.favoriteMessage(UserManager.getAuthToken(MessageDetailsActivity.this),
+                        mMessage.getMessageId(), UserManager.getId(MessageDetailsActivity.this), new Callback<Response>() {
+                            @Override
+                            public void success(Response response, Response response2) {
+                                stopFavoriteLoading();
+                                addFavorite();
+                            }
+
+                            @Override
+                            public void failure(RetrofitError error) {
+                                stopFavoriteLoading();
+                                NetworkManager.logErrorResponse(TAG, "Removing a favorite from MessageDetails", error);
+                                Toast.makeText(MessageDetailsActivity.this, getResources().getString(R.string.msg_favorite_failed_toast), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            } else {
+                ZipChatApi.INSTANCE.removeFavorite(UserManager.getAuthToken(MessageDetailsActivity.this),
+                        mMessage.getMessageId(), UserManager.getId(MessageDetailsActivity.this), new Callback<Response>() {
+                            @Override
+                            public void success(Response response, Response response2) {
+                                stopFavoriteLoading();
+                                removeFavorite();
+                            }
+
+                            @Override
+                            public void failure(RetrofitError error) {
+                                stopFavoriteLoading();
+                                NetworkManager.logErrorResponse(TAG, "Removing a favorite from MessageDetails", error);
+                                Toast.makeText(MessageDetailsActivity.this, getResources().getString(R.string.remove_msg_favorite_failed_toast), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+        }
     }
 }

@@ -21,32 +21,32 @@
                 android:id="@+id/anon_toggle"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginLeft="6dp"
-                android:paddingRight="8dp"
                 android:layout_marginBottom="8dp"
-                app:border_width="1dp"
-                app:border_color="@color/zipchat_blue"/>
+                android:layout_marginLeft="6dp"
+                android:layout_marginTop="8dp"
+                android:paddingRight="8dp"
+                app:border_color="@color/zipchat_blue"
+                app:border_width="1dp" />
 
             <EditText
                 android:id="@+id/chat_room_activity_message_box"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
                 android:layout_gravity="bottom"
-                android:padding="12dp"
+                android:layout_weight="2"
                 android:hint="@string/chat_room_activity_message_box_hint"
                 android:imeOptions="actionSend"
+                android:padding="12dp"
                 android:textColor="@color/black"
-                android:textColorHint="@color/grey"/>
+                android:textColorHint="@color/grey" />
 
             <ImageView
                 android:id="@+id/chat_room_activity_send_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:src="@drawable/ic_action_send_now"
-                android:contentDescription="Send Message" />
+                android:contentDescription="Send Message"
+                android:src="@drawable/ic_action_send_now" />
 
         </LinearLayout>
 

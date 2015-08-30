@@ -60,6 +60,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
     private int mSelfBorderColorId;
     private int mOtherBoarderColor;
     private long mAnonUserId;
+
     public MessageAdapter(Activity activity, List<Message> messages, MessageFavoriteListener messageFavoriteListener) {
         this(activity, messages, 0, messageFavoriteListener);
     }
@@ -93,6 +94,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
             default:
                 throw new AssertionError("Default switch case on Message.FavoriteState");
         }
+    }
+
+    public static Drawable getMessageDrawable(Context context, Message.FavoriteState state) {
+        return context.getResources().getDrawable(getMessageDrawableId(state));
     }
 
     @Override
@@ -193,10 +198,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
 
     public Message getMessage(int position) {
         return mMessages.get(position);
-    }
-
-    public static Drawable getMessageDrawable(Context context, Message.FavoriteState state) {
-        return context.getResources().getDrawable(getMessageDrawableId(state));
     }
 
     public void confirmMessage(String uuid, Message msg) {

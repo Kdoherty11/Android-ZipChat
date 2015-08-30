@@ -22,8 +22,7 @@ import retrofit.client.Response;
 
 public class RegistrationIntentService extends IntentService {
 
-    public static final String DEFAULT_REG_ID = "";
-    private static final String TAG = "RegIntentService";
+    private static final String TAG = RegistrationIntentService.class.getSimpleName();
     private static final String[] TOPICS = {"global"};
 
     public RegistrationIntentService() {

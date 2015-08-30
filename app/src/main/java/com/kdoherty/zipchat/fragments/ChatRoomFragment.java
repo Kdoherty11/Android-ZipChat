@@ -59,8 +59,8 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     private static final int MESSAGE_LIMIT = 25;
     private static final int ITEM_VIEW_CACHE_SIZE = 25;
 
-    private static final String ARG_ROOM_ID = "ChatRoomFragmentRoomIdArg";
-    private static final String ARG_IS_PUBLIC_ROOM = "ChatRoomFragmentIsPublicRoom";
+    private static final String ARG_ROOM_ID = "fragments.ChatRoomFragment.arg.ROOM_ID";
+    private static final String ARG_IS_PUBLIC_ROOM = "fragments.ChatRoomFragment.arg.IS_PUBLIC";
 
     private MessageAdapter mMessageAdapter;
     private RecyclerView mMessagesRv;

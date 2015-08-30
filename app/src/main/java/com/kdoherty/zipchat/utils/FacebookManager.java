@@ -78,7 +78,6 @@ public class FacebookManager {
     }
 
 
-
     public static Bitmap getFacebookProfilePicture(String userId) {
         try {
             URL imageURL = new URL(getProfilePicUrl(userId, "square"));

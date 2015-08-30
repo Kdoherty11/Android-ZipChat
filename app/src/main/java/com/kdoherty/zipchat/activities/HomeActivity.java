@@ -20,8 +20,9 @@ import com.squareup.otto.Subscribe;
 
 public class HomeActivity extends AbstractLocationActivity implements SearchView.OnQueryTextListener {
 
-    public static final String ACTION_OPEN_REQUESTS_TAB = "OpenRequestsTab";
-    public static final String ACTION_OPEN_PRIVATE_ROOMS_TAB = "OpenOnPrivateRoomsTab";
+    public static final String ACTION_OPEN_REQUESTS_TAB = "activities.HomeActivity.action.OPEN_REQUESTS_TAB";
+    public static final String ACTION_OPEN_PRIVATE_ROOMS_TAB =
+            "activities.HomeActivity.action.OPEN_ON_PRIVAT_ROOMS_TAB";
     private static final String TAG = HomeActivity.class.getSimpleName();
     private HomeTabsFragment mTabsFragment;
     private SearchView mSearchView;

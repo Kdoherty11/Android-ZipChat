@@ -21,7 +21,7 @@ import com.kdoherty.zipchat.utils.Utils;
 public abstract class AbstractLocationActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
 
     private static final String TAG = AbstractLocationActivity.class.getSimpleName();
-    private static final String LOCATION_KEY = "com.kdoherty.zipchat.activities.AbstractLocationActivity.LOCATION";
+    private static final String LOCATION_KEY = "activities.AbstractLocationActivity.LOCATION";
     private static final float ACCEPTABLE_LOC_ACCURACY_THRESH = 20f;
     protected GoogleApiClient mGoogleApiClient;
     private Location mCurrentLocation;

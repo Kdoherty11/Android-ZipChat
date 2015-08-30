@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/user_prof_pic"
-        android:layout_centerHorizontal="true"
         android:layout_width="48dp"
-        android:layout_height="48dp" />
+        android:layout_height="48dp"
+        android:layout_centerHorizontal="true" />
 
     <com.devspark.robototextview.widget.RobotoTextView
         android:id="@+id/user_fb_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/chat_room_drawer_cell_text"
-        android:textSize="10sp"
         android:layout_below="@id/user_prof_pic"
         android:layout_centerHorizontal="true"
+        android:textColor="@color/chat_room_drawer_cell_text"
+        android:textSize="10sp"
         app:fontFamily="roboto"
         app:textWeight="light" />
 

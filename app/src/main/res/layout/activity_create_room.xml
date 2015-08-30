@@ -39,8 +39,8 @@
                 android:layout_marginLeft="@dimen/create_room_name_left_margin"
                 android:background="@drawable/create_room_name_et_background"
                 android:hint="@string/create_room_name_hint"
-                android:padding="10dp"
                 android:maxLength="28"
+                android:padding="10dp"
                 android:textColor="@color/black" />
 
         </LinearLayout>

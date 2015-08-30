@@ -13,12 +13,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.events.LeaveRoomEvent;
 import com.kdoherty.zipchat.fragments.ChatRoomFragment;
-import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
@@ -36,8 +34,8 @@ import retrofit.client.Response;
 public class PrivateRoomActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = PrivateRoomActivity.class.getSimpleName();
-    private static final String EXTRA_ROOM_ID = "PrivateChatActivityRoomId";
-    private static final String EXTRA_USER = "PrivateChatActivityUser";
+    private static final String EXTRA_ROOM_ID = "activities.PrivateRoomActivity.extra.ROOM_ID";
+    private static final String EXTRA_USER = "activities.PrivateRoomActivity.extra.USER";
     private ChatRoomFragment mChatRoomFragment;
     private User mUser;
     private long mRoomId;

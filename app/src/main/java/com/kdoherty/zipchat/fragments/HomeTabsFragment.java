@@ -21,8 +21,8 @@ public class HomeTabsFragment extends Fragment implements ViewPager.OnPageChange
 
     public static final String TAG = HomeTabsFragment.class.getSimpleName();
 
-    public static final String PREFS_TAB_POSITION = "tabPositionKey";
-    public static final String PREFS_FILE_NAME = "HomeScreenTabsFragmentPrefs";
+    public static final String PREFS_TAB_POSITION = "fragments.HomeTabsFragment.prefs.TAB_POSITION";
+    public static final String PREFS_FILE_NAME = "fragments.HomeTabsFragment.prefs.FILE";
     public static final int PRIVATE_ROOMS_TAB_INDEX = 1;
     public static final int REQUESTS_TAB_INDEX = 2;
     private SlidingTabLayout mSlidingTabLayout;

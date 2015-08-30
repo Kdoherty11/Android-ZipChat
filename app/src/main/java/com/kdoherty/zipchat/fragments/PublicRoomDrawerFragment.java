@@ -38,12 +38,12 @@ import java.util.List;
  */
 public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMapLoadedCallback {
 
-    public static final String KEY_USER_LEARNED_DRAWER = "chat_room_user_learned_drawer";
     private static final String TAG = PublicRoomDrawerFragment.class.getSimpleName();
-    private static final String PREFS_FILE_NAME = "chat_room_shared_preferences";
-    private static final String ARG_ROOM_NAME = "RoomName";
-    private static final String ARG_ROOM_CENTER = "RoomCenterLocation";
-    private static final String ARG_ROOM_RADIUS = "RoomRadius";
+    private static final String PREFS_USER_LEARNED_DRAWER = "fragments.PublicRoomDrawerFragment.prefs.USER_LEARNED_DRAWER";
+    private static final String PREFS_FILE_NAME = "fragments.PublicRoomDrawerFragment.prefs.FILE";
+    private static final String ARG_ROOM_NAME = "fragments.PublicRoomDrawerFragment.args.ROOM_NAME";
+    private static final String ARG_ROOM_CENTER = "fragments.PublicRoomDrawerFragment.args.ROOM_CENTER";
+    private static final String ARG_ROOM_RADIUS = "fragments.PublicRoomDrawerFragment.args.ROOM_RADIUS";
     private DrawerLayout mDrawerLayout;
     private View mContainerView;
     private boolean mUserLearnedDrawer;
@@ -76,7 +76,7 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mUserLearnedDrawer = PrefsHelper.readFromPreferences(getActivity(),
-                PREFS_FILE_NAME, KEY_USER_LEARNED_DRAWER, false);
+                PREFS_FILE_NAME, PREFS_USER_LEARNED_DRAWER, false);
 
         Bundle args = getArguments();
         mRoomName = args.getString(ARG_ROOM_NAME);
@@ -147,7 +147,7 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
                 if (!mUserLearnedDrawer) {
                     mUserLearnedDrawer = true;
                     PrefsHelper.saveToPreferences(getActivity(), PREFS_FILE_NAME,
-                            KEY_USER_LEARNED_DRAWER, true);
+                            PREFS_USER_LEARNED_DRAWER, true);
                 }
                 context.invalidateOptionsMenu();
             }

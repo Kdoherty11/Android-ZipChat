@@ -53,9 +53,9 @@ import retrofit.client.Response;
 
 public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, Filterable {
 
-    public static final String REFRESH_FEED_ACTION = "ChatRoomsFragmentRefreshFeedAction";
+    public static final String REFRESH_FEED_ACTION = "fragments.PublicRoomsFragment.action.REFRESH_FEED";
     private static final String TAG = PublicRoomsFragment.class.getSimpleName();
-    private static final String BUNDLE_RECYCLER_LAYOUT_KEY = "classname.recycler.layout";
+    private static final String BUNDLE_RECYCLER_LAYOUT_KEY = "fragments.PublicRoomsFragment.key.RECYCLER_STATE";
 
     private PublicRoomAdapter mAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;

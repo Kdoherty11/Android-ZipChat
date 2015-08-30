@@ -33,8 +33,8 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
     private static final String TAG = UserDetailsActivity.class.getSimpleName();
 
-    private static final String EXTRA_USER = "activities.UserDetailsActivity.USER";
-    private static final String EXTRA_ANON_USER_ID = "activities.UserDetailsActivity.ANON_USER_ID";
+    private static final String EXTRA_USER = "activities.UserDetailsActivity.extra.USER";
+    private static final String EXTRA_ANON_USER_ID = "activities.UserDetailsActivity.extra.ANON_USER_ID";
 
     private Button mRequestButton;
     private ProgressBar mRequestStatusLoadingPb;
