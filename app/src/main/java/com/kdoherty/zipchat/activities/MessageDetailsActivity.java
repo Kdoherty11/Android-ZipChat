@@ -162,6 +162,9 @@ public class MessageDetailsActivity extends AppCompatActivity {
     private void addFavorite() {
         User self = UserManager.getSelf(this);
         mMessage.addFavorite(self, self.getUserId());
+        if (mMessageFavoritesFragment != null) {
+            mMessageFavoritesFragment.addFavorite(self);
+        }
         updateFavoriteUi();
         if (mMessage.getFavoriteCount() == 1) {
             showFavoritesSection();
@@ -171,6 +174,9 @@ public class MessageDetailsActivity extends AppCompatActivity {
     private void removeFavorite() {
         User self = UserManager.getSelf(this);
         mMessage.removeFavorite(self, self.getUserId());
+        if (mMessageFavoritesFragment != null) {
+            mMessageFavoritesFragment.removeFavorite(self);
+        }
         updateFavoriteUi();
     }
 

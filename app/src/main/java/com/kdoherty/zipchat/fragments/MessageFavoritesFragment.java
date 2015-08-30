@@ -97,7 +97,11 @@ public class MessageFavoritesFragment extends Fragment {
         getActivity().unregisterReceiver(mGcmFavoriteReceiver);
     }
 
-    private void addFavorite(User favoritor) {
+    public void addFavorite(User favoritor) {
         mFavoriteAdapter.addUser(favoritor);
+    }
+
+    public void removeFavorite(User favoritor) {
+        mFavoriteAdapter.removeByUserId(favoritor.getUserId());
     }
 }
