@@ -93,9 +93,6 @@ public interface ZipChatApi {
     @PUT("/messages/{messageId}/flag")
     void flagMessage(@Header(AUTH_TOKEN_KEY) String authToken, @Path("messageId") long messageId, @Query("userId") long userId, Callback<Response> response);
 
-    @DELETE("/messages/{messageId}/flag")
-    void removeFlag(@Header(AUTH_TOKEN_KEY) String authToken, @Path("messageId") long messageId, @Query("userId") long userId, Callback<Response> response);
-
     // *************** Requests ***************
 
     @GET("/requests")

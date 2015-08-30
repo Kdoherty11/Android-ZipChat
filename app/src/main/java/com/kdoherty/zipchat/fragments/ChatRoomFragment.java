@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.kdoherty.zipchat.R;
@@ -83,11 +84,14 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     private boolean mIsAnon;
     private String mProfilePicUrl;
 
+    private ProgressBar mMessageLoadingPb;
+
     private User mAnonSelf;
 
     private Callback<List<Message>> mGetMessagesCallback = new Callback<List<Message>>() {
         @Override
         public void success(List<Message> messages, Response response) {
+            hideMessageLoadingPb();
             populateMessageList(messages);
             int numMessagesLoaded = messages.size();
             mMessageOffset += messages.size();
@@ -100,6 +104,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
 
         @Override
         public void failure(RetrofitError error) {
+            hideMessageLoadingPb();
             String roomType = mIsPublicRoom ? "public" : "private";
             NetworkManager.logErrorResponse(TAG, "Getting " + roomType + " room chat messages", error);
             mMessagesLoading = true;
@@ -159,6 +164,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         mMessagesRv = (RecyclerView) rootView.findViewById(R.id.chat_room_activity_messages);
         mMessageBoxEt = (EditText) rootView.findViewById(R.id.chat_room_activity_message_box);
         mAnonToggleCv = (CircleImageView) rootView.findViewById(R.id.anon_toggle);
+        mMessageLoadingPb = (ProgressBar) rootView.findViewById(R.id.messages_loading_pb);
 
         return rootView;
     }
@@ -239,6 +245,10 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
             return;
         }
 
+        if (mMessageOffset == 0) {
+            showMessageLoadingPb();
+        }
+
         if (mIsPublicRoom) {
             ZipChatApi.INSTANCE.getPublicRoomMessages(UserManager.getAuthToken(getActivity()), mRoomId,
                     MESSAGE_LIMIT, mMessageOffset, mGetMessagesCallback);
@@ -246,6 +256,14 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
             ZipChatApi.INSTANCE.getPrivateRoomMessages(UserManager.getAuthToken(getActivity()), mRoomId,
                     MESSAGE_LIMIT, mMessageOffset, mGetMessagesCallback);
         }
+    }
+
+    private void showMessageLoadingPb() {
+        mMessageLoadingPb.setVisibility(View.VISIBLE);
+    }
+
+    private void hideMessageLoadingPb() {
+        mMessageLoadingPb.setVisibility(View.GONE);
     }
 
     @Subscribe
