@@ -82,6 +82,8 @@
 
     <string name="action_leave_private_room">Leave Chat</string>
     <string name="my_location_marker_title">"My Location"</string>
-
+    <string name="msg_favorite_failed_toast">"Could not favorite this message at this time. Please try again later"</string>
+    <string name="remove_msg_favorite_failed_toast">"Could not remove your favorite at this time. Please try again later"</string>
+    <string name="favorites">Favorites</string>
 
 </resources>

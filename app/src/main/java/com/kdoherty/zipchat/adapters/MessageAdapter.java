@@ -1,5 +1,6 @@
 package com.kdoherty.zipchat.adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -55,33 +56,33 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
     private long mSelfUserId;
 
     private ImageLoadingListener mAnimateFirstListener = new AnimateFirstDisplayListener();
-    private Context mContext;
+    private Activity mActivity;
     private int mSelfBorderColorId;
     private int mOtherBoarderColor;
     private long mAnonUserId;
-    public MessageAdapter(Context context, List<Message> messages, MessageFavoriteListener messageFavoriteListener) {
-        this(context, messages, 0, messageFavoriteListener);
+    public MessageAdapter(Activity activity, List<Message> messages, MessageFavoriteListener messageFavoriteListener) {
+        this(activity, messages, 0, messageFavoriteListener);
     }
 
-    public MessageAdapter(Context context, List<Message> messages, long anonUserId, MessageFavoriteListener messageFavoriteListener) {
-        if (context == null) {
+    public MessageAdapter(Activity activity, List<Message> messages, long anonUserId, MessageFavoriteListener messageFavoriteListener) {
+        if (activity == null) {
             throw new IllegalArgumentException("Context is null");
         }
         if (messages == null) {
             throw new IllegalArgumentException("messages is null");
         }
-        mInflater = LayoutInflater.from(context);
+        mInflater = LayoutInflater.from(activity);
         mMessages = messages;
-        mContext = context;
+        mActivity = activity;
         mAnonUserId = anonUserId;
         mMessageFavListener = messageFavoriteListener;
-        ZipChatApplication.initImageLoader(mContext);
-        mSelfUserId = UserManager.getId(mContext);
-        mSelfBorderColorId = mContext.getResources().getColor(R.color.orange);
-        mOtherBoarderColor = mContext.getResources().getColor(R.color.zipchat_blue);
+        ZipChatApplication.initImageLoader(mActivity);
+        mSelfUserId = UserManager.getId(mActivity);
+        mSelfBorderColorId = mActivity.getResources().getColor(R.color.orange);
+        mOtherBoarderColor = mActivity.getResources().getColor(R.color.zipchat_blue);
     }
 
-    private static int getMessageDrawableId(Message.FavoriteState state) {
+    public static int getMessageDrawableId(Message.FavoriteState state) {
         switch (state) {
             case FAVORITED:
                 return R.drawable.ic_favorite_grey600_24dp;
@@ -106,7 +107,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         final User sender = message.getSender();
 
         if (TextUtils.isEmpty(sender.getFacebookId())) {
-            messageCellViewHolder.profilePicture.setImageDrawable(mContext.getResources().getDrawable(R.drawable.com_facebook_profile_picture_blank_square));
+            messageCellViewHolder.profilePicture.setImageDrawable(mActivity.getResources().getDrawable(R.drawable.com_facebook_profile_picture_blank_square));
         } else {
             ImageLoader.getInstance().displayImage(FacebookManager.getProfilePicUrl(sender.getFacebookId()), messageCellViewHolder.profilePicture,
                     FacebookManager.displayProfPicOpts, mAnimateFirstListener);
@@ -123,14 +124,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         messageCellViewHolder.profilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = UserDetailsActivity.getIntent(mContext, sender);
-                mContext.startActivity(intent);
+                Intent intent = UserDetailsActivity.getIntent(mActivity, sender, mAnonUserId);
+                mActivity.startActivity(intent);
             }
         });
 
         messageCellViewHolder.message.setText(message.getMessage());
 
-        long userId = UserManager.getId(mContext);
+        long userId = UserManager.getId(mActivity);
         if (message.isConfirmed()) {
             messageCellViewHolder.unconfirmedMsgPb.setVisibility(View.GONE);
             messageCellViewHolder.favoriteLayout.setVisibility(View.VISIBLE);
@@ -139,7 +140,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
 
             Message.FavoriteState favoriteState = message.getFavoriteState(userId);
 
-            Drawable favoriteDrawable = getMessageDrawable(favoriteState);
+            Drawable favoriteDrawable = getMessageDrawable(mActivity, favoriteState);
             messageCellViewHolder.favorite.setImageDrawable(favoriteDrawable);
 
             int favoriteCount = message.getFavoriteCount();
@@ -155,8 +156,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
             messageCellViewHolder.layout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = MessageDetailsActivity.getIntent(mContext, message);
-                    mContext.startActivity(intent);
+                    Intent intent = MessageDetailsActivity.getIntent(mActivity, message, mAnonUserId);
+                    mActivity.startActivityForResult(intent, MessageDetailsActivity.MESSAGE_FAVORITED_RESULT);
                 }
             });
         } else {
@@ -194,8 +195,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         return mMessages.get(position);
     }
 
-    private Drawable getMessageDrawable(Message.FavoriteState state) {
-        return mContext.getResources().getDrawable(getMessageDrawableId(state));
+    public static Drawable getMessageDrawable(Context context, Message.FavoriteState state) {
+        return context.getResources().getDrawable(getMessageDrawableId(state));
     }
 
     public void confirmMessage(String uuid, Message msg) {
@@ -207,7 +208,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         } else {
             Log.w(TAG, "Message " + msg + " couldn't be found to be confirmed." +
                     " uuid=" + uuid + " messages= " + mMessages);
-            Utils.debugToast(mContext, "Message: " + msg + " couldn't be found to be confirmed");
+            Utils.debugToast(mActivity, "Message: " + msg + " couldn't be found to be confirmed");
         }
     }
 
@@ -261,6 +262,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
             mFavoriteEventHandler.removeCallbacks(mSendFavoriteEvent);
             mSendFavoriteEvent.run();
         }
+    }
+
+    public void updateMessage(Message message) {
+        int messageIndex = indexOfMessageById(message.getMessageId());
+        mMessages.add(messageIndex, message);
+        notifyItemChanged(messageIndex);
     }
 
     public interface MessageFavoriteListener {
@@ -327,9 +334,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
             final boolean isAddFavorite = favoriteState != Message.FavoriteState.USER_FAVORITED;
 
             if (isAddFavorite) {
-                favoriteMessage(UserManager.getSelf(mContext), message.getMessageId(), userId);
+                favoriteMessage(UserManager.getSelf(mActivity), message.getMessageId(), userId);
             } else {
-                removeFavorite(UserManager.getSelf(mContext), message.getMessageId(), userId);
+                removeFavorite(UserManager.getSelf(mActivity), message.getMessageId(), userId);
             }
 
             if (mHasPendingFavorite) {

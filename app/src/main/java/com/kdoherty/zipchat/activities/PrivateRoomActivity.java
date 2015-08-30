@@ -13,10 +13,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.events.LeaveRoomEvent;
 import com.kdoherty.zipchat.fragments.ChatRoomFragment;
+import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
@@ -133,5 +135,12 @@ public class PrivateRoomActivity extends AppCompatActivity implements View.OnCli
                 startActivity(userDetails);
                 break;
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        MessageDetailsActivity.MessageDetailsResultHandler resultHandler =
+                new MessageDetailsActivity.MessageDetailsResultHandler(mChatRoomFragment);
+        resultHandler.onActivityResult(requestCode, resultCode, data);
     }
 }

@@ -29,6 +29,7 @@ import com.kdoherty.zipchat.events.MemberLeaveEvent;
 import com.kdoherty.zipchat.events.PublicRoomJoinEvent;
 import com.kdoherty.zipchat.fragments.ChatRoomFragment;
 import com.kdoherty.zipchat.fragments.PublicRoomDrawerFragment;
+import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.PublicRoom;
 import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
@@ -237,5 +238,12 @@ public class PublicRoomActivity extends AbstractLocationActivity {
     public void onLocationChanged(Location location) {
         super.onLocationChanged(location);
         mDrawerFragment.displayUserMarker(location);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        MessageDetailsActivity.MessageDetailsResultHandler resultHandler =
+                new MessageDetailsActivity.MessageDetailsResultHandler(mChatRoomFragment);
+        resultHandler.onActivityResult(requestCode, resultCode, data);
     }
 }

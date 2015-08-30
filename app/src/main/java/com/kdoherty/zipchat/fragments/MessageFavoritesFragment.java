@@ -16,8 +16,10 @@ import android.view.ViewGroup;
 
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.adapters.UserAdapter;
+import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.MyGcmListenerService;
+import com.kdoherty.zipchat.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,34 +29,30 @@ import java.util.List;
  */
 public class MessageFavoritesFragment extends Fragment {
 
-    private static final String GCM_RECEIVER_NAME = "MessageFavoritesFragmentGcmReceiver";
-
+    private static final String GCM_RECEIVER_NAME = "fragments.MessageFavoritesFragment.GCM_RECEIVER";
     private static final String TAG = MessageFavoritesFragment.class.getSimpleName();
-    private static final String ARG_MESSAGE = "MessageFavoritesFragmentMessage";
+    private static final String ARG_MESSAGE = "fragments.MessageFavoritesFragment.MESSAGE";
+    private static final int NUM_COLS = 4;
     private RecyclerView mMessageFavorites;
     private List<User> mMessageFavoritors = new ArrayList<>();
     private UserAdapter mFavoriteAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    //This is the handler that will manager to process the broadcast intent
     private BroadcastReceiver mGcmFavoriteReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String event = intent.getStringExtra(MyGcmListenerService.Key.EVENT);
 
-            Log.d(TAG, "Received message favorited event!!!: " + intent.getDataString());
-
             if (MyGcmListenerService.Event.MESSAGE_FAVORITED.equals(event)) {
-                // TODO
+                Log.i(TAG, "Received message favorited event!!!: " + intent.getDataString());
+                Utils.debugToast(getActivity(), "Received message favorited event!!!: " + intent.getDataString());
             } else {
                 // Let GCM intent service deal with it
             }
         }
     };
 
-
-    public MessageFavoritesFragment() {
-    }
+    public MessageFavoritesFragment() { }
 
     public static MessageFavoritesFragment newInstance(List<User> messageFavorites) {
         Bundle args = new Bundle();
@@ -81,7 +79,7 @@ public class MessageFavoritesFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         mMessageFavorites = (RecyclerView) view.findViewById(R.id.message_favoritor_list);
         mMessageFavorites.setHasFixedSize(true);
-        mLayoutManager = new GridLayoutManager(getActivity(), 2);
+        mLayoutManager = new GridLayoutManager(getActivity(), NUM_COLS);
         mMessageFavorites.setLayoutManager(mLayoutManager);
         mFavoriteAdapter = new UserAdapter(getActivity(), R.layout.cell_msg_favoritor, mMessageFavoritors);
         mMessageFavorites.setAdapter(mFavoriteAdapter);
@@ -97,5 +95,9 @@ public class MessageFavoritesFragment extends Fragment {
     public void onPause() {
         super.onPause();
         getActivity().unregisterReceiver(mGcmFavoriteReceiver);
+    }
+
+    private void addFavorite(User favoritor) {
+        mFavoriteAdapter.addUser(favoritor);
     }
 }

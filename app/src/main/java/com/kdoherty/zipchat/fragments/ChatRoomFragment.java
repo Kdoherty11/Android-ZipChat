@@ -371,6 +371,10 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         AnimateFirstDisplayListener.clearImages();
     }
 
+    public void updateMessage(Message message) {
+        mMessageAdapter.updateMessage(message);
+    }
+
     private class MessagesScrollListener extends RecyclerView.OnScrollListener {
 
         private LinearLayoutManager mLayoutManager;
