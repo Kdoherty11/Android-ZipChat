@@ -36,7 +36,7 @@ import java.util.Queue;
  */
 public class RoomSocket {
 
-    public static final String KEEP_ALIVE_MSG = "Beat";
+    private static final String KEEP_ALIVE_MSG = "Beat";
     private static final String TAG = RoomSocket.class.getSimpleName();
     private static final long INITIAL_BACKOFF_MILLIS = 500;
     private static final long MAX_BACKOFF_DELAY_MILLIS = 64 * 1000;
@@ -93,7 +93,6 @@ public class RoomSocket {
 
                             BusProvider.getInstance().post(new PublicRoomJoinEvent(roomMemberList, anonUser, isSubscribed));
                         }
-
                         break;
                     case "favorite":
                         User msgFavoritor = gson.fromJson(stringJson.getString("user"), User.class);
@@ -148,7 +147,7 @@ public class RoomSocket {
         }
     };
 
-    public RoomSocket(@NonNull Context context, @NonNull ChatService chatService) {
+    public RoomSocket(Context context, ChatService chatService) {
         this.mContext = context;
         this.userId = UserManager.getId(context);
         this.mChatService = chatService;

@@ -23,16 +23,16 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserCellViewHo
 
     private static final String TAG = UserAdapter.class.getSimpleName();
 
-    private static final int DEFAULT_WIDTH = 500;
-    private static final int DEFAULT_HEIGHT = 500;
+    private static final int DEFAULT_WIDTH = 300;
+    private static final int DEFAULT_HEIGHT = 300;
 
     private final LayoutInflater mInflater;
     private final List<User> mRoomMembers;
     private Context mContext;
     private int mCellLayoutId;
 
-    int mWidth;
-    int mHeight;
+    private int mWidth;
+    private int mHeight;
 
     public UserAdapter(Context context, int cellLayoutId, List<User> roomMembers) {
         this(context, cellLayoutId, roomMembers, DEFAULT_WIDTH, DEFAULT_HEIGHT);
@@ -55,7 +55,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserCellViewHo
 
     @Override
     public void onBindViewHolder(UserCellViewHolder drawerCellViewHolder, int i) {
-
         final User user = mRoomMembers.get(i);
 
         drawerCellViewHolder.text.setText(user.getName());

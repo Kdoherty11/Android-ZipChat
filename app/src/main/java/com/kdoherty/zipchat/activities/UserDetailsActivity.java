@@ -33,18 +33,23 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
     private static final String TAG = UserDetailsActivity.class.getSimpleName();
 
-    private static final String EXTRA_USER = "UserDetailsActivityUserKey";
+    private static final String EXTRA_USER = "activities.UserDetailsActivity.USER";
+    private static final String EXTRA_ANON_USER_ID = "activities.UserDetailsActivity.ANON_USER_ID";
 
     private Button mRequestButton;
     private ProgressBar mRequestStatusLoadingPb;
 
     private User mUser;
 
-    private boolean mIsSelf = false;
-
     public static Intent getIntent(Context context, User user) {
         Intent userDetailsIntent = new Intent(context, UserDetailsActivity.class);
         userDetailsIntent.putExtra(EXTRA_USER, user);
+        return userDetailsIntent;
+    }
+
+    public static Intent getIntent(Context context, User user, long anonUserId) {
+        Intent userDetailsIntent = getIntent(context, user);
+        userDetailsIntent.putExtra(EXTRA_ANON_USER_ID, anonUserId);
         return userDetailsIntent;
     }
 
@@ -56,6 +61,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
         final Intent intent = getIntent();
         mUser = intent.getParcelableExtra(EXTRA_USER);
+        long mAnonUserId = intent.getLongExtra(EXTRA_ANON_USER_ID, 0);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.user_details_app_bar);
         setSupportActionBar(toolbar);
@@ -72,19 +78,13 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
         mRequestStatusLoadingPb = (ProgressBar) findViewById(R.id.request_status_loading_pb);
 
-        mIsSelf = mUser.getUserId() == UserManager.getId(this);
-
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        int screenWidth = size.x;
+        boolean mIsSelf = mUser.getUserId() == UserManager.getId(this) || mUser.getUserId() == mAnonUserId;
 
         int width = 800;
         int height = mIsSelf ? 1200 : 1000;
 
         final ImageView profilePictureView = (ImageView) findViewById(R.id.chat_request_profile_picture);
         FacebookManager.displayProfilePicture(mUser.getFacebookId(), profilePictureView, width, height);
-
 
         if (!mIsSelf) {
             setButtonText();

@@ -30,6 +30,8 @@ public class FacebookManager {
     private static final String FACEBOOK_PREFERENCES = "facebookPreferences";
     private static final String PREFS_USER_ID_KEY = "facebookUserIdKey";
     private static final String PREFS_FACEBOOK_NAME_KEY = "facebookUsernameKey";
+    private static final int DEFAULT_WIDTH = 250;
+    private static final int DEFAULT_HEIGHT = 250;
 
     private FacebookManager() {
     }
@@ -52,7 +54,7 @@ public class FacebookManager {
     }
 
     public static String getProfilePicUrl(String userId) {
-        return getProfilePicUrl(userId, "square");
+        return getProfilePicUrl(userId, DEFAULT_WIDTH, DEFAULT_HEIGHT);
     }
 
     public static String getProfilePicUrl(String userId, String type) {
