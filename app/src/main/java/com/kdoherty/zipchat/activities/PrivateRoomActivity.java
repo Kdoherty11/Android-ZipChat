@@ -104,7 +104,6 @@ public class PrivateRoomActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void leaveRoom() {
-
         if (!NetworkManager.checkOnline(this)) {
             return;
         }

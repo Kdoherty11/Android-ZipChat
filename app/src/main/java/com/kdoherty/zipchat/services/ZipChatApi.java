@@ -90,10 +90,10 @@ public interface ZipChatApi {
     @DELETE("/messages/{messageId}/favorite")
     void removeFavorite(@Header(AUTH_TOKEN_KEY) String authToken, @Path("messageId") long messageId, @Query("userId") long userId, Callback<Response> response);
 
-    @PUT("/messages/{messageId}/favorite")
+    @PUT("/messages/{messageId}/flag")
     void flagMessage(@Header(AUTH_TOKEN_KEY) String authToken, @Path("messageId") long messageId, @Query("userId") long userId, Callback<Response> response);
 
-    @DELETE("/messages/{messageId}/favorite")
+    @DELETE("/messages/{messageId}/flag")
     void removeFlag(@Header(AUTH_TOKEN_KEY) String authToken, @Path("messageId") long messageId, @Query("userId") long userId, Callback<Response> response);
 
     // *************** Requests ***************

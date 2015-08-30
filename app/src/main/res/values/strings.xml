@@ -85,5 +85,8 @@
     <string name="msg_favorite_failed_toast">"Could not favorite this message at this time. Please try again later"</string>
     <string name="remove_msg_favorite_failed_toast">"Could not remove your favorite at this time. Please try again later"</string>
     <string name="favorites">Favorites</string>
+    <string name="action_report_message">Report</string>
+    <string name="message_reported_toast">Message Reported</string>
+    <string name="message_reported_failed_toast">You have already reported this message</string>
 
 </resources>

@@ -4,11 +4,9 @@
     tools:context="com.kdoherty.zipchat.activities.MessageDetailsActivity">
 
     <item
-        android:id="@+id/flag_message"
-        android:name="@string/action_flag_message"
-        android:icon="@drawable/ic_notifications_on_white_24dp"
+        android:id="@+id/action_report_message"
         android:orderInCategory="100"
-        android:title="@string/action_flag_message"
-        app:showAsAction="ifRoom" />
+        android:title="@string/action_report_message"
+        app:showAsAction="never" />
 
 </menu>

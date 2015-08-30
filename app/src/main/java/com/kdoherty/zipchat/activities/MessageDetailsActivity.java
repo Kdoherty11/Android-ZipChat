@@ -250,13 +250,40 @@ public class MessageDetailsActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (id == android.R.id.home) {
-            setResult();
-            finish();
-            return true;
+        switch (id) {
+            case android.R.id.home:
+                setResult();
+                finish();
+                return true;
+            case R.id.action_report_message:
+                reportMessage();
+                break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void reportMessage() {
+        if (!NetworkManager.checkOnline(this)) {
+            return;
+        }
+        ZipChatApi.INSTANCE.flagMessage(UserManager.getAuthToken(this), mMessage.getMessageId(), UserManager.getId(this), new Callback<Response>() {
+            @Override
+            public void success(Response response, Response response2) {
+                Toast.makeText(MessageDetailsActivity.this, getString(R.string.message_reported_toast), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Response response = error.getResponse();
+                if (response.getStatus() == 400 && NetworkManager.responseToString(response).contains("already flagged")) {
+                    Toast.makeText(MessageDetailsActivity.this, getString(R.string.message_reported_failed_toast), Toast.LENGTH_SHORT).show();
+                } else {
+                    NetworkManager.logErrorResponse(TAG, "Reporting a message", error);
+                }
+
+            }
+        });
     }
 
     public static class MessageDetailsResultHandler {
