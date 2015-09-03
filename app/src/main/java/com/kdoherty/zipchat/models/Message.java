@@ -2,6 +2,7 @@ package com.kdoherty.zipchat.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,7 +31,9 @@ public class Message implements Parcelable {
     private Date createdAtDate;
     private List<User> favorites = new ArrayList<>();
     private FavoriteState favoriteState;
+    // True for when read from parcel
     private boolean isConfirmed = true;
+    private boolean didTimeout = false;
 
     public Message() {
     }
@@ -38,7 +41,7 @@ public class Message implements Parcelable {
     public Message(String message, User sender, String uuid) {
         this.messageId = -1;
         this.message = message;
-        // TODO is this necessary
+        // TODO is this necessary?
         this.sender = new User(sender);
         this.isConfirmed = false;
         this.uuid = uuid;
@@ -62,9 +65,13 @@ public class Message implements Parcelable {
     }
 
     public void addFavorite(User user, long selfId) {
-        favorites.add(user);
-        score++;
-        initFavoriteState(selfId);
+        if (!favorites.contains(user)) {
+            favorites.add(user);
+            score++;
+            initFavoriteState(selfId);
+        } else {
+            Log.w("Message", "Attempting to favorite a message twice");
+        }
     }
 
     public void removeFavorite(User user, long selfId) {
@@ -138,6 +145,14 @@ public class Message implements Parcelable {
 
     public FavoriteState getFavoriteState() {
         return favoriteState;
+    }
+
+    public boolean didTimeout() {
+        return didTimeout;
+    }
+
+    public void setDidTimeout(boolean didTimeout) {
+        this.didTimeout = didTimeout;
     }
 
     @Override

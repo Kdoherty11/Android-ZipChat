@@ -1,4 +1,4 @@
-package com.kdoherty.zipchat.services;
+package com.kdoherty.zipchat.utils;
 
 import android.os.Handler;
 import android.os.Looper;

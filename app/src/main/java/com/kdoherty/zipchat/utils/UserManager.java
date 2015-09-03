@@ -17,6 +17,7 @@ public class UserManager {
     private static final long DEFAULT_USER_ID = -1;
     private static final String DEFAULT_AUTH_TOKEN = "";
     private static final long DEFAULT_DEVICE_ID = -1;
+    private static User self = null;
 
     private UserManager() {
     }
@@ -54,7 +55,10 @@ public class UserManager {
     }
 
     public static User getSelf(Context context) {
-        return new User(FacebookManager.getFacebookName(context), FacebookManager.getFacebookId(context), getId(context));
+        if (self == null) {
+            self = new User(getId(context), FacebookManager.getFacebookId(context), FacebookManager.getFacebookName(context));
+        }
+        return self;
     }
 
 }

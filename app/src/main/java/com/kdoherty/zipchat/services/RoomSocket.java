@@ -12,10 +12,12 @@ import com.kdoherty.zipchat.events.MemberJoinEvent;
 import com.kdoherty.zipchat.events.MemberLeaveEvent;
 import com.kdoherty.zipchat.events.PublicRoomJoinEvent;
 import com.kdoherty.zipchat.events.RemoveFavoriteEvent;
+import com.kdoherty.zipchat.events.SocketReconnectTimeout;
 import com.kdoherty.zipchat.events.TalkConfirmationEvent;
 import com.kdoherty.zipchat.events.TalkEvent;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
+import com.kdoherty.zipchat.utils.BusProvider;
 import com.kdoherty.zipchat.utils.UserManager;
 import com.kdoherty.zipchat.utils.Utils;
 import com.koushikdutta.async.callback.CompletedCallback;
@@ -36,15 +38,15 @@ import java.util.Queue;
 public class RoomSocket {
 
     private static final String KEEP_ALIVE_MSG = "Beat";
-    private static final String TAG = RoomSocket.class.getSimpleName();
-    private static final long INITIAL_BACKOFF_MILLIS = 500;
-    private static final long MAX_BACKOFF_DELAY_MILLIS = 64 * 1000;
+    private static final String TAG = "KBD" + RoomSocket.class.getSimpleName();
+    private static final long BACKOFF_MILLIS = 2500;
+    private static final int MAX_NUM_RETRY_ATTEMPTS = 4;
     private final long userId;
     private Queue<JSONObject> mSocketEventQueue = new ArrayDeque<>();
     private boolean mIsReconnecting = false;
     private ChatService mChatService;
     private Context mContext;
-    private final WebSocket.StringCallback stringCallback = new WebSocket.StringCallback() {
+    private final WebSocket.StringCallback mEventCallback = new WebSocket.StringCallback() {
         @Override
         public void onStringAvailable(String s) {
             try {
@@ -120,19 +122,18 @@ public class RoomSocket {
     };
     private WebSocket mWebSocket;
     private Handler mHandler = new Handler();
-    private long mBackoffDelay = INITIAL_BACKOFF_MILLIS;
+    private int mNumRetryAttempts = 0;
     private Runnable mReconnectRunnable = new Runnable() {
         @Override
         public void run() {
             if (socketIsAvailable()) {
                 mIsReconnecting = false;
-                mBackoffDelay = INITIAL_BACKOFF_MILLIS;
+                mNumRetryAttempts = 0;
+            } else if (mNumRetryAttempts++ <= MAX_NUM_RETRY_ATTEMPTS) {
+                reconnectWithRetry();
             } else {
-                mBackoffDelay *= 2;
-
-                if (mBackoffDelay <= MAX_BACKOFF_DELAY_MILLIS) {
-                    reconnectWithRetry();
-                }
+                BusProvider.getInstance().post(new SocketReconnectTimeout());
+                Log.e(TAG, "Done trying to reconnect to the socket after " + MAX_NUM_RETRY_ATTEMPTS + " attempts");
             }
         }
     };
@@ -142,6 +143,8 @@ public class RoomSocket {
             if (ex != null) {
                 Log.w(TAG, "Attempting to recover from " + ex.getMessage());
                 reconnect();
+            } else {
+                Log.i(TAG, "Socket closed");
             }
         }
     };
@@ -155,7 +158,7 @@ public class RoomSocket {
     public void setWebSocket(@Nullable WebSocket webSocket) {
         this.mWebSocket = webSocket;
         if (webSocket != null) {
-            this.mWebSocket.setStringCallback(stringCallback);
+            this.mWebSocket.setStringCallback(mEventCallback);
             this.mWebSocket.setClosedCallback(closedCallback);
             sendQueuedEvents();
         }
@@ -210,12 +213,11 @@ public class RoomSocket {
         mSocketEventQueue.add(event);
 
         reconnect();
-
-        Utils.debugToast(mContext, "ChatService is not currently connecting... Attempting to reconnect");
     }
 
     private void reconnect() {
         if (!mIsReconnecting) {
+            Utils.debugToast(mContext, "ChatService is not currently connecting... Attempting to reconnect");
             mIsReconnecting = true;
             reconnectWithRetry();
         }
@@ -226,9 +228,9 @@ public class RoomSocket {
         mChatService.cancel();
         mChatService = new ChatService(mChatService);
 
-        Utils.debugToast(mContext, "Reconnect with " + mBackoffDelay + " delay", Toast.LENGTH_SHORT);
+        Utils.debugToast(mContext, "Reconnect attempt number " + mNumRetryAttempts, Toast.LENGTH_SHORT);
 
-        mHandler.postDelayed(mReconnectRunnable, mBackoffDelay);
+        mHandler.postDelayed(mReconnectRunnable, BACKOFF_MILLIS);
     }
 
     private void sendQueuedEvents() {

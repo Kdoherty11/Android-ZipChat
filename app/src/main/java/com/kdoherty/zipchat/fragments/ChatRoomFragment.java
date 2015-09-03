@@ -21,14 +21,15 @@ import com.kdoherty.zipchat.adapters.MessageAdapter;
 import com.kdoherty.zipchat.events.AddFavoriteEvent;
 import com.kdoherty.zipchat.events.PublicRoomJoinEvent;
 import com.kdoherty.zipchat.events.RemoveFavoriteEvent;
+import com.kdoherty.zipchat.events.SocketReconnectTimeout;
 import com.kdoherty.zipchat.events.TalkConfirmationEvent;
 import com.kdoherty.zipchat.events.TalkEvent;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
-import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ChatService;
 import com.kdoherty.zipchat.services.RoomSocket;
 import com.kdoherty.zipchat.services.ZipChatApi;
+import com.kdoherty.zipchat.utils.BusProvider;
 import com.kdoherty.zipchat.utils.FacebookManager;
 import com.kdoherty.zipchat.utils.NetworkManager;
 import com.kdoherty.zipchat.utils.UserManager;
@@ -53,9 +54,9 @@ import retrofit.client.Response;
 /**
  * Created by kevindoherty on 2/2/15.
  */
-public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSocketConnectCallback, View.OnClickListener, MessageAdapter.MessageFavoriteListener {
+public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSocketConnectCallback, View.OnClickListener, MessageAdapter.SocketEventListener {
 
-    private static final String TAG = ChatRoomFragment.class.getSimpleName();
+    private static final String TAG = "KBD" + ChatRoomFragment.class.getSimpleName();
 
     private static final int MESSAGE_LIMIT = 25;
     private static final int ITEM_VIEW_CACHE_SIZE = 25;
@@ -100,6 +101,8 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
             if (numMessagesLoaded < MESSAGE_LIMIT) {
                 mLoadedAllMessages = true;
             }
+
+
         }
 
         @Override
@@ -177,7 +180,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         mMessagesRv.addItemDecoration(new DividerItemDecoration(getResources().getDrawable(R.drawable.message_list_divider), true, true));
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mMessagesRv.setLayoutManager(layoutManager);
-        mMessagesRv.setOnScrollListener(new MessagesScrollListener(layoutManager));
+        mMessagesRv.addOnScrollListener(new MessagesScrollListener(layoutManager));
 
         populateMessageList();
 
@@ -301,7 +304,11 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     @Subscribe
     @SuppressWarnings("unused")
     public void onTalkConfirmation(TalkConfirmationEvent event) {
-        mMessageAdapter.confirmMessage(event.getUuid(), event.getMessage());
+        if (mMessageAdapter != null) {
+            mMessageAdapter.confirmMessage(event.getUuid(), event.getMessage());
+        } else {
+            Log.w(TAG, "mMessageAdapter is null when confirming a talk message");
+        }
     }
 
     private void sendMessage() {
@@ -309,7 +316,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         if (!messageContent.isEmpty()) {
             String uuid = UUID.randomUUID().toString();
             addMessageLocally(messageContent, uuid);
-            mRoomSocket.sendTalk(messageContent, mIsAnon, uuid);
+            sendTalkEvent(messageContent, mIsAnon, uuid);
             Utils.hideKeyboard(getActivity(), mMessageBoxEt);
             mMessageBoxEt.setText("");
         }
@@ -347,6 +354,15 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         mRoomSocket.sendFavorite(messageId, isFavorite);
     }
 
+    public void sendTalkEvent(String text, boolean isAnon, String uuid) {
+        mRoomSocket.sendTalk(text, isAnon, uuid);
+    }
+
+    @Override
+    public void sendTalkEvent(String text, boolean isAnon) {
+        sendTalkEvent(text, isAnon, UUID.randomUUID().toString());
+    }
+
     @Override
     public void onCompleted(Exception exception, WebSocket webSocket) {
         if (exception != null) {
@@ -363,6 +379,20 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         mAnonSelf = event.getAnonUser();
         if (mMessageAdapter != null) {
             mMessageAdapter.setAnonUserId(mAnonSelf.getUserId());
+        }
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onSocketReconnectTimeout(SocketReconnectTimeout event) {
+        failUnconfirmedMessages();
+    }
+
+    private void failUnconfirmedMessages() {
+        if (mMessageAdapter != null) {
+            mMessageAdapter.timeoutUnconfirmedMessages();
+        } else {
+            Log.w(TAG, "mMessageAdapter is null when failing unconfirmed messages");
         }
     }
 

@@ -1,7 +1,9 @@
 package com.kdoherty.zipchat.activities;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -21,16 +23,19 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.adapters.MessageAdapter;
 import com.kdoherty.zipchat.fragments.ChatRoomFragment;
 import com.kdoherty.zipchat.fragments.MessageFavoritesFragment;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
+import com.kdoherty.zipchat.services.MyGcmListenerService;
 import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.FacebookManager;
 import com.kdoherty.zipchat.utils.NetworkManager;
 import com.kdoherty.zipchat.utils.UserManager;
+import com.kdoherty.zipchat.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +53,8 @@ public class MessageDetailsActivity extends AppCompatActivity {
     private static final String TAG = MessageDetailsActivity.class.getSimpleName();
     private static final String EXTRA_MESSAGE = "activities.MessageDetailsActivity.extra.MESSAGE";
     private static final String EXTRA_ANON_USER_ID = "activities.MessageDetailsActivity.extra.ANON_USER_ID";
+    private static final String GCM_RECEIVER_NAME = "fragments.MessageFavoritesFragment.GCM_RECEIVER";
+
     private MessageFavoritesFragment mMessageFavoritesFragment;
 
     private Message mMessage;
@@ -62,10 +69,41 @@ public class MessageDetailsActivity extends AppCompatActivity {
     private TextView mFavoritesTitleTv;
     private View mFavoritesDividerLine;
     private List<User> mInitialFavorites;
+    private BroadcastReceiver mGcmFavoriteReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle extras = intent.getExtras();
 
-    public static Intent getIntent(Context context, Message message, long anonUserId) {
+            if (extras != null && extras.containsKey(MyGcmListenerService.Key.EVENT)) {
+                String event = intent.getStringExtra(MyGcmListenerService.Key.EVENT);
+
+                boolean isMessageFavorite = MyGcmListenerService.Event.MESSAGE_FAVORITED.equals(event);
+
+                if (isMessageFavorite) {
+                    Gson gson = new Gson();
+                    Message message = gson.fromJson(intent.getStringExtra(MyGcmListenerService.Key.MESSAGE), Message.class);
+                    boolean isThisMessage = mMessage.getMessageId() == message.getMessageId();
+
+                    if (isThisMessage) {
+                        User user = gson.fromJson(extras.getString(MyGcmListenerService.Key.USER), User.class);
+                        addFavorite(user);
+                        Utils.debugToast(context, "Success intercepting gcm and fromJson on message and user");
+                        abortBroadcast();
+                    }
+
+                }
+            }
+        }
+    };
+
+    public static Intent getIntent(Context context, Message message) {
         Intent messageDetail = new Intent(context, MessageDetailsActivity.class);
         messageDetail.putExtra(EXTRA_MESSAGE, message);
+        return messageDetail;
+    }
+
+    public static Intent getIntent(Context context, Message message, long anonUserId) {
+        Intent messageDetail = getIntent(context, message);
         messageDetail.putExtra(EXTRA_ANON_USER_ID, anonUserId);
         return messageDetail;
     }
@@ -148,16 +186,19 @@ public class MessageDetailsActivity extends AppCompatActivity {
         }
     }
 
-    private void addFavorite() {
-        User self = UserManager.getSelf(this);
-        mMessage.addFavorite(self, self.getUserId());
+    private void addFavorite(User user) {
+        mMessage.addFavorite(user, user.getUserId());
         if (mMessageFavoritesFragment != null) {
-            mMessageFavoritesFragment.addFavorite(self);
+            mMessageFavoritesFragment.addFavorite(user);
         }
         updateFavoriteUi();
         if (mMessage.getFavoriteCount() == 1) {
             showFavoritesSection();
         }
+    }
+
+    private void favoriteMessage() {
+        addFavorite(UserManager.getSelf(this));
     }
 
     private void removeFavorite() {
@@ -286,6 +327,22 @@ public class MessageDetailsActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onResume() {
+        IntentFilter filter = new IntentFilter(GCM_RECEIVER_NAME);
+        filter.addAction("com.google.android.c2dm.intent.RECEIVE");
+        filter.setPriority(100);
+
+        registerReceiver(mGcmFavoriteReceiver, filter);
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        unregisterReceiver(mGcmFavoriteReceiver);
+        super.onPause();
+    }
+
     public static class MessageDetailsResultHandler {
 
         private ChatRoomFragment mChatRoomFragment;
@@ -327,7 +384,7 @@ public class MessageDetailsActivity extends AppCompatActivity {
                             @Override
                             public void success(Response response, Response response2) {
                                 stopFavoriteLoading();
-                                addFavorite();
+                                favoriteMessage();
                             }
 
                             @Override

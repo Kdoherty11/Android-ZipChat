@@ -38,7 +38,7 @@ import java.util.List;
  */
 public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMapLoadedCallback {
 
-    private static final String TAG = PublicRoomDrawerFragment.class.getSimpleName();
+    private static final String TAG = "KBD" + PublicRoomDrawerFragment.class.getSimpleName();
     private static final String PREFS_USER_LEARNED_DRAWER = "fragments.PublicRoomDrawerFragment.prefs.USER_LEARNED_DRAWER";
     private static final String PREFS_FILE_NAME = "fragments.PublicRoomDrawerFragment.prefs.FILE";
     private static final String ARG_ROOM_NAME = "fragments.PublicRoomDrawerFragment.args.ROOM_NAME";

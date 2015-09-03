@@ -11,7 +11,7 @@ import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.kdoherty.zipchat.events.LocationAvailableEvent;
-import com.kdoherty.zipchat.services.BusProvider;
+import com.kdoherty.zipchat.utils.BusProvider;
 import com.kdoherty.zipchat.utils.LocationManager;
 import com.kdoherty.zipchat.utils.Utils;
 
@@ -81,7 +81,6 @@ public abstract class AbstractLocationActivity extends AppCompatActivity impleme
         Utils.checkServices(this);
         LocationManager.checkLocation(this);
         BusProvider.getInstance().register(this);
-
     }
 
     @Override

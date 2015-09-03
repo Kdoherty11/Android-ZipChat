@@ -38,10 +38,9 @@ import retrofit.client.Response;
 
 public class PublicRoomActivity extends AbstractLocationActivity {
 
-    private static final String TAG = PublicRoomActivity.class.getSimpleName();
+    private static final String TAG = "KBD" + PublicRoomActivity.class.getSimpleName();
 
     private static final String EXTRA_ROOM = "PublicRoomActivityRoomExtra";
-
 
     private PublicRoomDrawerFragment mDrawerFragment;
     private ChatRoomFragment mChatRoomFragment;
@@ -166,8 +165,11 @@ public class PublicRoomActivity extends AbstractLocationActivity {
         Utils.debugToast(this, "Join success in public room activity subscribe method");
         mNotificationsOn = event.isSubscribed();
         setNotificationsIcon();
-
-        mDrawerFragment.setupRoomMembers(event.getRoomMembers());
+        if (mDrawerFragment != null) {
+            mDrawerFragment.setupRoomMembers(event.getRoomMembers());
+        } else {
+            Log.w(TAG, "mDrawerFragment is null during join success");
+        }
     }
 
     private void subscribe() {
@@ -209,15 +211,23 @@ public class PublicRoomActivity extends AbstractLocationActivity {
     @Subscribe
     @SuppressWarnings("unused")
     public void onUserJoinEvent(MemberJoinEvent event) {
-        Log.d(TAG, "Received member join event");
-        mDrawerFragment.addRoomMember(event.getUser());
+        Log.d(TAG, "Received user join event");
+        if (mDrawerFragment != null) {
+            mDrawerFragment.addRoomMember(event.getUser());
+        } else {
+            Log.w(TAG, "mDrawerFragment is null when receiving user join event");
+        }
     }
 
     @Subscribe
     @SuppressWarnings("unused")
     public void onUserQuitEvent(MemberLeaveEvent event) {
         Log.d(TAG, "Received member quit event");
-        mDrawerFragment.removeRoomMember(event.getUser());
+        if (mDrawerFragment != null) {
+            mDrawerFragment.removeRoomMember(event.getUser());
+        } else {
+            Log.w(TAG, "mDrawerFragment is null when receiving user quit event");
+        }
     }
 
     @Override

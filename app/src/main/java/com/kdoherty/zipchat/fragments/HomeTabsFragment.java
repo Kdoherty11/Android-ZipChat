@@ -13,14 +13,13 @@ import android.widget.Filter;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.adapters.HomeTabsAdapter;
 import com.kdoherty.zipchat.events.TabChangeEvent;
-import com.kdoherty.zipchat.services.BusProvider;
+import com.kdoherty.zipchat.utils.BusProvider;
 import com.kdoherty.zipchat.utils.PrefsHelper;
 import com.kdoherty.zipchat.views.SlidingTabLayout;
 
 public class HomeTabsFragment extends Fragment implements ViewPager.OnPageChangeListener {
 
     public static final String TAG = HomeTabsFragment.class.getSimpleName();
-
     public static final String PREFS_TAB_POSITION = "fragments.HomeTabsFragment.prefs.TAB_POSITION";
     public static final String PREFS_FILE_NAME = "fragments.HomeTabsFragment.prefs.FILE";
     public static final int PRIVATE_ROOMS_TAB_INDEX = 1;
@@ -125,5 +124,9 @@ public class HomeTabsFragment extends Fragment implements ViewPager.OnPageChange
 
     public Filter getFilter() {
         return mAdapter.getFilter(mTabPosition);
+    }
+
+    public enum TabType {
+        DISTANCE, ACTIVITY;
     }
 }

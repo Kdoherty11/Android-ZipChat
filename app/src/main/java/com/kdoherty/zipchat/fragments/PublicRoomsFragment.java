@@ -32,9 +32,8 @@ import com.kdoherty.zipchat.adapters.PublicRoomAdapter;
 import com.kdoherty.zipchat.events.LocationAvailableEvent;
 import com.kdoherty.zipchat.events.RoomCreatedEvent;
 import com.kdoherty.zipchat.models.PublicRoom;
-import com.kdoherty.zipchat.models.SortingTabs;
-import com.kdoherty.zipchat.services.BusProvider;
 import com.kdoherty.zipchat.services.ZipChatApi;
+import com.kdoherty.zipchat.utils.BusProvider;
 import com.kdoherty.zipchat.utils.LocationManager;
 import com.kdoherty.zipchat.utils.NetworkManager;
 import com.kdoherty.zipchat.utils.UserManager;
@@ -191,7 +190,7 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
     }
 
     private void sortRooms() {
-        SortingTabs tab = SortingTabs.valueOf(mCurrentTabTitle.toUpperCase());
+        HomeTabsFragment.TabType tab = HomeTabsFragment.TabType.valueOf(mCurrentTabTitle.toUpperCase());
         if (mAdapter != null) {
             mAdapter.sortRooms(tab);
         }

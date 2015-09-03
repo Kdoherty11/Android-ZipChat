@@ -21,10 +21,6 @@ public class Request {
         return requestId;
     }
 
-    public void setRequestId(long requestId) {
-        this.requestId = requestId;
-    }
-
     public enum Status {
         accepted,
         denied,

@@ -85,7 +85,7 @@ public class PrivateRoomAdapter extends RecyclerView.Adapter<PrivateRoomAdapter.
 
             @Override
             public void onClick(View v) {
-                Intent intent = PrivateRoomActivity.getIntent(mContext, privateRoom.getId(), privateRoom.getOther());
+                Intent intent = PrivateRoomActivity.getIntent(mContext, privateRoom.getRoomId(), privateRoom.getOther());
                 mContext.startActivity(intent);
             }
         });

@@ -21,19 +21,17 @@ import java.util.List;
 public class MessageFavoritesFragment extends Fragment {
 
     private static final String TAG = MessageFavoritesFragment.class.getSimpleName();
-    private static final String ARG_MESSAGE = "fragments.MessageFavoritesFragment.arg.MESSAGE";
+    private static final String ARG_MESSAGE_FAVORITES = "fragments.MessageFavoritesFragment.arg.MESSAGE_FAVORITES";
     private static final int NUM_COLS = 4;
-    private RecyclerView mMessageFavorites;
     private List<User> mMessageFavoritors = new ArrayList<>();
     private UserAdapter mFavoriteAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
 
     public MessageFavoritesFragment() {
     }
 
-    public static MessageFavoritesFragment newInstance(List<User> messageFavorites) {
+    public static MessageFavoritesFragment newInstance(List<User> favorites) {
         Bundle args = new Bundle();
-        args.putParcelableArrayList(ARG_MESSAGE, new ArrayList<>(messageFavorites));
+        args.putParcelableArrayList(ARG_MESSAGE_FAVORITES, new ArrayList<>(favorites));
 
         MessageFavoritesFragment fragment = new MessageFavoritesFragment();
         fragment.setArguments(args);
@@ -43,7 +41,7 @@ public class MessageFavoritesFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mMessageFavoritors = getArguments().getParcelableArrayList(ARG_MESSAGE);
+        mMessageFavoritors = getArguments().getParcelableArrayList(ARG_MESSAGE_FAVORITES);
     }
 
     @Override
@@ -54,12 +52,12 @@ public class MessageFavoritesFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        mMessageFavorites = (RecyclerView) view.findViewById(R.id.message_favoritor_list);
-        mMessageFavorites.setHasFixedSize(true);
-        mLayoutManager = new GridLayoutManager(getActivity(), NUM_COLS);
-        mMessageFavorites.setLayoutManager(mLayoutManager);
+        RecyclerView messageFavoritesRv = (RecyclerView) view.findViewById(R.id.message_favoritor_list);
+        messageFavoritesRv.setHasFixedSize(true);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity(), NUM_COLS);
+        messageFavoritesRv.setLayoutManager(layoutManager);
         mFavoriteAdapter = new UserAdapter(getActivity(), R.layout.cell_msg_favoritor, mMessageFavoritors);
-        mMessageFavorites.setAdapter(mFavoriteAdapter);
+        messageFavoritesRv.setAdapter(mFavoriteAdapter);
     }
 
     public void addFavorite(User user) {

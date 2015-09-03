@@ -88,8 +88,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserCellViewHo
         }
     }
 
-    public void addUser(int position, User user) {
-        mRoomMembers.add(position, user);
+    private void addUser(int position, User user) {
+        if (!mRoomMembers.contains(user)) {
+            mRoomMembers.add(position, user);
+        }
         notifyItemInserted(position);
     }
 

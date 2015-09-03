@@ -2,15 +2,18 @@ package com.kdoherty.zipchat.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
+
+import com.kdoherty.zipchat.utils.MyObjects;
 
 /**
  * Created by kdoherty on 12/18/14.
  */
 public class User implements Parcelable {
 
-    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
-        public User createFromParcel(Parcel in) {
-            return new User(in);
+    public static final Creator<User> CREATOR = new Creator<User>() {
+        public User createFromParcel(Parcel source) {
+            return new User(source);
         }
 
         public User[] newArray(int size) {
@@ -18,49 +21,67 @@ public class User implements Parcelable {
         }
     };
     private long userId;
-    private String name;
     private String facebookId;
+    private String name;
+    private String gender;
+
+    public User(long userId, @Nullable String facebookId, String name) {
+        this.userId = userId;
+        this.facebookId = facebookId;
+        this.name = name;
+    }
 
     public User(User user) {
-        this.userId = user.getUserId();
-        this.facebookId = user.getFacebookId();
-        this.name = user.getName();
+        this(user.getUserId(), user.getFacebookId(), user.getName());
     }
 
-    public User(String name, String facebookId, long userId) {
-        this.name = name;
-        this.facebookId = facebookId;
-        this.userId = userId;
+    protected User(Parcel in) {
+        this.userId = in.readLong();
+        this.facebookId = in.readString();
+        this.name = in.readString();
+        this.gender = in.readString();
     }
 
-    public User(String name, String facebookId) {
-        this(name, facebookId, 0);
-    }
-
-    public User(Parcel in) {
-        userId = in.readLong();
-        name = in.readString();
-        facebookId = in.readString();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public long getUserId() {
+        return userId;
     }
 
     public String getFacebookId() {
         return facebookId;
     }
 
-    public void setFacebookId(String facebookId) {
-        this.facebookId = facebookId;
+    public String getName() {
+        return name;
     }
 
-    public long getUserId() {
-        return userId;
+    public boolean isAnon() {
+        return facebookId == null;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if (!(other instanceof User)) return false;
+        User that = (User) other;
+        return MyObjects.equals(userId, that.userId) &&
+                MyObjects.equals(facebookId, that.facebookId) &&
+                MyObjects.equals(name, that.name) &&
+                MyObjects.equals(gender, that.gender);
+    }
+
+    @Override
+    public int hashCode() {
+        return MyObjects.hash(userId, facebookId, name, gender);
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId='" + userId + '\'' +
+                ", facebookId='" + facebookId + '\'' +
+                ", name='" + name + '\'' +
+                ", gender='" + gender + '\'' +
+                '}';
     }
 
     @Override
@@ -70,37 +91,9 @@ public class User implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(userId);
-        dest.writeString(name);
-        dest.writeString(facebookId);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        User user = (User) o;
-
-        if (userId != user.userId) return false;
-        if (name != null ? !name.equals(user.name) : user.name != null) return false;
-        return !(facebookId != null ? !facebookId.equals(user.facebookId) : user.facebookId != null);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + (facebookId != null ? facebookId.hashCode() : 0);
-        result = 31 * result + (int) (userId ^ (userId >>> 32));
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "name='" + name + '\'' +
-                ", facebookId='" + facebookId + '\'' +
-                ", userId='" + userId + '\'' +
-                '}';
+        dest.writeLong(this.userId);
+        dest.writeString(this.facebookId);
+        dest.writeString(this.name);
+        dest.writeString(this.gender);
     }
 }

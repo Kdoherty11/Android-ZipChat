@@ -1,48 +1,66 @@
 package com.kdoherty.zipchat.models;
 
+import android.os.Parcel;
+
+import com.kdoherty.zipchat.utils.MyObjects;
+
 /**
  * Created by kdoherty on 12/14/14.
  */
-public class PrivateRoom {
+public class PrivateRoom extends AbstractRoom {
 
-    private long roomId;
+    public static final Creator<PrivateRoom> CREATOR = new Creator<PrivateRoom>() {
+        public PrivateRoom createFromParcel(Parcel source) {
+            return new PrivateRoom(source);
+        }
+
+        public PrivateRoom[] newArray(int size) {
+            return new PrivateRoom[size];
+        }
+    };
     private User other;
-    private long lastActivity;
     private User sender;
     private User receiver;
+    private boolean senderInRoom;
+    private boolean receiverInRoom;
+
+    public PrivateRoom() {
+        super(RoomType.PRIVATE);
+    }
 
     public PrivateRoom(long roomId, User other, long lastActivity) {
-        this.roomId = roomId;
+        super(RoomType.PRIVATE, roomId);
         this.other = other;
         this.lastActivity = lastActivity;
     }
 
-    public User getOther() {
-        return other;
-    }
-
-    public long getLastActivity() {
-        return lastActivity;
-    }
-
-    public long getId() {
-        return roomId;
+    protected PrivateRoom(Parcel in) {
+        super(in);
+        this.other = in.readParcelable(User.class.getClassLoader());
+        this.sender = in.readParcelable(User.class.getClassLoader());
+        this.receiver = in.readParcelable(User.class.getClassLoader());
+        this.senderInRoom = in.readByte() != 0;
+        this.receiverInRoom = in.readByte() != 0;
     }
 
     public User getSender() {
         return sender;
     }
 
-    public void setSender(User sender) {
-        this.sender = sender;
-    }
-
     public User getReceiver() {
         return receiver;
     }
 
-    public void setReceiver(User receiver) {
-        this.receiver = receiver;
+    public boolean isSenderInRoom() {
+        return senderInRoom;
+    }
+
+    public boolean isReceiverInRoom() {
+        return receiverInRoom;
+    }
+
+    public User getOther() {
+        return other;
     }
 
     public User getAndSetOther(long userId) {
@@ -55,6 +73,28 @@ public class PrivateRoom {
     }
 
     @Override
+    public boolean canEqual(Object other) {
+        return other instanceof PrivateRoom;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if (!(other instanceof PrivateRoom)) return false;
+        PrivateRoom that = (PrivateRoom) other;
+        return that.canEqual(this) && super.equals(that) &&
+                MyObjects.equals(senderInRoom, that.senderInRoom) &&
+                MyObjects.equals(receiverInRoom, that.receiverInRoom) &&
+                MyObjects.equals(sender, that.sender) &&
+                MyObjects.equals(receiver, that.receiver);
+    }
+
+    @Override
+    public int hashCode() {
+        return MyObjects.hash(super.hashCode(), sender, receiver, senderInRoom, receiverInRoom);
+    }
+
+    @Override
     public String toString() {
         return "PrivateRoom{" +
                 "roomId=" + roomId +
@@ -63,5 +103,20 @@ public class PrivateRoom {
                 ", sender=" + sender +
                 ", receiver=" + receiver +
                 '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeParcelable(this.other, 0);
+        dest.writeParcelable(this.sender, 0);
+        dest.writeParcelable(this.receiver, 0);
+        dest.writeByte(senderInRoom ? (byte) 1 : (byte) 0);
+        dest.writeByte(receiverInRoom ? (byte) 1 : (byte) 0);
     }
 }

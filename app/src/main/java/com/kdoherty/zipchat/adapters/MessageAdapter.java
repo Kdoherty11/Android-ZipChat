@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -31,6 +32,7 @@ import com.kdoherty.zipchat.views.AnimateFirstDisplayListener;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -49,7 +51,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
     private final LayoutInflater mInflater;
     private final List<Message> mMessages;
     private final Handler mFavoriteEventHandler = new Handler();
-    private MessageFavoriteListener mMessageFavListener;
+    private SocketEventListener mMessageFavListener;
     private boolean mHasPendingFavorite;
     private SendFavoriteEventRunnable mSendFavoriteEvent;
     private Message.FavoriteState mInitialFavoriteState;
@@ -61,11 +63,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
     private int mOtherBoarderColor;
     private long mAnonUserId;
 
-    public MessageAdapter(Activity activity, List<Message> messages, MessageFavoriteListener messageFavoriteListener) {
-        this(activity, messages, 0, messageFavoriteListener);
+    public MessageAdapter(Activity activity, List<Message> messages, SocketEventListener socketEventListener) {
+        this(activity, messages, 0, socketEventListener);
     }
 
-    public MessageAdapter(Activity activity, List<Message> messages, long anonUserId, MessageFavoriteListener messageFavoriteListener) {
+    public MessageAdapter(Activity activity, List<Message> messages, long anonUserId, SocketEventListener socketEventListener) {
         if (activity == null) {
             throw new IllegalArgumentException("Context is null");
         }
@@ -76,7 +78,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         mMessages = messages;
         mActivity = activity;
         mAnonUserId = anonUserId;
-        mMessageFavListener = messageFavoriteListener;
+        mMessageFavListener = socketEventListener;
         ZipChatApplication.initImageLoader(mActivity);
         mSelfUserId = UserManager.getId(mActivity);
         mSelfBorderColorId = mActivity.getResources().getColor(R.color.orange);
@@ -107,11 +109,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
     }
 
     @Override
-    public void onBindViewHolder(final MessageCellViewHolder messageCellViewHolder, int i) {
+    public void onBindViewHolder(final MessageCellViewHolder messageCellViewHolder, final int i) {
         final Message message = mMessages.get(i);
         final User sender = message.getSender();
+        final boolean isAnon = TextUtils.isEmpty(sender.getFacebookId());
 
-        if (TextUtils.isEmpty(sender.getFacebookId())) {
+        if (isAnon) {
             messageCellViewHolder.profilePicture.setImageDrawable(mActivity.getResources().getDrawable(R.drawable.com_facebook_profile_picture_blank_square));
         } else {
             ImageLoader.getInstance().displayImage(FacebookManager.getProfilePicUrl(sender.getFacebookId()), messageCellViewHolder.profilePicture,
@@ -165,6 +168,24 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
                     mActivity.startActivityForResult(intent, MessageDetailsActivity.MESSAGE_FAVORITED_RESULT);
                 }
             });
+        } else if (message.didTimeout()) {
+            messageCellViewHolder.unconfirmedMsgPb.setVisibility(View.GONE);
+
+            messageCellViewHolder.failedMsgLayout.setVisibility(View.VISIBLE);
+
+            messageCellViewHolder.retrySendMsgBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mMessageFavListener.sendTalkEvent(message.getMessage(), isAnon);
+                }
+            });
+            messageCellViewHolder.deleteUnsentMsgBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    removeMessage(i);
+                }
+            });
+
         } else {
             // not yet confirmed
             messageCellViewHolder.unconfirmedMsgPb.setVisibility(View.VISIBLE);
@@ -174,6 +195,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(
                 message.getCreatedAt() * 1000);
         messageCellViewHolder.timestamp.setText(timeAgo);
+    }
+
+    private void removeMessage(int position) {
+        mMessages.remove(position);
+        notifyItemRemoved(position);
     }
 
     @Override
@@ -201,7 +227,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
     }
 
     public void confirmMessage(String uuid, Message msg) {
-        int msgIndex = findUnconfirmedMsgIndex(uuid);
+        int msgIndex = findUnsentMessageByUuid(uuid);
         if (msgIndex > -1) {
             Log.d(TAG, "Confirming message at index: " + msgIndex);
             mMessages.set(msgIndex, msg);
@@ -213,7 +239,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         }
     }
 
-    private int findUnconfirmedMsgIndex(String uuid) {
+    private int findUnsentMessageByUuid(String uuid) {
         int numMessages = mMessages.size();
         for (int i = 0; i < numMessages; i++) {
             Message message = mMessages.get(i);
@@ -267,12 +293,33 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
 
     public void updateMessage(Message message) {
         int messageIndex = indexOfMessageById(message.getMessageId());
-        mMessages.add(messageIndex, message);
+        mMessages.set(messageIndex, message);
         notifyItemChanged(messageIndex);
     }
 
-    public interface MessageFavoriteListener {
+    public void notifyItemsChanged(List<Integer> changedIndices) {
+        for (Integer index : changedIndices) {
+            notifyItemChanged(index);
+        }
+    }
+
+    public void timeoutUnconfirmedMessages() {
+        List<Integer> timedOutMessageIndices = new ArrayList<>();
+        for (int i = 0; i < mMessages.size(); i++) {
+            Message msg = mMessages.get(i);
+            if (!msg.isConfirmed()) {
+                timedOutMessageIndices.add(i);
+                msg.setDidTimeout(true);
+            }
+        }
+
+        notifyItemsChanged(timedOutMessageIndices);
+    }
+
+    public interface SocketEventListener {
         void sendFavoriteEvent(long messageId, boolean isFavorite);
+
+        void sendTalkEvent(String text, boolean isAnon);
     }
 
     private class SendFavoriteEventRunnable implements Runnable {
@@ -366,6 +413,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         private TextView timestamp;
         private LinearLayout favoriteLayout;
         private ProgressBar unconfirmedMsgPb;
+        private LinearLayout failedMsgLayout;
+        private Button retrySendMsgBtn;
+        private Button deleteUnsentMsgBtn;
 
         public MessageCellViewHolder(View itemView) {
             super(itemView);
@@ -378,6 +428,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
             favoriteCount = (TextView) favoriteLayout.findViewById(R.id.message_favorite_count);
             timestamp = (TextView) itemView.findViewById(R.id.message_timestamp);
             unconfirmedMsgPb = (ProgressBar) itemView.findViewById(R.id.unconfirmed_msg_pb);
+            failedMsgLayout = (LinearLayout) itemView.findViewById(R.id.message_timeout_layout);
+            retrySendMsgBtn = (Button) failedMsgLayout.findViewById(R.id.retry_send_msg_btn);
+            deleteUnsentMsgBtn = (Button) failedMsgLayout.findViewById(R.id.delete_unsent_msg_btn);
         }
     }
 }

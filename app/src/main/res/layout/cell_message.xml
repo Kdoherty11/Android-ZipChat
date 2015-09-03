@@ -30,6 +30,30 @@
         android:textColor="@color/zipchat_blue"
         android:textSize="8sp" />
 
+    <LinearLayout
+        android:id="@+id/message_timeout_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/retry_send_msg_btn"
+            android:text="@string/retry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/delete_unsent_msg_btn"
+            android:text="@string/delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
     <ProgressBar
         android:id="@+id/unconfirmed_msg_pb"
         android:layout_width="32dp"

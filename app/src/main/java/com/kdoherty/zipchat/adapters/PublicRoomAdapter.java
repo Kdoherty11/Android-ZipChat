@@ -17,9 +17,9 @@ import android.widget.TextView;
 
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.PublicRoomActivity;
+import com.kdoherty.zipchat.fragments.HomeTabsFragment;
 import com.kdoherty.zipchat.models.PublicRoom;
 import com.kdoherty.zipchat.models.PublicRoomComparators;
-import com.kdoherty.zipchat.models.SortingTabs;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -82,7 +82,7 @@ public class PublicRoomAdapter extends RecyclerView.Adapter<PublicRoomAdapter.Ch
         return mFilteredPublicRooms.get(position);
     }
 
-    public void sortRooms(SortingTabs tab) {
+    public void sortRooms(HomeTabsFragment.TabType tab) {
         switch (tab) {
             case DISTANCE:
                 Collections.sort(mPublicRooms, PublicRoomComparators.DistanceComparator.ASCENDING);

@@ -1,16 +1,15 @@
 package com.kdoherty.zipchat.models;
 
 import android.os.Parcel;
-import android.os.Parcelable;
 
-import java.util.List;
+import com.kdoherty.zipchat.utils.MyObjects;
 
 /**
  * Created by kdoherty on 12/14/14.
  */
-public class PublicRoom implements Parcelable {
+public class PublicRoom extends AbstractRoom {
 
-    public static final Parcelable.Creator<PublicRoom> CREATOR = new Parcelable.Creator<PublicRoom>() {
+    public static final Creator<PublicRoom> CREATOR = new Creator<PublicRoom>() {
         public PublicRoom createFromParcel(Parcel source) {
             return new PublicRoom(source);
         }
@@ -19,19 +18,19 @@ public class PublicRoom implements Parcelable {
             return new PublicRoom[size];
         }
     };
-    private int position;
-    private List<Message> messages;
+    private String name;
     private double latitude;
     private double longitude;
     private int radius;
-    private long timeStamp;
+    private int position;
     private int distance = -1;
-    private long roomId;
-    private String name;
-    private long lastActivity;
+
+    public PublicRoom() {
+        super(RoomType.PUBLIC);
+    }
 
     public PublicRoom(long roomId, String name, int radius, double latitude, double longitude) {
-        this.roomId = roomId;
+        super(RoomType.PUBLIC, roomId);
         this.name = name;
         this.radius = radius;
         this.latitude = latitude;
@@ -39,72 +38,33 @@ public class PublicRoom implements Parcelable {
     }
 
     protected PublicRoom(Parcel in) {
-        this.position = in.readInt();
-        this.messages = in.createTypedArrayList(Message.CREATOR);
+        super(in);
+        this.name = in.readString();
         this.latitude = in.readDouble();
         this.longitude = in.readDouble();
         this.radius = in.readInt();
-        this.timeStamp = in.readLong();
+        this.position = in.readInt();
         this.distance = in.readInt();
-        this.roomId = in.readLong();
-        this.name = in.readString();
-        this.lastActivity = in.readLong();
     }
 
-    public long getLastActivity() {
-        return lastActivity;
-    }
-
-    public void setLastActivity(long lastActivity) {
-        this.lastActivity = lastActivity;
-    }
-
-    public int getPosition() {
-        return position;
-    }
-
-    public void setPosition(int position) {
-        this.position = position;
-    }
-
-    public List<Message> getMessages() {
-        return messages;
-    }
-
-    public void setMessages(List<Message> messages) {
-        this.messages = messages;
+    public String getName() {
+        return name;
     }
 
     public double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
     public double getLongitude() {
         return longitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
     }
 
     public int getRadius() {
         return radius;
     }
 
-    public void setRadius(int radius) {
-        this.radius = radius;
-    }
-
-    public long getTimeStamp() {
-        return timeStamp;
-    }
-
-    public void setTimeStamp(long timeStamp) {
-        this.timeStamp = timeStamp;
+    public int getPosition() {
+        return position;
     }
 
     public int getDistance() {
@@ -115,16 +75,26 @@ public class PublicRoom implements Parcelable {
         this.distance = distance;
     }
 
-    public long getRoomId() {
-        return roomId;
+    @Override
+    public boolean canEqual(Object other) {
+        return other instanceof PublicRoom;
     }
 
-    public void setRoomId(long roomId) {
-        this.roomId = roomId;
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if (!(other instanceof PublicRoom)) return false;
+        PublicRoom that = (PublicRoom) other;
+        return that.canEqual(this) && super.equals(that) &&
+                MyObjects.equals(name, that.name) &&
+                MyObjects.equals(latitude, that.latitude) &&
+                MyObjects.equals(longitude, that.longitude) &&
+                MyObjects.equals(radius, that.radius);
     }
 
-    public String getName() {
-        return name;
+    @Override
+    public int hashCode() {
+        return MyObjects.hash(super.hashCode(), name, latitude, longitude, radius);
     }
 
     @Override
@@ -134,15 +104,12 @@ public class PublicRoom implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.position);
-        dest.writeTypedList(messages);
+        super.writeToParcel(dest, flags);
+        dest.writeString(this.name);
         dest.writeDouble(this.latitude);
         dest.writeDouble(this.longitude);
         dest.writeInt(this.radius);
-        dest.writeLong(this.timeStamp);
+        dest.writeInt(this.position);
         dest.writeInt(this.distance);
-        dest.writeLong(this.roomId);
-        dest.writeString(this.name);
-        dest.writeLong(this.lastActivity);
     }
 }
