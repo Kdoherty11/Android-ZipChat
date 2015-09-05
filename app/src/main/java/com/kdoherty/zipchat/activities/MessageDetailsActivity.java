@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +31,7 @@ import com.kdoherty.zipchat.fragments.ChatRoomFragment;
 import com.kdoherty.zipchat.fragments.MessageFavoritesFragment;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
+import com.kdoherty.zipchat.notifications.AbstractNotification;
 import com.kdoherty.zipchat.services.MyGcmListenerService;
 import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.FacebookManager;
@@ -74,18 +76,18 @@ public class MessageDetailsActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
 
-            if (extras != null && extras.containsKey(MyGcmListenerService.Key.EVENT)) {
-                String event = intent.getStringExtra(MyGcmListenerService.Key.EVENT);
+            if (extras != null && extras.containsKey(MyGcmListenerService.EVENT_KEY)) {
+                String event = intent.getStringExtra(MyGcmListenerService.EVENT_KEY);
 
                 boolean isMessageFavorite = MyGcmListenerService.Event.MESSAGE_FAVORITED.equals(event);
 
                 if (isMessageFavorite) {
                     Gson gson = new Gson();
-                    Message message = gson.fromJson(intent.getStringExtra(MyGcmListenerService.Key.MESSAGE), Message.class);
+                    Message message = gson.fromJson(intent.getStringExtra(AbstractNotification.Key.MESSAGE), Message.class);
                     boolean isThisMessage = mMessage.getMessageId() == message.getMessageId();
 
                     if (isThisMessage) {
-                        User user = gson.fromJson(extras.getString(MyGcmListenerService.Key.USER), User.class);
+                        User user = gson.fromJson(extras.getString(AbstractNotification.Key.USER), User.class);
                         addFavorite(user);
                         Utils.debugToast(context, "Success intercepting gcm and fromJson on message and user");
                         abortBroadcast();
@@ -126,7 +128,8 @@ public class MessageDetailsActivity extends AppCompatActivity {
         }
 
         mMessage = getIntent().getParcelableExtra(EXTRA_MESSAGE);
-        long anonUserId = getIntent().getLongExtra(EXTRA_ANON_USER_ID, 0);
+        mMessage.initFavoriteState(UserManager.getId(this));
+
         mInitialFavorites = new ArrayList<>(mMessage.getFavorites());
 
         mSenderProfPicCiv = (CircleImageView) findViewById(R.id.message_picture);
@@ -142,6 +145,8 @@ public class MessageDetailsActivity extends AppCompatActivity {
         mFavoritesDividerLine = findViewById(R.id.divider_line);
         mFavoritesTitleTv = (TextView) findViewById(R.id.favorites_title);
 
+        long anonUserId = getIntent().getLongExtra(EXTRA_ANON_USER_ID, 0l);
+        Log.d(TAG, "anonUserId: " + anonUserId);
         populateMessageDetails(anonUserId);
     }
 

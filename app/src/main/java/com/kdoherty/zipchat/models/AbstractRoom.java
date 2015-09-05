@@ -7,6 +7,7 @@ import com.google.gson.annotations.JsonAdapter;
 import com.kdoherty.zipchat.utils.MyObjects;
 import com.kdoherty.zipchat.utils.RuntimeTypeAdapterFactory;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -19,7 +20,7 @@ public abstract class AbstractRoom implements Parcelable {
     protected long createdAt;
     protected long lastActivity;
     protected List<Message> messages;
-    protected RoomType type;
+    public RoomType type;
 
     AbstractRoom(RoomType type) {
         this.type = type;
@@ -89,7 +90,7 @@ public abstract class AbstractRoom implements Parcelable {
         dest.writeTypedList(messages);
     }
 
-    protected enum RoomType {
+    public enum RoomType {
         PUBLIC, PRIVATE
     }
 

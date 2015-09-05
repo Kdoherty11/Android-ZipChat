@@ -12,10 +12,11 @@ import com.kdoherty.zipchat.notifications.MessageNotification;
 public class MyGcmListenerService extends GcmListenerService {
 
     private static final String TAG = MyGcmListenerService.class.getSimpleName();
-    private static final String EVENT_KEY = "event";
+    public static final String EVENT_KEY = "event";
 
     @Override
     public void onMessageReceived(String from, Bundle data) {
+        Log.d(TAG, "onMessageReceived: " + data);
         final String event = data.getString(EVENT_KEY, "No event found in received message");
 
         switch (event) {

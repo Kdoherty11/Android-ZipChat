@@ -15,11 +15,17 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
 import com.kdoherty.zipchat.activities.HomeActivity;
+import com.kdoherty.zipchat.activities.MessageDetailsActivity;
 import com.kdoherty.zipchat.activities.PrivateRoomActivity;
 import com.kdoherty.zipchat.activities.PublicRoomActivity;
+import com.kdoherty.zipchat.models.AbstractRoom;
+import com.kdoherty.zipchat.models.Message;
+import com.kdoherty.zipchat.models.PrivateRoom;
 import com.kdoherty.zipchat.models.PublicRoom;
 import com.kdoherty.zipchat.models.User;
+import com.kdoherty.zipchat.utils.GsonProvider;
 import com.kdoherty.zipchat.utils.LocationManager;
+import com.kdoherty.zipchat.utils.UserManager;
 
 import java.util.concurrent.TimeUnit;
 
@@ -34,7 +40,7 @@ public abstract class AbstractNotification {
     protected static final int LIGHT_OFF_MS = 4000;
     protected static final int LIGHT_COLOR = Color.argb(0, 93, 188, 210);
     private static final String TAG = AbstractNotification.class.getSimpleName();
-    protected final Gson mGson = new Gson();
+    protected final Gson mGson = GsonProvider.getInstance();
     protected final Context mContext;
     protected NotificationManager mNotificationManager;
 
@@ -51,6 +57,28 @@ public abstract class AbstractNotification {
         }
 
         mNotificationManager.notify(NOTIFICATION_ID, notification);
+    }
+
+    protected PendingIntent getMessageDetailsPendingIntent(Message message, AbstractRoom room, boolean includeRoomIntent) {
+        Intent messageDetailsIntent = MessageDetailsActivity.getIntent(mContext, message);
+
+        TaskStackBuilder builder = TaskStackBuilder.create(mContext)
+                .addNextIntent(new Intent(mContext, HomeActivity.class));
+
+        if (includeRoomIntent) {
+            Intent roomIntent;
+            if (room.isPublic()) {
+                roomIntent = PublicRoomActivity.getIntent(mContext, (PublicRoom) room);
+            } else {
+                PrivateRoom privateRoom = (PrivateRoom) room;
+                User other = privateRoom.getAndSetOther(UserManager.getId(mContext));
+                roomIntent = PrivateRoomActivity.getIntent(mContext, room.getRoomId(), other);
+            }
+            builder.addNextIntent(roomIntent);
+        }
+
+        return builder.addNextIntent(messageDetailsIntent)
+                .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     protected PendingIntent getPublicRoomPendingIntent(PublicRoom publicRoom) {
@@ -94,10 +122,10 @@ public abstract class AbstractNotification {
         return false;
     }
 
-    protected class Key {
-        protected static final String USER = "user";
-        protected static final String ROOM = "room";
-        protected static final String MESSAGE = "message";
-        protected static final String CHAT_REQUEST_RESPONSE = "response";
+    public class Key {
+        public static final String USER = "user";
+        public static final String ROOM = "room";
+        public static final String MESSAGE = "message";
+        public static final String CHAT_REQUEST_RESPONSE = "response";
     }
 }

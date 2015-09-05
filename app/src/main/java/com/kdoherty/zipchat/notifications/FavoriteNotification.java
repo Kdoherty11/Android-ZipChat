@@ -29,16 +29,9 @@ public class FavoriteNotification extends AbstractNotification {
 
     @Override
     public void handleNotification() {
-        if (room.isPublic()) {
-            PublicRoom publicRoom = (PublicRoom) room;
-            if (userInArea(publicRoom)) {
-                PendingIntent contentIntent = getPublicRoomPendingIntent(publicRoom);
-                notifyMessageFavorited(contentIntent, mMessageFavoritor.getName(), message.getMessage());
-            }
-        } else {
-            PendingIntent contentIntent = getPrivateRoomIntent(room.getRoomId(), mMessageFavoritor);
-            notifyMessageFavorited(contentIntent, mMessageFavoritor.getName(), message.getMessage());
-        }
+        boolean addRoomToBackStack = !room.isPublic() || userInArea((PublicRoom) room);
+        PendingIntent contentIntent = getMessageDetailsPendingIntent(message, room, addRoomToBackStack);
+        notifyMessageFavorited(contentIntent, mMessageFavoritor.getName(), message.getMessage());
     }
 
     private void notifyMessageFavorited(PendingIntent contentIntent, String userName, String message) {

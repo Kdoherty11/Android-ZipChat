@@ -95,6 +95,7 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
             @Override
             public void failure(RetrofitError error) {
                 NetworkManager.logErrorResponse(TAG, "Sending fb access token", error);
+                // Retry button?
                 mAuthPb.setVisibility(View.GONE);
                 mLoginButton.setVisibility(View.VISIBLE);
 

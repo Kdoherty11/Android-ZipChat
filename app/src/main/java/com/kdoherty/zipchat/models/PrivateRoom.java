@@ -63,8 +63,8 @@ public class PrivateRoom extends AbstractRoom {
         return other;
     }
 
-    public User getAndSetOther(long userId) {
-        if (userId == sender.getUserId()) {
+    public User getAndSetOther(long selfId) {
+        if (selfId == sender.getUserId()) {
             other = receiver;
         } else {
             other = sender;
