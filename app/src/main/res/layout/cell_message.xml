@@ -35,21 +35,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginTop="7dp"
         android:orientation="vertical"
         android:visibility="gone">
 
         <Button
             android:id="@+id/retry_send_msg_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/msg_send_failed_btns"
             android:text="@string/retry" />
 
         <Button
             android:id="@+id/delete_unsent_msg_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/msg_send_failed_btns"
+            android:layout_marginTop="7dp"
             android:text="@string/delete" />
 
     </LinearLayout>

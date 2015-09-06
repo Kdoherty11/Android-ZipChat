@@ -59,7 +59,7 @@ import retrofit.client.Response;
  */
 public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSocketConnectCallback, View.OnClickListener, MessageAdapter.MessageCellClickListener {
 
-    private static final String TAG = "KBD" + ChatRoomFragment.class.getSimpleName();
+    private static final String TAG = ChatRoomFragment.class.getSimpleName();
 
     private static final int MESSAGE_LIMIT = 25;
     private static final int ITEM_VIEW_CACHE_SIZE = 25;
@@ -359,8 +359,8 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     }
 
     @Override
-    public void onResendMessageClick(String text, boolean isAnon) {
-        sendTalkEvent(text, isAnon, UUID.randomUUID().toString());
+    public void onResendMessageClick(Message message) {
+        mRoomSocket.sendTalk(message.getMessage(), message.getSender().isAnon(), message.getUuid(), false);
     }
 
     @Override

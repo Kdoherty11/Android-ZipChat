@@ -38,7 +38,7 @@ import retrofit.client.Response;
 
 public class PublicRoomActivity extends AbstractLocationActivity {
 
-    private static final String TAG = "KBD" + PublicRoomActivity.class.getSimpleName();
+    private static final String TAG = PublicRoomActivity.class.getSimpleName();
 
     private static final String EXTRA_ROOM = "PublicRoomActivityRoomExtra";
 

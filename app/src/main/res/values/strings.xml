@@ -61,6 +61,7 @@
     <string name="create">CREATE</string>
     <string name="enter_message">Enter Message</string>
     <string name="menu">Menu</string>
+    <string name="pending">Pending</string>
 
     <string-array name="home_tab_titles">
         <item>Nearby Rooms</item>

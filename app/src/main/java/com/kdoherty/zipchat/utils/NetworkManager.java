@@ -105,6 +105,7 @@ public final class NetworkManager {
         Crashlytics.log(Log.ERROR, tag, errorMessage);
 
         if (status == 401) {
+            Log.w(TAG, "Status was 401 redirecting to LoginActivity");
             Intent loginIntent = new Intent(context, LoginActivity.class);
             context.startActivity(loginIntent);
             if (context instanceof Activity) {

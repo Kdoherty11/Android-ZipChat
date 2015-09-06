@@ -56,7 +56,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
     private SendFavoriteEventRunnable mSendFavoriteEvent;
     private Message.FavoriteState mInitialFavoriteState;
     private long mSelfUserId;
-    private AbstractRoom mRoom;
 
     private ImageLoadingListener mAnimateFirstListener = new AnimateFirstDisplayListener();
     private Activity mActivity;
@@ -110,8 +109,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
     }
 
     @Override
-    public void onBindViewHolder(final MessageCellViewHolder messageCellViewHolder, final int i) {
-        final Message message = mMessages.get(i);
+    public void onBindViewHolder(final MessageCellViewHolder messageCellViewHolder, final int position) {
+        final Message message = mMessages.get(position);
         final User sender = message.getSender();
         final boolean isAnon = TextUtils.isEmpty(sender.getFacebookId());
 
@@ -143,8 +142,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         long userId = UserManager.getId(mActivity);
         if (message.isConfirmed()) {
             messageCellViewHolder.unconfirmedMsgPb.setVisibility(View.GONE);
-            messageCellViewHolder.favoriteLayout.setVisibility(View.VISIBLE);
+            messageCellViewHolder.failedMsgLayout.setVisibility(View.GONE);
 
+            messageCellViewHolder.favoriteLayout.setVisibility(View.VISIBLE);
             messageCellViewHolder.favorite.setOnClickListener(new FavoriteClickListener(message, userId));
 
             Message.FavoriteState favoriteState = message.getFavoriteState(userId);
@@ -169,27 +169,31 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
                 }
             });
         } else if (message.didTimeout()) {
+            messageCellViewHolder.favoriteLayout.setVisibility(View.GONE);
             messageCellViewHolder.unconfirmedMsgPb.setVisibility(View.GONE);
-
             messageCellViewHolder.failedMsgLayout.setVisibility(View.VISIBLE);
 
             messageCellViewHolder.retrySendMsgBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mClickCallbacks.onResendMessageClick(message.getMessage(), isAnon);
+                    message.setDidTimeout(false);
+                    notifyItemChanged(position);
+                    mClickCallbacks.onResendMessageClick(message);
                 }
             });
             messageCellViewHolder.deleteUnsentMsgBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    removeMessage(i);
+                    removeMessage(position);
                 }
             });
-
+            messageCellViewHolder.timestamp.setText(mActivity.getResources().getString(R.string.pending));
         } else {
             // not yet confirmed
-            messageCellViewHolder.unconfirmedMsgPb.setVisibility(View.VISIBLE);
+            messageCellViewHolder.failedMsgLayout.setVisibility(View.GONE);
             messageCellViewHolder.favoriteLayout.setVisibility(View.GONE);
+            messageCellViewHolder.unconfirmedMsgPb.setVisibility(View.VISIBLE);
+            messageCellViewHolder.timestamp.setText(mActivity.getResources().getString(R.string.pending));
         }
 
         CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(
@@ -229,7 +233,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
     public void confirmMessage(String uuid, Message msg) {
         int msgIndex = findUnsentMessageByUuid(uuid);
         if (msgIndex > -1) {
-            Log.d(TAG, "Confirming message at index: " + msgIndex);
             mMessages.set(msgIndex, msg);
             notifyItemChanged(msgIndex);
         } else {
@@ -318,9 +321,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
 
     public interface MessageCellClickListener {
         void onFavoriteClick(long messageId, boolean isFavorite);
-
-        void onResendMessageClick(String text, boolean isAnon);
-
+        void onResendMessageClick(Message message);
         void onMessageClick(Message message);
     }
 

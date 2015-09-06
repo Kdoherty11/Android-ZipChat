@@ -38,8 +38,8 @@ import java.util.Queue;
 public class RoomSocket {
 
     private static final String KEEP_ALIVE_MSG = "Beat";
-    private static final String TAG = "KBD" + RoomSocket.class.getSimpleName();
-    private static final long BACKOFF_MILLIS = 2500;
+    private static final String TAG = RoomSocket.class.getSimpleName();
+    private static final long BACKOFF_MILLIS = 2000;
     private static final int MAX_NUM_RETRY_ATTEMPTS = 4;
     private final long userId;
     private Queue<JSONObject> mSocketEventQueue = new ArrayDeque<>();
@@ -132,6 +132,8 @@ public class RoomSocket {
             } else if (mNumRetryAttempts++ <= MAX_NUM_RETRY_ATTEMPTS) {
                 reconnectWithRetry();
             } else {
+                mIsReconnecting = false;
+                mNumRetryAttempts = 0;
                 BusProvider.getInstance().post(new SocketReconnectTimeout());
                 Log.e(TAG, "Done trying to reconnect to the socket after " + MAX_NUM_RETRY_ATTEMPTS + " attempts");
             }
@@ -165,6 +167,10 @@ public class RoomSocket {
     }
 
     public void sendTalk(String message, boolean isAnon, String uuid) {
+        sendTalk(message, isAnon, uuid, true);
+    }
+
+    public void sendTalk(String message, boolean isAnon, String uuid, boolean addToQueue) {
         JSONObject talkEvent = new JSONObject();
         try {
             talkEvent.put("event", "talk");
@@ -176,7 +182,7 @@ public class RoomSocket {
             return;
         }
 
-        send(talkEvent);
+        send(talkEvent, addToQueue);
     }
 
     public void sendFavorite(long messageId, boolean isFavorite) {
@@ -194,10 +200,14 @@ public class RoomSocket {
     }
 
     private void send(JSONObject event) {
+        send(event, true);
+    }
+
+    private void send(JSONObject event, boolean addToQueue) {
         if (socketIsAvailable()) {
             mWebSocket.send(event.toString());
         } else {
-            sendEventSocketNotAvailable(event);
+            sendEventSocketNotAvailable(event, addToQueue);
         }
     }
 
@@ -205,17 +215,20 @@ public class RoomSocket {
         return mWebSocket != null && mWebSocket.isOpen();
     }
 
-    private void sendEventSocketNotAvailable(JSONObject event) {
+    private void sendEventSocketNotAvailable(JSONObject event, boolean addToQueue) {
         String err = "WebSocket is closed when trying to send "
                 + event.toString() + "... Adding event to queue";
         Utils.debugToast(mContext, err);
         Log.w(TAG, err);
-        mSocketEventQueue.add(event);
+
+        if (addToQueue) {
+            mSocketEventQueue.add(event);
+        }
 
         reconnect();
     }
 
-    private void reconnect() {
+    private synchronized void reconnect() {
         if (!mIsReconnecting) {
             Utils.debugToast(mContext, "ChatService is not currently connecting... Attempting to reconnect");
             mIsReconnecting = true;

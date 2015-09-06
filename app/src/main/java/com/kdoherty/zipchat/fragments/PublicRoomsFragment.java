@@ -257,15 +257,11 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
             @Override
             public void success(List<PublicRoom> publicRooms, Response response) {
                 populateList(publicRooms);
-                mSwipeRefreshLayout.setRefreshing(false);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                mSwipeRefreshLayout.setRefreshing(false);
-                if (mAdapter == null) {
-                    mAdapter = new PublicRoomAdapter(getActivity(), new ArrayList<PublicRoom>());
-                }
+                populateList(new ArrayList<PublicRoom>());
                 NetworkManager.handleErrorResponse(TAG, "Getting public rooms", error, getActivity());
             }
         });
