@@ -13,23 +13,13 @@
 
         <Button
             android:id="@+id/chat_request_accept_btn"
-            android:layout_width="@dimen/chat_request_buttons_width"
-            android:layout_height="@dimen/chat_request_buttons_height"
-            android:layout_margin="@dimen/chat_request_buttons_margins"
-            android:background="@drawable/chat_request_buttons_background"
-            android:text="@string/accept"
-            android:textSize="@dimen/chat_request_buttons_text_size" />
+            style="@style/chat_response_btns"
+            android:text="@string/accept" />
 
         <Button
             android:id="@+id/chat_request_deny_btn"
-            android:layout_width="@dimen/chat_request_buttons_width"
-            android:layout_height="@dimen/chat_request_buttons_height"
-            android:layout_marginBottom="@dimen/chat_request_buttons_margins"
-            android:layout_marginLeft="@dimen/chat_request_buttons_margins"
-            android:layout_marginRight="@dimen/chat_request_buttons_margins"
-            android:background="@drawable/chat_request_buttons_background"
-            android:text="@string/deny"
-            android:textSize="@dimen/chat_request_buttons_text_size" />
+            style="@style/chat_response_btns"
+            android:text="@string/deny" />
 
     </LinearLayout>
 

@@ -98,4 +98,12 @@
         <item name="android:background">@drawable/msg_send_failed_btns</item>
     </style>
 
+    <style name="chat_response_btns">
+        <item name="android:layout_width">@dimen/chat_request_buttons_width</item>
+        <item name="android:layout_height">@dimen/chat_request_buttons_height</item>
+        <item name="android:layout_margin">@dimen/chat_request_buttons_margins</item>
+        <item name="android:background">@drawable/chat_request_buttons_background</item>
+        <item name="android:textSize">@dimen/chat_request_buttons_text_size</item>
+    </style>
+
 </resources>
