@@ -10,89 +10,62 @@
     <string name="title_activity_create_room">Create Room</string>
     <string name="title_activity_chat_room_members">Members</string>
     <string name="title_activity_request">Chat Request</string>
+    <string name="title_activity_message_detail">Message</string>
 
-    <!-- ***** Home Screen Activity ***** -->
+    <!-- ***** Toast messages ***** -->
+    <string name="toast_no_internet">Internet connection not found. Please try again.</string>
+    <string name="toast_room_name_empty">Please enter a room name and try again</string>
+    <string name="toast_room_name_too_long">Please keep the room name to 50 or less characters</string>
+    <string name="toast_message_reported">Message Reported</string>
+    <string name="toast_message_reported_failed">You have already reported this message</string>
+    <string name="toast_msg_favorite_failed">"Could not favorite this message at this time. Please try again later"</string>
+    <string name="toast_remove_msg_favorite_failed">"Could not remove your favorite at this time. Please try again later"</string>
+    <string name="toast_user_left_room">has left the chat</string>
+    <string name="toast_login_failure">"Could not login… Please try again later"</string>
+
+    <!-- ***** Button Texts ***** -->
+    <string name="btn_text_create">+</string>
+    <string name="btn_text_send_request">Send Chat Request</string>
+    <string name="btn_text_already_chatting">"Already chatting"</string>
+
+    <!-- ***** App IDs ***** -->
+    <string name="facebook_app_id">1512980755633097</string>
+
+    <!-- ***** Strings ***** -->
+    <string name="retry">Retry</string>
+    <string name="delete">Delete</string>
+    <string name="message">Message</string>
+    <string name="are_you_sure_leave_room_prompt">Are you sure you want to leave this chat?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="no_rooms_in_area">No rooms found in this area</string>
+    <string name="no_private_chats">You are not in any private chats</string>
+    <string name="no_chat_requests">You have no new chat requests</string>
+    <string name="favorites">Favorites</string>
+    <string name="report">Report</string>
+    <string name="leave_chat">Leave Chat</string>
+    <string name="action_toggle_notifications_off">Notifications Off</string>
+    <string name="action_toggle_notifications_on">Notifications On</string>
+    <string name="my_location">My Location</string>
+    <string name="dialog_location_not_enabled">Location is not enabled</string>
+    <string name="fix">Fix</string>
+    <string name="cancel">Cancel</string>
+    <string name="distance">Distance</string>
+    <string name="activity">Activity</string>
+    <string name="accept">Accept</string>
+    <string name="deny">Deny</string>
+    <string name="search">Search</string>
+    <string name="name">Name</string>
+    <string name="create_room_name_hint">Room name</string>
+    <string name="radius">Radius</string>
+    <string name="create">CREATE</string>
+    <string name="enter_message">Enter Message</string>
+    <string name="menu">Menu</string>
+
     <string-array name="home_tab_titles">
         <item>Nearby Rooms</item>
         <item>My Chats</item>
         <item>Chat Requests</item>
-        <item>Notifications</item>
     </string-array>
 
-    <string name="home_create_room_button">+</string>
-
-    <!-- Home screen sorting tabs -->
-    <string name="home_sort_by_distance_tab">Distance</string>
-    <string name="home_sort_by_activity_tab">Activity</string>
-    <string name="home_sort_by_votes_tab">Votes</string>
-
-    <!-- Home screen chat request buttons -->
-    <string name="request_accept_button">Accept</string>
-    <string name="request_deny_button">Deny</string>
-
-    <!-- Home screen action bar -->
-    <string name="action_settings">Settings</string>
-    <string name="action_search">Search</string>
-    <string name="action_add_room">Add Room</string>
-    <string name="search">Search</string>
-
-    <!-- ***** Create Chat Room Activity ***** -->
-    <string name="create_room_name">Name</string>
-    <string name="create_room_name_hint">Room name</string>
-    <string name="create_room_radius">Radius</string>
-    <string name="create_room_small_option">Small</string>
-    <string name="create_room_medium_option">Medium</string>
-    <string name="create_room_large_option">Large </string>
-    <string name="create_room_create_button">CREATE</string>
-
-    <!-- ***** Chat Room Activity ***** -->
-    <string name="chat_room_activity_message_box_hint">Enter Message</string>
-    <string name="chat_room_activity_send_button">Send</string>
-    <string name="action_view_members">View Members</string>
-    <string name="user_message_name">Me</string>
-    <string name="public_room_drawer_open">Drawer Open</string>
-    <string name="public_room_drawer_closed">Drawer Closed</string>
-    <string name="public_room_drawer_members">Members</string>
-    <string name="public_room_drawer_settings">Settings</string>
-    <string name="action_toggle_drawer">Menu</string>
-
-    <!-- ***** Toast error messages ***** -->
-    <string name="default_no_internet_toast">Internet connection not found. Please try again.</string>
-    <string name="create_room_no_name_toast">Please enter a room name and try again</string>
-    <string name="create_room_name_too_long_toast">Please keep the room name to 50 or less characters</string>
-
-    <!-- ***** App IDs ***** -->
-    <!-- Facebook -->
-    <string name="facebook_app_id">1512980755633097</string>
-
-    <string name="location_not_enabled">Location is not enabled</string>
-    <string name="open_location_settings">Fix</string>
-    <string name="cancel_location_dialog">Cancel</string>
-
-    <string name="send_request_button">Send Chat Request</string>
-    <string name="action_toggle_notifications_off">Notifications Off</string>
-    <string name="action_toggle_notifications_on">Notifications On</string>
-    <string name="title_activity_message_detail">MessageDetailActivity</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="drawer_user_location_pin_title">My Location</string>
-    <string name="action_flag_message">Flag Message</string>
-
-    <string name="login_failure_toast">"Could not login… Please try again later"</string>
-    <string name="request_status_already_chatting">"Already chatting"</string>
-
-    <string name="action_leave_private_room">Leave Chat</string>
-    <string name="my_location_marker_title">"My Location"</string>
-    <string name="msg_favorite_failed_toast">"Could not favorite this message at this time. Please try again later"</string>
-    <string name="remove_msg_favorite_failed_toast">"Could not remove your favorite at this time. Please try again later"</string>
-    <string name="favorites">Favorites</string>
-    <string name="action_report_message">Report</string>
-    <string name="message_reported_toast">Message Reported</string>
-    <string name="message_reported_failed_toast">You have already reported this message</string>
-    <string name="retry">Retry</string>
-    <string name="delete">Delete</string>
-    <string name="message">Message</string>
-    <string name="user_left_room_toast">has left the chat</string>
-    <string name="are_you_sure_leave_room_prompt">Are you sure you want to leave this chat?</string>
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
 </resources>

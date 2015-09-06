@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.TextView;
 
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.adapters.RequestAdapter;
@@ -24,6 +25,7 @@ import com.kdoherty.zipchat.utils.UserManager;
 import com.kdoherty.zipchat.views.DividerItemDecoration;
 import com.squareup.otto.Subscribe;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit.Callback;
@@ -40,6 +42,7 @@ public class RequestsFragment extends Fragment implements SwipeRefreshLayout.OnR
     private RecyclerView mChatRequestsRv;
     private RequestAdapter mAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private TextView mNoRequestsTv;
 
     public RequestsFragment() {
 
@@ -53,7 +56,8 @@ public class RequestsFragment extends Fragment implements SwipeRefreshLayout.OnR
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        mChatRequestsRv = (RecyclerView) view.findViewById(R.id.chat_requests);
+        mNoRequestsTv = (TextView) view.findViewById(R.id.no_chat_requests_tv);
+        mChatRequestsRv = (RecyclerView) view.findViewById(R.id.chat_requests_rv);
         mChatRequestsRv.addItemDecoration(new DividerItemDecoration(getResources().getDrawable(R.drawable.message_list_divider), true, true));
         mChatRequestsRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         mChatRequestsRv.setItemAnimator(new DefaultItemAnimator());
@@ -85,6 +89,11 @@ public class RequestsFragment extends Fragment implements SwipeRefreshLayout.OnR
                 mSwipeRefreshLayout.setRefreshing(false);
                 mAdapter = new RequestAdapter(getActivity(), requests);
                 mChatRequestsRv.setAdapter(mAdapter);
+                if (requests.isEmpty()) {
+                    displayNoRequestsNotice();
+                } else {
+                    hideNoRequestsNotice();
+                }
             }
 
             @Override
@@ -93,6 +102,14 @@ public class RequestsFragment extends Fragment implements SwipeRefreshLayout.OnR
                 NetworkManager.handleErrorResponse(TAG, "Getting chat requests for a user with ID: " + userId, error, getActivity());
             }
         });
+    }
+
+    private void hideNoRequestsNotice() {
+        mNoRequestsTv.setVisibility(View.GONE);
+    }
+
+    private void displayNoRequestsNotice() {
+        mNoRequestsTv.setVisibility(View.VISIBLE);
     }
 
     @Subscribe

@@ -118,9 +118,9 @@ public class PrivateRoomAdapter extends RecyclerView.Adapter<PrivateRoomAdapter.
         public PrivateChatViewHolder(View itemView) {
             super(itemView);
             layout = (RelativeLayout) itemView;
-            title = (TextView) itemView.findViewById(R.id.private_chat_title);
-            lastActivity = (TextView) itemView.findViewById(R.id.private_chat_last_activity);
-            circleProfilePictureView = (CircleImageView) itemView.findViewById(R.id.private_chat_picture);
+            title = (TextView) itemView.findViewById(R.id.private_chat_title_tv);
+            lastActivity = (TextView) itemView.findViewById(R.id.private_chat_last_activity_tv);
+            circleProfilePictureView = (CircleImageView) itemView.findViewById(R.id.private_chat_picture_civ);
         }
 
     }

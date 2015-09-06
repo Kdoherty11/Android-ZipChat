@@ -11,8 +11,8 @@ import com.kdoherty.zipchat.notifications.MessageNotification;
 
 public class MyGcmListenerService extends GcmListenerService {
 
-    private static final String TAG = MyGcmListenerService.class.getSimpleName();
     public static final String EVENT_KEY = "event";
+    private static final String TAG = MyGcmListenerService.class.getSimpleName();
 
     @Override
     public void onMessageReceived(String from, Bundle data) {

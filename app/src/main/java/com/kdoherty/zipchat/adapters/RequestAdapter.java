@@ -106,11 +106,11 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
         public RequestViewHolder(View itemView) {
             super(itemView);
-            senderTv = (TextView) itemView.findViewById(R.id.chat_request_sender_name);
-            timeStamp = (TextView) itemView.findViewById(R.id.chat_request_time_stamp);
-            senderPicture = (CircleImageView) itemView.findViewById(R.id.chat_request_sender_picture);
-            acceptButton = (Button) itemView.findViewById(R.id.chat_request_accept_button);
-            denyButton = (Button) itemView.findViewById(R.id.chat_request_deny_button);
+            senderTv = (TextView) itemView.findViewById(R.id.chat_request_sender_name_tv);
+            timeStamp = (TextView) itemView.findViewById(R.id.chat_request_timestamp_tv);
+            senderPicture = (CircleImageView) itemView.findViewById(R.id.chat_request_sender_picture_civ);
+            acceptButton = (Button) itemView.findViewById(R.id.chat_request_accept_btn);
+            denyButton = (Button) itemView.findViewById(R.id.chat_request_deny_btn);
         }
     }
 

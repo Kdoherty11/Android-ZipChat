@@ -33,5 +33,62 @@
         <item name="color">@color/white</item>
     </style>
 
+    <style name="home_screen_empty_list_notice">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:layout_marginTop">36dp</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:visibility">gone</item>
+    </style>
+
+    <style name="activity_style">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">@color/white</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="home_screen_cell_timestamp">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_alignParentBottom">true</item>
+        <item name="android:layout_alignParentStart">true</item>
+        <item name="android:layout_marginBottom">4dp</item>
+        <item name="android:layout_marginStart">6dp</item>
+        <item name="android:textColor">@color/zipchat_blue</item>
+        <item name="android:textSize">@dimen/home_screen_cell_timestamp_text_size</item>
+    </style>
+
+    <style name="home_screen_cell_profile_picture">
+        <item name="android:layout_height">@dimen/home_screen_cell_prof_pic_dimens</item>
+        <item name="android:layout_width">@dimen/home_screen_cell_prof_pic_dimens</item>
+        <item name="android:layout_alignParentStart">true</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_marginBottom">12dp</item>
+        <item name="android:layout_marginStart">4dp</item>
+        <item name="android:layout_marginEnd">12dp</item>
+        <item name="android:layout_marginTop">12dp</item>
+    </style>
+
+    <style name="home_screen_cell_title">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">@dimen/home_screen_cell_title_text_size</item>
+    </style>
+
+    <style name="home_screen_cell">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/home_screen_cell_height</item>
+        <item name="android:background">@color/white</item>
+    </style>
+
+    <style name="home_screen_swipe_refresh">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentTop">true</item>
+    </style>
 
 </resources>

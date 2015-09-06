@@ -6,14 +6,17 @@
     android:background="@color/white"
     tools:context="com.kdoherty.zipchat.fragments.PublicRoomsFragment">
 
+    <TextView
+        android:id="@+id/no_rooms_in_area_tv"
+        style="@style/home_screen_empty_list_notice"
+        android:text="@string/no_rooms_in_area" />
+
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true">
+        style="@style/home_screen_swipe_refresh">
 
         <com.kdoherty.zipchat.views.QuickReturnRecyclerView
-            android:id="@+id/chat_rooms"
+            android:id="@+id/public_rooms_rv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:divider="@color/home_list_divider"
@@ -26,7 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_marginBottom="50dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"

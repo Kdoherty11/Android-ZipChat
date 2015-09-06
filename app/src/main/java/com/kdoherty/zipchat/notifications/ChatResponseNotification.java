@@ -4,11 +4,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
-import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.HomeActivity;
 import com.kdoherty.zipchat.events.RequestAcceptedEvent;
 import com.kdoherty.zipchat.models.Request;

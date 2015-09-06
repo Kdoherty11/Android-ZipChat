@@ -6,13 +6,13 @@
     android:background="@color/zipchat_blue">
 
     <Button
-        android:id="@+id/create_room_create_button"
+        android:id="@+id/create_room_create_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|center_vertical"
         android:background="@android:color/transparent"
         android:padding="@dimen/create_room_create_button_padding"
-        android:text="@string/create_room_create_button"
+        android:text="@string/create"
         android:textColor="@color/white"
         android:textSize="@dimen/create_room_create_button_text"
         android:textStyle="bold" />

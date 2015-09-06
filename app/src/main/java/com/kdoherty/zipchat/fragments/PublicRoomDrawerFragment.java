@@ -93,7 +93,7 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
 
-        mRoomMembersRv = (RecyclerView) view.findViewById(R.id.chat_room_drawer_list);
+        mRoomMembersRv = (RecyclerView) view.findViewById(R.id.room_members_rv);
         mRoomMembersRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
     }
@@ -196,7 +196,7 @@ public class PublicRoomDrawerFragment extends Fragment implements OnMapReadyCall
         mUserMarker = mGoogleMap.addMarker(
                 new MarkerOptions()
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
-                        .title(getResources().getString(R.string.my_location_marker_title))
+                        .title(getResources().getString(R.string.my_location))
                         .position(latLng));
     }
 

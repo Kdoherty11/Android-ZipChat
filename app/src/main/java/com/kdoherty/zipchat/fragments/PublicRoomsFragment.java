@@ -61,6 +61,7 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
     private RecyclerView mChatRoomsRv;
     private TabHost mTabHost;
     private TabWidget mSortingTabs;
+    private TextView mNoRoomsInAreaTv;
 
     private Map<String, ImageView> mDotIndicatorMap = new HashMap<>();
 
@@ -90,7 +91,8 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_public_rooms, container, false);
 
-        mChatRoomsRv = (QuickReturnRecyclerView) rootView.findViewById(R.id.chat_rooms);
+        mChatRoomsRv = (QuickReturnRecyclerView) rootView.findViewById(R.id.public_rooms_rv);
+        mNoRoomsInAreaTv = (TextView) rootView.findViewById(R.id.no_rooms_in_area_tv);
 
         return rootView;
     }
@@ -137,7 +139,6 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
             double latitude = publicRoom.getLatitude();
             double longitude = publicRoom.getLongitude();
 
-            // TODO Get from server
             int distance = (int) LocationManager.getDistance(location.getLatitude(), location.getLongitude(),
                     latitude, longitude);
             publicRoom.setDistance(distance);
@@ -145,22 +146,31 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
     }
 
     public void populateList(List<PublicRoom> publicRooms) {
-        setRoomDistances(publicRooms);
-
+        mSwipeRefreshLayout.setRefreshing(false);
         mAdapter = new PublicRoomAdapter(getActivity(), publicRooms);
         mChatRoomsRv.setAdapter(mAdapter);
 
-        //mChatRoomsRv.setReturningView(mQuickReturnView);
+        if (publicRooms.isEmpty()) {
+            displayNoRoomsFoundMessage();
+        } else {
+            hideNoRoomsFoundMessage();
+            setRoomDistances(publicRooms);
+            sortRooms();
+        }
+    }
 
-        mSwipeRefreshLayout.setRefreshing(false);
+    private void displayNoRoomsFoundMessage() {
+        mNoRoomsInAreaTv.setVisibility(View.VISIBLE);
+    }
 
-        sortRooms();
+    private void hideNoRoomsFoundMessage() {
+        mNoRoomsInAreaTv.setVisibility(View.GONE);
     }
 
     private void setupSortingTabs() {
 
-        String mSortByDistanceTab = getString(R.string.home_sort_by_distance_tab);
-        String mSortByActivityTab = getString(R.string.home_sort_by_activity_tab);
+        String mSortByDistanceTab = getString(R.string.distance);
+        String mSortByActivityTab = getString(R.string.activity);
 
         mCurrentTabTitle = mSortByDistanceTab;
 

@@ -164,9 +164,9 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_chat_room, container, false);
 
-        mMessagesRv = (RecyclerView) rootView.findViewById(R.id.chat_room_activity_messages);
-        mMessageBoxEt = (EditText) rootView.findViewById(R.id.chat_room_activity_message_box);
-        mAnonToggleCv = (CircleImageView) rootView.findViewById(R.id.anon_toggle);
+        mMessagesRv = (RecyclerView) rootView.findViewById(R.id.messages_rv);
+        mMessageBoxEt = (EditText) rootView.findViewById(R.id.message_box_et);
+        mAnonToggleCv = (CircleImageView) rootView.findViewById(R.id.anon_toggle_civ);
         mMessageLoadingPb = (ProgressBar) rootView.findViewById(R.id.messages_loading_pb);
 
         return rootView;
@@ -197,7 +197,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
             }
         });
 
-        view.findViewById(R.id.chat_room_activity_send_button).setOnClickListener(this);
+        view.findViewById(R.id.message_send_btn).setOnClickListener(this);
         if (mRoom.isPublic()) {
             mAnonToggleCv.setOnClickListener(this);
             ImageLoader.getInstance().displayImage(mProfilePicUrl, mAnonToggleCv,
@@ -211,10 +211,10 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     public void onClick(View view) {
         int id = view.getId();
         switch (id) {
-            case R.id.chat_room_activity_send_button:
+            case R.id.message_send_btn:
                 sendMessage();
                 break;
-            case R.id.anon_toggle:
+            case R.id.anon_toggle_civ:
                 mIsAnon = !mIsAnon;
                 if (mIsAnon) {
                     mAnonToggleCv.setImageDrawable(getResources().getDrawable(R.drawable.com_facebook_profile_picture_blank_square));

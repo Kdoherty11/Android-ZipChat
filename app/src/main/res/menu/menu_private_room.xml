@@ -6,7 +6,7 @@
     <item
         android:id="@+id/action_leave_room"
         android:orderInCategory="100"
-        android:title="@string/action_leave_private_room"
+        android:title="@string/leave_chat"
         app:showAsAction="never" />
 
 </menu>

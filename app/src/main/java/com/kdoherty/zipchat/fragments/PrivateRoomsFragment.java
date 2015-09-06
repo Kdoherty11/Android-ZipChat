@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.TextView;
 
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.adapters.PrivateRoomAdapter;
@@ -27,6 +28,7 @@ import com.kdoherty.zipchat.utils.UserManager;
 import com.kdoherty.zipchat.views.DividerItemDecoration;
 import com.squareup.otto.Subscribe;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -45,6 +47,7 @@ public class PrivateRoomsFragment extends Fragment implements Filterable, SwipeR
     private RecyclerView mPrivateChatsRv;
     private PrivateRoomAdapter mAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private TextView mNoPrivateRoomsTv;
 
     public PrivateRoomsFragment() {
 
@@ -58,7 +61,8 @@ public class PrivateRoomsFragment extends Fragment implements Filterable, SwipeR
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        mPrivateChatsRv = (RecyclerView) view.findViewById(R.id.my_chats_list);
+        mNoPrivateRoomsTv = (TextView) view.findViewById(R.id.no_private_chats_tv);
+        mPrivateChatsRv = (RecyclerView) view.findViewById(R.id.private_chats_rv);
         mPrivateChatsRv.addItemDecoration(new DividerItemDecoration(getResources().getDrawable(R.drawable.message_list_divider), true, true));
         mPrivateChatsRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         mPrivateChatsRv.setItemAnimator(new DefaultItemAnimator());
@@ -89,9 +93,15 @@ public class PrivateRoomsFragment extends Fragment implements Filterable, SwipeR
             public void success(List<PrivateRoom> privateRooms, Response response) {
                 mSwipeRefreshLayout.setRefreshing(false);
                 mPrivateRooms = privateRooms;
-                Collections.sort(mPrivateRooms, PrivateRoomComparator.INSTANCE);
                 mAdapter = new PrivateRoomAdapter(getActivity(), mPrivateRooms);
                 mPrivateChatsRv.setAdapter(mAdapter);
+
+                if (privateRooms.isEmpty()) {
+                    displayNoPrivateRoomsNotice();
+                } else {
+                    hideNoPrivateRoomsNotice();
+                    Collections.sort(mPrivateRooms, PrivateRoomComparator.INSTANCE);
+                }
             }
 
             @Override
@@ -100,6 +110,14 @@ public class PrivateRoomsFragment extends Fragment implements Filterable, SwipeR
                 NetworkManager.handleErrorResponse(TAG, "Getting private rooms by userId: " + userId, error, getActivity());
             }
         });
+    }
+
+    private void hideNoPrivateRoomsNotice() {
+        mNoPrivateRoomsTv.setVisibility(View.GONE);
+    }
+
+    private void displayNoPrivateRoomsNotice() {
+        mNoPrivateRoomsTv.setVisibility(View.VISIBLE);
     }
 
     @Subscribe

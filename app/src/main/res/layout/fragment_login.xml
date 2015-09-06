@@ -6,7 +6,7 @@
     tools:context="com.kdoherty.zipchat.activities.LoginActivity">
 
     <ImageView
-        android:id="@+id/zip_chat_logo"
+        android:id="@+id/zip_chat_logo_iv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -14,10 +14,10 @@
         android:src="@drawable/zip_chat_logo" />
 
     <com.facebook.login.widget.LoginButton
-        android:id="@+id/login_button"
+        android:id="@+id/login_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/zip_chat_logo"
+        android:layout_below="@id/zip_chat_logo_iv"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="48dp" />
 
@@ -25,7 +25,7 @@
         android:id="@+id/auth_pb"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/zip_chat_logo"
+        android:layout_below="@id/zip_chat_logo_iv"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="48dp"
         android:visibility="gone" />

@@ -5,7 +5,7 @@
     android:layout_height="@dimen/chat_room_drawer_cell_height">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/user_prof_pic"
+        android:id="@+id/user_prof_pic_civ"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_centerVertical="true"
@@ -14,7 +14,7 @@
         android:padding="@dimen/chat_room_drawer_cell_padding" />
 
     <com.devspark.robototextview.widget.RobotoTextView
-        android:id="@+id/user_fb_name"
+        android:id="@+id/user_fb_name_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"

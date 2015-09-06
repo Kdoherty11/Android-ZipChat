@@ -2,11 +2,9 @@ package com.kdoherty.zipchat.notifications;
 
 import android.app.PendingIntent;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
-import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.models.AbstractRoom;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.PublicRoom;

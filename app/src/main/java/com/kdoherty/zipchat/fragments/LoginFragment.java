@@ -51,7 +51,7 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
 
         mCallbackManager = CallbackManager.Factory.create();
 
-        mLoginButton = (LoginButton) view.findViewById(R.id.login_button);
+        mLoginButton = (LoginButton) view.findViewById(R.id.login_btn);
         mAuthPb = (ProgressBar) view.findViewById(R.id.auth_pb);
 
         if (mSentAuthRequest) {
@@ -101,7 +101,7 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
                 mAuthPb.setVisibility(View.GONE);
                 mLoginButton.setVisibility(View.VISIBLE);
 
-                Toast.makeText(getActivity(), getString(R.string.login_failure_toast),
+                Toast.makeText(getActivity(), getString(R.string.toast_login_failure),
                         Toast.LENGTH_SHORT).show();
             }
         });
@@ -173,7 +173,7 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
                     mLoginButton.setVisibility(View.VISIBLE);
                     mAuthPb.setVisibility(View.GONE);
 
-                    Toast.makeText(getActivity(), getString(R.string.login_failure_toast), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), getString(R.string.toast_login_failure), Toast.LENGTH_SHORT).show();
                 }
             });
         }

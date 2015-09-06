@@ -10,7 +10,7 @@
     tools:context="com.kdoherty.zipchat.fragments.MessageFavoritesFragment">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/message_favoritor_list"
+        android:id="@+id/message_favorites_rv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white" />

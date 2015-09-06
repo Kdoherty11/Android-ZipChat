@@ -3,15 +3,6 @@ package com.kdoherty.zipchat.utils;
 import android.content.Context;
 
 import com.kdoherty.zipchat.models.User;
-import com.kdoherty.zipchat.services.ZipChatApi;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.Future;
-
-import retrofit.Callback;
 
 public class UserManager {
 

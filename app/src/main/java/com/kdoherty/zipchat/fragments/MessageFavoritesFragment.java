@@ -52,7 +52,7 @@ public class MessageFavoritesFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        RecyclerView messageFavoritesRv = (RecyclerView) view.findViewById(R.id.message_favoritor_list);
+        RecyclerView messageFavoritesRv = (RecyclerView) view.findViewById(R.id.message_favorites_rv);
         messageFavoritesRv.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity(), NUM_COLS);
         messageFavoritesRv.setLayoutManager(layoutManager);

@@ -20,8 +20,10 @@
     <dimen name="home_screen_bottom_tabs_padding">6dp</dimen>
 
     <!-- Home screen cells -->
-    <dimen name="home_screen_cell_name_text_size">26sp</dimen>
-    <dimen name="home_screen_cell_last_activity_text_size">12sp</dimen>
+    <dimen name="home_screen_cell_title_text_size">26sp</dimen>
+    <dimen name="home_screen_cell_timestamp_text_size">12sp</dimen>
+    <dimen name="home_screen_cell_height">96dp</dimen>
+    <dimen name="home_screen_cell_prof_pic_dimens">48dp</dimen>
 
     <!-- ***** Home Screen Chat room cell ***** -->
     <dimen name="chat_room_distance_text_size">14sp</dimen>

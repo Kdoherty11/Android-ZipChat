@@ -78,7 +78,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
         mRadiusSeekBar = (SeekBar) findViewById(R.id.radius_seek_bar);
         mRadiusSeekBar.setProgress(DEFAULT_RADIUS);
 
-        toolbar.findViewById(R.id.create_room_create_button).setOnClickListener(this);
+        toolbar.findViewById(R.id.create_room_create_btn).setOnClickListener(this);
 
         mRoomNameEt = (EditText) findViewById(R.id.create_room_name_et);
         Utils.hideKeyboardOnEnter(this, mRoomNameEt);
@@ -87,7 +87,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.create_room_create_button:
+            case R.id.create_room_create_btn:
                 if (mDisableButton) {
                     break;
                 }
@@ -96,12 +96,12 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
                 final String roomName = mRoomNameEt.getText().toString().trim();
                 final int roomNameLength = roomName.length();
                 if (roomNameLength == 0) {
-                    Toast.makeText(getApplicationContext(), getString(R.string.create_room_no_name_toast), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.toast_room_name_empty), Toast.LENGTH_SHORT).show();
                     mDisableButton = false;
                     break;
                 }
                 if (roomNameLength > MAX_ROOM_NAME_CHARS) {
-                    Toast.makeText(getApplicationContext(), getString(R.string.create_room_name_too_long_toast), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.toast_room_name_too_long), Toast.LENGTH_SHORT).show();
                     mDisableButton = false;
                     break;
                 }
@@ -183,7 +183,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
         LatLng userLatLng = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
 
         mMarker = mGoogleMap.addMarker(new MarkerOptions().position(userLatLng)
-                .title(getResources().getString(R.string.my_location_marker_title)));
+                .title(getResources().getString(R.string.my_location)));
 
         mMapCircle = LocationManager.setRoomCircle(this, mGoogleMap, userLatLng, mRadius);
     }

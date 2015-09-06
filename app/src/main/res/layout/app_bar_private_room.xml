@@ -6,7 +6,7 @@
     android:background="@color/zipchat_blue">
 
     <ImageView
-        android:id="@+id/other_user_pic"
+        android:id="@+id/other_user_pic_iv"
         android:layout_width="@dimen/private_chat_room_pic_side"
         android:layout_height="@dimen/private_chat_room_pic_side"
         android:layout_gravity="end|center_vertical"

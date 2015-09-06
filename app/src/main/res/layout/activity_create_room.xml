@@ -1,9 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    android:orientation="vertical"
+    style="@style/activity_style"
     tools:context="com.kdoherty.zipchat.activities.CreateRoomActivity">
 
     <include
@@ -28,7 +25,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/create_room_name"
+                android:text="@string/name"
                 android:textColor="@color/black"
                 android:textSize="@dimen/create_room_label_text_size" />
 
@@ -54,7 +51,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/create_room_radius"
+                android:text="@string/radius"
                 android:textColor="@color/black"
                 android:textSize="@dimen/create_room_label_text_size" />
 

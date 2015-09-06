@@ -4,7 +4,6 @@ import android.os.Parcel;
 import android.support.annotation.Nullable;
 
 import com.kdoherty.zipchat.utils.MyObjects;
-import com.kdoherty.zipchat.utils.UserManager;
 
 /**
  * Created by kdoherty on 12/14/14.
@@ -67,7 +66,9 @@ public class PrivateRoom extends AbstractRoom {
         return receiverInRoom;
     }
 
-    public @Nullable User getOther() {
+    public
+    @Nullable
+    User getOther() {
         return other;
     }
 

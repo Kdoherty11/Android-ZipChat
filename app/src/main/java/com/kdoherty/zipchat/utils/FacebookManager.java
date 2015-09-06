@@ -1,20 +1,14 @@
 package com.kdoherty.zipchat.utils;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.ImageView;
 
-import com.facebook.AccessToken;
 import com.kdoherty.zipchat.R;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-
-import java.io.IOException;
-import java.net.URL;
 
 /**
  * Created by kdoherty on 12/31/14.

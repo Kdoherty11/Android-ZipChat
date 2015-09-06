@@ -74,7 +74,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
             actionBar.setTitle(mUser.getName());
         }
 
-        mRequestButton = (Button) findViewById(R.id.chat_request_button);
+        mRequestButton = (Button) findViewById(R.id.chat_request_btn);
         mRequestButton.setOnClickListener(this);
 
         mRequestStatusLoadingPb = (ProgressBar) findViewById(R.id.request_status_loading_pb);
@@ -143,7 +143,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
                 final Long privateRoomId = Utils.tryParse(status);
 
                 if (privateRoomId != null) {
-                    mRequestButton.setText(getString(R.string.request_status_already_chatting));
+                    mRequestButton.setText(getString(R.string.btn_text_already_chatting));
                     mRequestButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -205,7 +205,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case (R.id.chat_request_button):
+            case (R.id.chat_request_btn):
                 sendChatRequest();
                 break;
             default:

@@ -109,9 +109,9 @@ public class PublicRoomAdapter extends RecyclerView.Adapter<PublicRoomAdapter.Ch
         public ChatRoomViewHolder(View itemView) {
             super(itemView);
             layout = (RelativeLayout) itemView;
-            nameTv = (TextView) itemView.findViewById(R.id.chat_room_name);
-            distanceTv = (TextView) itemView.findViewById(R.id.chat_room_distance);
-            lastActivityTv = (TextView) itemView.findViewById(R.id.chat_room_last_activity);
+            nameTv = (TextView) itemView.findViewById(R.id.chat_room_name_tv);
+            distanceTv = (TextView) itemView.findViewById(R.id.chat_room_distance_tv);
+            lastActivityTv = (TextView) itemView.findViewById(R.id.chat_room_last_activity_tv);
         }
 
         @Override

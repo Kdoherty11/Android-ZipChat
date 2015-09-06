@@ -149,18 +149,18 @@ public class MessageDetailsActivity extends AppCompatActivity {
 
         mInitialFavorites = new ArrayList<>(mMessage.getFavorites());
 
-        mSenderProfPicCiv = (CircleImageView) findViewById(R.id.message_picture);
-        mSenderNameTv = (TextView) findViewById(R.id.message_sender);
-        mMsgContentTv = (TextView) findViewById(R.id.message_text);
+        mSenderProfPicCiv = (CircleImageView) findViewById(R.id.message_picture_civ);
+        mSenderNameTv = (TextView) findViewById(R.id.message_sender_tv);
+        mMsgContentTv = (TextView) findViewById(R.id.message_text_tv);
 
-        mFavoriteIv = (ImageView) findViewById(R.id.message_favorite);
-        mFavoriteCountTv = (TextView) findViewById(R.id.message_favorite_count);
-        mMsgTimestampTv = (TextView) findViewById(R.id.message_timestamp);
+        mFavoriteIv = (ImageView) findViewById(R.id.message_favorite_iv);
+        mFavoriteCountTv = (TextView) findViewById(R.id.message_favorite_count_tv);
+        mMsgTimestampTv = (TextView) findViewById(R.id.message_timestamp_tv);
         mSendingFavoritePb = (ProgressBar) findViewById(R.id.sending_favorite_pb);
         mFavoriteContainer = (LinearLayout) findViewById(R.id.favorite_container);
 
         mFavoritesDividerLine = findViewById(R.id.divider_line);
-        mFavoritesTitleTv = (TextView) findViewById(R.id.favorites_title);
+        mFavoritesTitleTv = (TextView) findViewById(R.id.favorites_title_tv);
 
         long anonUserId = getIntent().getLongExtra(EXTRA_ANON_USER_ID, 0l);
         Log.d(TAG, "anonUserId: " + anonUserId);
@@ -333,14 +333,14 @@ public class MessageDetailsActivity extends AppCompatActivity {
         ZipChatApi.INSTANCE.flagMessage(UserManager.getAuthToken(this), mMessage.getMessageId(), UserManager.getId(this), new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
-                Toast.makeText(MessageDetailsActivity.this, getString(R.string.message_reported_toast), Toast.LENGTH_SHORT).show();
+                Toast.makeText(MessageDetailsActivity.this, getString(R.string.toast_message_reported), Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void failure(RetrofitError error) {
                 Response response = error.getResponse();
                 if (response.getStatus() == 400 && NetworkManager.responseToString(response).contains("already flagged")) {
-                    Toast.makeText(MessageDetailsActivity.this, getString(R.string.message_reported_failed_toast), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MessageDetailsActivity.this, getString(R.string.toast_message_reported_failed), Toast.LENGTH_SHORT).show();
                 } else {
                     NetworkManager.handleErrorResponse(TAG, "Reporting a message", error, MessageDetailsActivity.this);
                 }
@@ -413,7 +413,7 @@ public class MessageDetailsActivity extends AppCompatActivity {
                             public void failure(RetrofitError error) {
                                 stopFavoriteLoading();
                                 NetworkManager.handleErrorResponse(TAG, "Removing a favorite from MessageDetails", error, MessageDetailsActivity.this);
-                                Toast.makeText(MessageDetailsActivity.this, getResources().getString(R.string.msg_favorite_failed_toast), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MessageDetailsActivity.this, getResources().getString(R.string.toast_msg_favorite_failed), Toast.LENGTH_SHORT).show();
                             }
                         });
             } else {
@@ -429,7 +429,7 @@ public class MessageDetailsActivity extends AppCompatActivity {
                             public void failure(RetrofitError error) {
                                 stopFavoriteLoading();
                                 NetworkManager.handleErrorResponse(TAG, "Removing a favorite from MessageDetails", error, MessageDetailsActivity.this);
-                                Toast.makeText(MessageDetailsActivity.this, getResources().getString(R.string.remove_msg_favorite_failed_toast), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MessageDetailsActivity.this, getResources().getString(R.string.toast_remove_msg_favorite_failed), Toast.LENGTH_SHORT).show();
                             }
                         });
             }

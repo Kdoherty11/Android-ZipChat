@@ -5,16 +5,16 @@
     android:layout_height="match_parent">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/user_prof_pic"
+        android:id="@+id/user_prof_pic_civ"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_centerHorizontal="true" />
 
     <com.devspark.robototextview.widget.RobotoTextView
-        android:id="@+id/user_fb_name"
+        android:id="@+id/user_fb_name_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/user_prof_pic"
+        android:layout_below="@id/user_prof_pic_civ"
         android:layout_centerHorizontal="true"
         android:textColor="@color/chat_room_drawer_cell_text"
         android:textSize="10sp"

@@ -7,7 +7,6 @@ import com.google.gson.annotations.JsonAdapter;
 import com.kdoherty.zipchat.utils.MyObjects;
 import com.kdoherty.zipchat.utils.RuntimeTypeAdapterFactory;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -29,6 +28,15 @@ public abstract class AbstractRoom implements Parcelable {
     protected AbstractRoom(RoomType roomType, long roomId) {
         this(roomType);
         this.roomId = roomId;
+    }
+
+    protected AbstractRoom(Parcel in) {
+        this.roomId = in.readLong();
+        this.createdAt = in.readLong();
+        this.lastActivity = in.readLong();
+        this.messages = in.createTypedArrayList(Message.CREATOR);
+        int tmpType = in.readInt();
+        this.type = tmpType == -1 ? null : RoomType.values()[tmpType];
     }
 
     public static long getId(AbstractRoom room) {
@@ -75,6 +83,15 @@ public abstract class AbstractRoom implements Parcelable {
         return MyObjects.hash(createdAt, lastActivity);
     }
 
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(this.roomId);
+        dest.writeLong(this.createdAt);
+        dest.writeLong(this.lastActivity);
+        dest.writeTypedList(messages);
+        dest.writeInt(this.type == null ? -1 : this.type.ordinal());
+    }
+
     public enum RoomType {
         PUBLIC, PRIVATE
     }
@@ -85,23 +102,5 @@ public abstract class AbstractRoom implements Parcelable {
             registerSubtype(PublicRoom.class, RoomType.PUBLIC.toString());
             registerSubtype(PrivateRoom.class, RoomType.PRIVATE.toString());
         }
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(this.roomId);
-        dest.writeLong(this.createdAt);
-        dest.writeLong(this.lastActivity);
-        dest.writeTypedList(messages);
-        dest.writeInt(this.type == null ? -1 : this.type.ordinal());
-    }
-
-    protected AbstractRoom(Parcel in) {
-        this.roomId = in.readLong();
-        this.createdAt = in.readLong();
-        this.lastActivity = in.readLong();
-        this.messages = in.createTypedArrayList(Message.CREATOR);
-        int tmpType = in.readInt();
-        this.type = tmpType == -1 ? null : RoomType.values()[tmpType];
     }
 }

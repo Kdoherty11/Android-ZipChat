@@ -5,6 +5,4 @@
     android:layout_height="wrap_content"
     android:background="?android:selectableItemBackground"
     android:gravity="center"
-    android:padding="8dp"
-    android:textSize="12sp"
-    android:textStyle="bold" />
+    android:padding="8dp" />

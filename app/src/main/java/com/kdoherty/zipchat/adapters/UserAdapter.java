@@ -109,8 +109,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserCellViewHo
         public UserCellViewHolder(View itemView) {
             super(itemView);
             layout = itemView;
-            profilePicture = (ImageView) itemView.findViewById(R.id.user_prof_pic);
-            text = (TextView) itemView.findViewById(R.id.user_fb_name);
+            profilePicture = (ImageView) itemView.findViewById(R.id.user_prof_pic_civ);
+            text = (TextView) itemView.findViewById(R.id.user_fb_name_tv);
         }
     }
 }

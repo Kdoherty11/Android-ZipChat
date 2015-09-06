@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -18,7 +17,7 @@
             android:orientation="horizontal">
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/anon_toggle"
+                android:id="@+id/anon_toggle_civ"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_marginBottom="8dp"
@@ -29,19 +28,19 @@
                 app:border_width="1dp" />
 
             <EditText
-                android:id="@+id/chat_room_activity_message_box"
+                android:id="@+id/message_box_et"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:layout_weight="2"
-                android:hint="@string/chat_room_activity_message_box_hint"
+                android:hint="@string/enter_message"
                 android:imeOptions="actionSend"
                 android:padding="12dp"
                 android:textColor="@color/black"
                 android:textColorHint="@color/grey" />
 
             <ImageView
-                android:id="@+id/chat_room_activity_send_button"
+                android:id="@+id/message_send_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -51,7 +50,7 @@
         </LinearLayout>
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/chat_room_activity_messages"
+            android:id="@+id/messages_rv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@id/chat_box_layout"

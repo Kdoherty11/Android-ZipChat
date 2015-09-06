@@ -10,16 +10,13 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
-import com.facebook.AccessToken;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.LoginActivity;
-import com.kdoherty.zipchat.services.ZipChatApi;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
@@ -42,7 +39,7 @@ public final class NetworkManager {
     }
 
     public static boolean checkOnline(Context context) {
-        return checkOnline(context, context.getString(R.string.default_no_internet_toast));
+        return checkOnline(context, context.getString(R.string.toast_no_internet));
     }
 
     public static boolean checkOnline(Context context, String message) {

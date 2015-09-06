@@ -29,8 +29,8 @@ public final class LocationManager {
         if (!isLocationEnabled(activity)) {
 
             AlertDialog.Builder dialog = new AlertDialog.Builder(activity);
-            dialog.setMessage(activity.getString(R.string.location_not_enabled));
-            dialog.setPositiveButton(activity.getString(R.string.open_location_settings), new DialogInterface.OnClickListener() {
+            dialog.setMessage(activity.getString(R.string.dialog_location_not_enabled));
+            dialog.setPositiveButton(activity.getString(R.string.fix), new DialogInterface.OnClickListener() {
 
                 @Override
                 public void onClick(DialogInterface paramDialogInterface, int paramInt) {
@@ -39,7 +39,7 @@ public final class LocationManager {
                 }
             });
 
-            dialog.setNegativeButton(activity.getString(R.string.cancel_location_dialog), new DialogInterface.OnClickListener() {
+            dialog.setNegativeButton(activity.getString(R.string.cancel), new DialogInterface.OnClickListener() {
 
                 @Override
                 public void onClick(DialogInterface paramDialogInterface, int paramInt) {

@@ -20,7 +20,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.kdoherty.zipchat.R;
-import com.kdoherty.zipchat.activities.MessageDetailsActivity;
 import com.kdoherty.zipchat.activities.UserDetailsActivity;
 import com.kdoherty.zipchat.activities.ZipChatApplication;
 import com.kdoherty.zipchat.models.AbstractRoom;
@@ -319,7 +318,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
 
     public interface MessageCellClickListener {
         void onFavoriteClick(long messageId, boolean isFavorite);
+
         void onResendMessageClick(String text, boolean isAnon);
+
         void onMessageClick(Message message);
     }
 
@@ -421,13 +422,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         public MessageCellViewHolder(View itemView) {
             super(itemView);
             layout = (RelativeLayout) itemView;
-            profilePicture = (CircleImageView) itemView.findViewById(R.id.message_picture);
-            name = (TextView) itemView.findViewById(R.id.message_sender);
-            message = (TextView) itemView.findViewById(R.id.message_text);
+            profilePicture = (CircleImageView) itemView.findViewById(R.id.message_picture_civ);
+            name = (TextView) itemView.findViewById(R.id.message_sender_tv);
+            message = (TextView) itemView.findViewById(R.id.message_text_tv);
             favoriteLayout = (LinearLayout) itemView.findViewById(R.id.favorite_container);
-            favorite = (ImageView) favoriteLayout.findViewById(R.id.message_favorite);
-            favoriteCount = (TextView) favoriteLayout.findViewById(R.id.message_favorite_count);
-            timestamp = (TextView) itemView.findViewById(R.id.message_timestamp);
+            favorite = (ImageView) favoriteLayout.findViewById(R.id.message_favorite_iv);
+            favoriteCount = (TextView) favoriteLayout.findViewById(R.id.message_favorite_count_tv);
+            timestamp = (TextView) itemView.findViewById(R.id.message_timestamp_tv);
             unconfirmedMsgPb = (ProgressBar) itemView.findViewById(R.id.unconfirmed_msg_pb);
             failedMsgLayout = (LinearLayout) itemView.findViewById(R.id.message_timeout_layout);
             retrySendMsgBtn = (Button) failedMsgLayout.findViewById(R.id.retry_send_msg_btn);

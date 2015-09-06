@@ -61,13 +61,13 @@ public class PrivateRoomActivity extends AppCompatActivity implements View.OnCli
         mOtherUser = mPrivateRoom.getAndSetOther(UserManager.getId(this));
 
         if (!mPrivateRoom.isOtherInRoom()) {
-            Toast.makeText(this, mOtherUser.getName() + getResources().getString(R.string.user_left_room_toast), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, mOtherUser.getName() + getResources().getString(R.string.toast_user_left_room), Toast.LENGTH_SHORT).show();
         }
 
         ZipChatApplication.initImageLoader(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.private_chat_room_app_bar);
-        ImageView otherMembersPic = (ImageView) toolbar.findViewById(R.id.other_user_pic);
+        ImageView otherMembersPic = (ImageView) toolbar.findViewById(R.id.other_user_pic_iv);
         FacebookManager.displayProfilePicture(mOtherUser.getFacebookId(), otherMembersPic, 300, 300);
         otherMembersPic.setOnClickListener(this);
         setSupportActionBar(toolbar);
@@ -113,7 +113,7 @@ public class PrivateRoomActivity extends AppCompatActivity implements View.OnCli
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch (which){
+                switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
                         leaveRoom();
                         break;
@@ -155,7 +155,7 @@ public class PrivateRoomActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.other_user_pic:
+            case R.id.other_user_pic_iv:
                 Intent userDetails = UserDetailsActivity.getIntent(this, mOtherUser);
                 startActivity(userDetails);
                 break;
