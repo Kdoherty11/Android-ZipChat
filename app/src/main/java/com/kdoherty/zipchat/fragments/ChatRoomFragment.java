@@ -432,6 +432,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mRoomSocket.onDestroy();
         AnimateFirstDisplayListener.clearImages();
     }
 

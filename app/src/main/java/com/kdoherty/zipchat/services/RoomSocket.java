@@ -144,7 +144,7 @@ public class RoomSocket {
                 Log.w(TAG, "Attempting to recover from " + ex.getMessage());
                 reconnect();
             } else {
-                Log.i(TAG, "Socket closed");
+                Log.w(TAG, "Socket closed!");
             }
         }
     };
@@ -256,6 +256,13 @@ public class RoomSocket {
             Log.i(TAG, "Resuming socket!");
             mWebSocket.resume();
             Utils.debugToast(mContext, "Resuming socket in on resume", Toast.LENGTH_SHORT);
+        }
+    }
+
+    public void onDestroy() {
+        if (mWebSocket != null && mWebSocket.getSocket() != null) {
+            Log.i(TAG, "onDestroy in RoomSocket");
+            mWebSocket.getSocket().close();
         }
     }
 
