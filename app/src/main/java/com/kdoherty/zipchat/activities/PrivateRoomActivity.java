@@ -1,8 +1,11 @@
 package com.kdoherty.zipchat.activities;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -99,11 +102,33 @@ public class PrivateRoomActivity extends AppCompatActivity implements View.OnCli
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_leave_room:
-                leaveRoom();
+                showLeaveRoomAreYouSurePrompt();
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showLeaveRoomAreYouSurePrompt() {
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        leaveRoom();
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
+                }
+            }
+        };
+
+        Resources res = getResources();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(res.getString(R.string.are_you_sure_leave_room_prompt)).setPositiveButton(res.getString(R.string.yes), dialogClickListener)
+                .setNegativeButton(res.getString(R.string.no), dialogClickListener).show();
     }
 
     private void leaveRoom() {

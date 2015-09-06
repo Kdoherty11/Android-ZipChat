@@ -92,4 +92,7 @@
     <string name="delete">Delete</string>
     <string name="message">Message</string>
     <string name="user_left_room_toast">has left the chat</string>
+    <string name="are_you_sure_leave_room_prompt">Are you sure you want to leave this chat?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>
