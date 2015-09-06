@@ -104,7 +104,7 @@ public class PublicRoomActivity extends AbstractLocationActivity {
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-                mChatRoomFragment = ChatRoomFragment.newInstance(mPublicRoom.getRoomId(), true);
+                mChatRoomFragment = ChatRoomFragment.newInstance(mPublicRoom);
 
                 fragmentTransaction.add(R.id.chat_room_fragment_container, mChatRoomFragment);
                 fragmentTransaction.commit();

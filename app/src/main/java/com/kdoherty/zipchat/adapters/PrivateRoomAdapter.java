@@ -42,6 +42,9 @@ public class PrivateRoomAdapter extends RecyclerView.Adapter<PrivateRoomAdapter.
     private PrivateChatFilter mFilter = new PrivateChatFilter();
 
     public PrivateRoomAdapter(Context context, List<PrivateRoom> privateRooms) {
+        if (context == null || privateRooms == null) {
+            throw new NullPointerException();
+        }
         mInflater = LayoutInflater.from(context);
         mContext = context;
         mPrivateRooms = privateRooms;
@@ -85,7 +88,7 @@ public class PrivateRoomAdapter extends RecyclerView.Adapter<PrivateRoomAdapter.
 
             @Override
             public void onClick(View v) {
-                Intent intent = PrivateRoomActivity.getIntent(mContext, privateRoom.getRoomId(), privateRoom.getOther());
+                Intent intent = PrivateRoomActivity.getIntent(mContext, privateRoom);
                 mContext.startActivity(intent);
             }
         });

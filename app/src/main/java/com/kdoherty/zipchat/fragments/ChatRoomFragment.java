@@ -1,6 +1,7 @@
 package com.kdoherty.zipchat.fragments;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -16,6 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.kdoherty.zipchat.R;
+import com.kdoherty.zipchat.activities.MessageDetailsActivity;
 import com.kdoherty.zipchat.activities.ZipChatApplication;
 import com.kdoherty.zipchat.adapters.MessageAdapter;
 import com.kdoherty.zipchat.events.AddFavoriteEvent;
@@ -24,6 +26,7 @@ import com.kdoherty.zipchat.events.RemoveFavoriteEvent;
 import com.kdoherty.zipchat.events.SocketReconnectTimeout;
 import com.kdoherty.zipchat.events.TalkConfirmationEvent;
 import com.kdoherty.zipchat.events.TalkEvent;
+import com.kdoherty.zipchat.models.AbstractRoom;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.ChatService;
@@ -54,15 +57,14 @@ import retrofit.client.Response;
 /**
  * Created by kevindoherty on 2/2/15.
  */
-public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSocketConnectCallback, View.OnClickListener, MessageAdapter.SocketEventListener {
+public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSocketConnectCallback, View.OnClickListener, MessageAdapter.MessageCellClickListener {
 
     private static final String TAG = "KBD" + ChatRoomFragment.class.getSimpleName();
 
     private static final int MESSAGE_LIMIT = 25;
     private static final int ITEM_VIEW_CACHE_SIZE = 25;
 
-    private static final String ARG_ROOM_ID = "fragments.ChatRoomFragment.arg.ROOM_ID";
-    private static final String ARG_IS_PUBLIC_ROOM = "fragments.ChatRoomFragment.arg.IS_PUBLIC";
+    private static final String ARG_ROOM = "fragments.ChatRoomFragment.arg.ABSTRACT_ROOM";
 
     private MessageAdapter mMessageAdapter;
     private RecyclerView mMessagesRv;
@@ -80,10 +82,9 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     private ImageLoadingListener mAnimateFirstListener = new AnimateFirstDisplayListener();
     private DisplayImageOptions options;
 
-    private boolean mIsPublicRoom;
-    private long mRoomId;
     private boolean mIsAnon;
     private String mProfilePicUrl;
+    private AbstractRoom mRoom;
 
     private ProgressBar mMessageLoadingPb;
 
@@ -108,8 +109,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         @Override
         public void failure(RetrofitError error) {
             hideMessageLoadingPb();
-            String roomType = mIsPublicRoom ? "public" : "private";
-            NetworkManager.logErrorResponse(TAG, "Getting " + roomType + " room chat messages", error);
+            NetworkManager.logErrorResponse(TAG, "Getting " + mRoom.getType() + " room chat messages", error);
             mMessagesLoading = true;
         }
     };
@@ -117,10 +117,9 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
     public ChatRoomFragment() {
     }
 
-    public static ChatRoomFragment newInstance(long roomId, boolean isPublicRoom) {
+    public static ChatRoomFragment newInstance(AbstractRoom room) {
         Bundle args = new Bundle();
-        args.putLong(ARG_ROOM_ID, roomId);
-        args.putBoolean(ARG_IS_PUBLIC_ROOM, isPublicRoom);
+        args.putParcelable(ARG_ROOM, room);
 
         ChatRoomFragment fragment = new ChatRoomFragment();
         fragment.setArguments(args);
@@ -136,11 +135,12 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         mSelfId = UserManager.getId(activity);
 
         Bundle args = getArguments();
-        mRoomId = args.getLong(ARG_ROOM_ID);
-        mIsPublicRoom = args.getBoolean(ARG_IS_PUBLIC_ROOM);
+        mRoom = args.getParcelable(ARG_ROOM);
+        if (mRoom == null) {
+            throw new IllegalArgumentException("Room must be passed as an argument to ChatRoomFragment");
+        }
 
-        ChatService.RoomType roomType = mIsPublicRoom ? ChatService.RoomType.PUBLIC : ChatService.RoomType.PRIVATE;
-        ChatService chatService = new ChatService(mSelfId, mRoomId, roomType, UserManager.getAuthToken(activity), this);
+        ChatService chatService = new ChatService(mSelfId, mRoom, UserManager.getAuthToken(activity), this);
         mRoomSocket = new RoomSocket(activity, chatService);
     }
 
@@ -198,7 +198,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         });
 
         view.findViewById(R.id.chat_room_activity_send_button).setOnClickListener(this);
-        if (mIsPublicRoom) {
+        if (mRoom.isPublic()) {
             mAnonToggleCv.setOnClickListener(this);
             ImageLoader.getInstance().displayImage(mProfilePicUrl, mAnonToggleCv,
                     options, mAnimateFirstListener);
@@ -252,11 +252,11 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
             showMessageLoadingPb();
         }
 
-        if (mIsPublicRoom) {
-            ZipChatApi.INSTANCE.getPublicRoomMessages(UserManager.getAuthToken(getActivity()), mRoomId,
+        if (mRoom.isPublic()) {
+            ZipChatApi.INSTANCE.getPublicRoomMessages(UserManager.getAuthToken(getActivity()), mRoom.getRoomId(),
                     MESSAGE_LIMIT, mMessageOffset, mGetMessagesCallback);
         } else {
-            ZipChatApi.INSTANCE.getPrivateRoomMessages(UserManager.getAuthToken(getActivity()), mRoomId,
+            ZipChatApi.INSTANCE.getPrivateRoomMessages(UserManager.getAuthToken(getActivity()), mRoom.getRoomId(),
                     MESSAGE_LIMIT, mMessageOffset, mGetMessagesCallback);
         }
     }
@@ -349,18 +349,34 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         });
     }
 
-    @Override
-    public void sendFavoriteEvent(long messageId, boolean isFavorite) {
-        mRoomSocket.sendFavorite(messageId, isFavorite);
-    }
-
     public void sendTalkEvent(String text, boolean isAnon, String uuid) {
         mRoomSocket.sendTalk(text, isAnon, uuid);
     }
 
     @Override
-    public void sendTalkEvent(String text, boolean isAnon) {
+    public void onFavoriteClick(long messageId, boolean isFavorite) {
+        mRoomSocket.sendFavorite(messageId, isFavorite);
+    }
+
+    @Override
+    public void onResendMessageClick(String text, boolean isAnon) {
         sendTalkEvent(text, isAnon, UUID.randomUUID().toString());
+    }
+
+    @Override
+    public void onMessageClick(Message message) {
+        Intent intent;
+        Activity activity = getActivity();
+        if (activity == null) {
+            Log.w(TAG, "Activity is null in onMessageClick");
+            return;
+        }
+        if (mRoom.isPublic()) {
+            intent = MessageDetailsActivity.getIntent(activity, message, mRoom, mAnonSelf.getUserId());
+        } else {
+            intent = MessageDetailsActivity.getIntent(activity, message, mRoom);
+        }
+        activity.startActivityForResult(intent, MessageDetailsActivity.MESSAGE_FAVORITED_RESULT);
     }
 
     @Override

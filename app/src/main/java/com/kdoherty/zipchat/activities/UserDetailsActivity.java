@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.kdoherty.zipchat.R;
+import com.kdoherty.zipchat.models.PrivateRoom;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.FacebookManager;
@@ -146,7 +147,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
                     mRequestButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent intent = PrivateRoomActivity.getIntent(UserDetailsActivity.this, privateRoomId, mUser);
+                            Intent intent = PrivateRoomActivity.getIntent(UserDetailsActivity.this, new PrivateRoom(privateRoomId, UserManager.getSelf(UserDetailsActivity.this), mUser));
                             startActivity(intent);
                         }
                     });

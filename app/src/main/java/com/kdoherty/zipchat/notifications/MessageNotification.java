@@ -3,13 +3,10 @@ package com.kdoherty.zipchat.notifications;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
-import android.text.TextUtils;
 import android.util.Log;
 
-import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.models.AbstractRoom;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.PrivateRoom;
@@ -51,27 +48,16 @@ public class MessageNotification extends AbstractNotification {
         PendingIntent contentIntent = getPublicRoomPendingIntent(publicRoom);
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(mContext)
-                        .setSmallIcon(R.drawable.ic_zipchat)
-                        .setContentTitle(message.getSender().getName())
-                        .setAutoCancel(true)
-                        .setLights(LIGHT_COLOR, LIGHT_ON_MS, LIGHT_OFF_MS)
+                        .setContentTitle(publicRoom.getName())
                         .setStyle(new NotificationCompat.BigTextStyle()
                                 .bigText(message.getMessage()))
                         .setContentIntent(contentIntent)
-                        .setContentText(message.getMessage());
+                        .setContentText(message.getSender().getName() + ": " + message.getMessage());
 
-        Bitmap facebookPicBm;
-        if (!TextUtils.isEmpty(message.getSender().getFacebookId())) {
-            facebookPicBm = FacebookManager.getFacebookProfilePicture(message.getSender().getFacebookId());
-            if (facebookPicBm == null) {
-                facebookPicBm = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.com_facebook_profile_picture_blank_square);
-                Log.w(TAG, "Null facebook picture for facebookId: " + message.getSender().getFacebookId());
-            }
-        } else {
-            facebookPicBm = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.com_facebook_profile_picture_blank_square);
-        }
+        setNotificationDefaults(builder);
 
-        builder.setLargeIcon(facebookPicBm);
+        Bitmap senderFbPicBm = FacebookManager.getFacebookProfilePicture(mContext, message.getSender().getFacebookId());
+        builder.setLargeIcon(senderFbPicBm);
 
         notify(builder.build());
 
@@ -79,23 +65,20 @@ public class MessageNotification extends AbstractNotification {
     }
 
     private void receivePrivateChatMessage(PrivateRoom room) {
-        PendingIntent contentIntent = getPrivateRoomIntent(room.getRoomId(), message.getSender());
+        PendingIntent contentIntent = getPrivateRoomIntent(room);
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(mContext)
-                        .setSmallIcon(R.drawable.ic_zipchat)
                         .setContentTitle(message.getSender().getName())
-                        .setAutoCancel(true)
-                        .setLights(LIGHT_COLOR, LIGHT_ON_MS, LIGHT_OFF_MS)
                         .setStyle(new NotificationCompat.BigTextStyle()
                                 .bigText(message.getMessage()))
                         .setContentIntent(contentIntent)
                         .setContentText(message.getMessage());
 
-        Bitmap facebookPicture = FacebookManager.getFacebookProfilePicture(message.getSender().getFacebookId());
-        if (facebookPicture != null) {
-            builder.setLargeIcon(facebookPicture);
-        }
+        setNotificationDefaults(builder);
+
+        Bitmap senderFbPicBm = FacebookManager.getFacebookProfilePicture(mContext, message.getSender().getFacebookId());
+        builder.setLargeIcon(senderFbPicBm);
 
         notify(builder.build());
     }

@@ -40,19 +40,16 @@ public class ChatRequestNotification extends AbstractNotification {
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(mContext)
-                        .setSmallIcon(R.drawable.ic_zipchat)
                         .setContentTitle("Chat Request")
-                        .setAutoCancel(true)
-                        .setLights(Color.argb(0, 93, 188, 210), LIGHT_ON_MS, LIGHT_OFF_MS)
                         .setStyle(new NotificationCompat.BigTextStyle()
                                 .bigText(message))
                         .setContentIntent(contentIntent)
                         .setContentText(message);
 
-        Bitmap facebookPicture = FacebookManager.getFacebookProfilePicture(mRequestSender.getFacebookId());
-        if (facebookPicture != null) {
-            builder.setLargeIcon(facebookPicture);
-        }
+        setNotificationDefaults(builder);
+
+        Bitmap senderFbPicBm = FacebookManager.getFacebookProfilePicture(mContext, mRequestSender.getFacebookId());
+        builder.setLargeIcon(senderFbPicBm);
 
         notify(builder.build());
     }

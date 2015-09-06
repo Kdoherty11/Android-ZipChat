@@ -23,6 +23,7 @@ import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.MessageDetailsActivity;
 import com.kdoherty.zipchat.activities.UserDetailsActivity;
 import com.kdoherty.zipchat.activities.ZipChatApplication;
+import com.kdoherty.zipchat.models.AbstractRoom;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.FacebookManager;
@@ -51,11 +52,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
     private final LayoutInflater mInflater;
     private final List<Message> mMessages;
     private final Handler mFavoriteEventHandler = new Handler();
-    private SocketEventListener mMessageFavListener;
+    private MessageCellClickListener mClickCallbacks;
     private boolean mHasPendingFavorite;
     private SendFavoriteEventRunnable mSendFavoriteEvent;
     private Message.FavoriteState mInitialFavoriteState;
     private long mSelfUserId;
+    private AbstractRoom mRoom;
 
     private ImageLoadingListener mAnimateFirstListener = new AnimateFirstDisplayListener();
     private Activity mActivity;
@@ -63,11 +65,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
     private int mOtherBoarderColor;
     private long mAnonUserId;
 
-    public MessageAdapter(Activity activity, List<Message> messages, SocketEventListener socketEventListener) {
-        this(activity, messages, 0, socketEventListener);
+    public MessageAdapter(Activity activity, List<Message> messages, MessageCellClickListener messageCellClickListener) {
+        this(activity, messages, 0, messageCellClickListener);
     }
 
-    public MessageAdapter(Activity activity, List<Message> messages, long anonUserId, SocketEventListener socketEventListener) {
+    public MessageAdapter(Activity activity, List<Message> messages, long anonUserId, MessageCellClickListener messageCellClickListener) {
         if (activity == null) {
             throw new IllegalArgumentException("Context is null");
         }
@@ -78,7 +80,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         mMessages = messages;
         mActivity = activity;
         mAnonUserId = anonUserId;
-        mMessageFavListener = socketEventListener;
+        mClickCallbacks = messageCellClickListener;
         ZipChatApplication.initImageLoader(mActivity);
         mSelfUserId = UserManager.getId(mActivity);
         mSelfBorderColorId = mActivity.getResources().getColor(R.color.orange);
@@ -164,8 +166,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
             messageCellViewHolder.layout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = MessageDetailsActivity.getIntent(mActivity, message, mAnonUserId);
-                    mActivity.startActivityForResult(intent, MessageDetailsActivity.MESSAGE_FAVORITED_RESULT);
+                    mClickCallbacks.onMessageClick(message);
                 }
             });
         } else if (message.didTimeout()) {
@@ -176,7 +177,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
             messageCellViewHolder.retrySendMsgBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mMessageFavListener.sendTalkEvent(message.getMessage(), isAnon);
+                    mClickCallbacks.onResendMessageClick(message.getMessage(), isAnon);
                 }
             });
             messageCellViewHolder.deleteUnsentMsgBtn.setOnClickListener(new View.OnClickListener() {
@@ -316,10 +317,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         notifyItemsChanged(timedOutMessageIndices);
     }
 
-    public interface SocketEventListener {
-        void sendFavoriteEvent(long messageId, boolean isFavorite);
-
-        void sendTalkEvent(String text, boolean isAnon);
+    public interface MessageCellClickListener {
+        void onFavoriteClick(long messageId, boolean isFavorite);
+        void onResendMessageClick(String text, boolean isAnon);
+        void onMessageClick(Message message);
     }
 
     private class SendFavoriteEventRunnable implements Runnable {
@@ -347,7 +348,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
 
             boolean userFavorited = mInitialFavoriteState == Message.FavoriteState.USER_FAVORITED;
             if (isAddFavorite != userFavorited) {
-                mMessageFavListener.sendFavoriteEvent(messageId, isAddFavorite);
+                mClickCallbacks.onFavoriteClick(messageId, isAddFavorite);
             }
 
             mInitialFavoriteState = null;

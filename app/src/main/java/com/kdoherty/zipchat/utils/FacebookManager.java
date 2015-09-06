@@ -3,6 +3,7 @@ package com.kdoherty.zipchat.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -78,13 +79,10 @@ public class FacebookManager {
     }
 
 
-    public static Bitmap getFacebookProfilePicture(String userId) {
-        try {
-            URL imageURL = new URL(getProfilePicUrl(userId, "square"));
-            return BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
-        } catch (IOException e) {
-            Log.e(TAG, "Problem getting the facebook profile picture: " + e.getMessage());
-            return null;
+    public static Bitmap getFacebookProfilePicture(Context context, String userId) {
+        if (TextUtils.isEmpty(userId)) {
+            return BitmapFactory.decodeResource(context.getResources(), R.drawable.com_facebook_profile_picture_blank_square);
         }
+        return ImageLoader.getInstance().loadImageSync(getProfilePicUrl(userId), displayProfPicOpts);
     }
 }

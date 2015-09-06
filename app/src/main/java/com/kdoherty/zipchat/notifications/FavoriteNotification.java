@@ -2,6 +2,7 @@ package com.kdoherty.zipchat.notifications;
 
 import android.app.PendingIntent;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
@@ -37,14 +38,13 @@ public class FavoriteNotification extends AbstractNotification {
     private void notifyMessageFavorited(PendingIntent contentIntent, String userName, String message) {
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(mContext)
-                        .setSmallIcon(R.drawable.ic_zipchat)
                         .setContentTitle("Favorite")
-                        .setAutoCancel(true)
-                        .setLights(LIGHT_COLOR, LIGHT_ON_MS, LIGHT_OFF_MS)
                         .setStyle(new NotificationCompat.BigTextStyle()
                                 .bigText(message))
                         .setContentIntent(contentIntent)
                         .setContentText(userName + " has favorited your message");
+
+        setNotificationDefaults(builder);
 
         notify(builder.build());
     }

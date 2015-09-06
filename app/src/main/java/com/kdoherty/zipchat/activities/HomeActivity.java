@@ -48,6 +48,7 @@ public class HomeActivity extends AbstractLocationActivity implements SearchView
 
         String action = getIntent().getAction();
         if (!TextUtils.isEmpty(action)) {
+            Log.d(TAG, "Got action " + action);
             if (ACTION_OPEN_REQUESTS_TAB.equals(action)) {
                 mTabsFragment.goToTab(HomeTabsFragment.REQUESTS_TAB_INDEX);
             } else if (ACTION_OPEN_PRIVATE_ROOMS_TAB.equals(action)) {

@@ -90,4 +90,5 @@
     <string name="message_reported_failed_toast">You have already reported this message</string>
     <string name="retry">Retry</string>
     <string name="delete">Delete</string>
+    <string name="message">Message</string>
 </resources>

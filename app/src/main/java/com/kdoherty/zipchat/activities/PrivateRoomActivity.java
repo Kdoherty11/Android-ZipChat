@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.events.LeaveRoomEvent;
 import com.kdoherty.zipchat.fragments.ChatRoomFragment;
+import com.kdoherty.zipchat.models.PrivateRoom;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.BusProvider;
@@ -34,16 +35,14 @@ import retrofit.client.Response;
 public class PrivateRoomActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = PrivateRoomActivity.class.getSimpleName();
-    private static final String EXTRA_ROOM_ID = "activities.PrivateRoomActivity.extra.ROOM_ID";
-    private static final String EXTRA_USER = "activities.PrivateRoomActivity.extra.USER";
+    private static final String EXTRA_ROOM = "activities.PrivateRoomActivity.extra.PRIVATE_ROOM";
     private ChatRoomFragment mChatRoomFragment;
-    private User mUser;
-    private long mRoomId;
+    private PrivateRoom mPrivateRoom;
+    private User mOtherUser;
 
-    public static Intent getIntent(Context context, long roomId, User other) {
+    public static Intent getIntent(Context context, PrivateRoom privateRoom) {
         Intent privateRoomIntent = new Intent(context, PrivateRoomActivity.class);
-        privateRoomIntent.putExtra(EXTRA_ROOM_ID, roomId);
-        privateRoomIntent.putExtra(EXTRA_USER, other);
+        privateRoomIntent.putExtra(EXTRA_ROOM, privateRoom);
         return privateRoomIntent;
     }
 
@@ -54,13 +53,14 @@ public class PrivateRoomActivity extends AppCompatActivity implements View.OnCli
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         final Intent intent = getIntent();
-        mUser = intent.getParcelableExtra(EXTRA_USER);
+        mPrivateRoom = intent.getParcelableExtra(EXTRA_ROOM);
+        mOtherUser = mPrivateRoom.getAndSetOther(UserManager.getId(this));
 
         ZipChatApplication.initImageLoader(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.private_chat_room_app_bar);
         ImageView otherMembersPic = (ImageView) toolbar.findViewById(R.id.other_user_pic);
-        FacebookManager.displayProfilePicture(mUser.getFacebookId(), otherMembersPic, 300, 300);
+        FacebookManager.displayProfilePicture(mOtherUser.getFacebookId(), otherMembersPic, 300, 300);
         otherMembersPic.setOnClickListener(this);
         setSupportActionBar(toolbar);
 
@@ -68,7 +68,7 @@ public class PrivateRoomActivity extends AppCompatActivity implements View.OnCli
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
-            actionBar.setTitle(mUser.getName());
+            actionBar.setTitle(mOtherUser.getName());
         }
 
         if (savedInstanceState == null && mChatRoomFragment == null) {
@@ -76,9 +76,7 @@ public class PrivateRoomActivity extends AppCompatActivity implements View.OnCli
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-            mRoomId = intent.getExtras().getLong(EXTRA_ROOM_ID);
-
-            mChatRoomFragment = ChatRoomFragment.newInstance(mRoomId, false);
+            mChatRoomFragment = ChatRoomFragment.newInstance(mPrivateRoom);
 
             fragmentTransaction.add(R.id.chat_room_fragment_container, mChatRoomFragment);
             fragmentTransaction.commit();
@@ -108,7 +106,7 @@ public class PrivateRoomActivity extends AppCompatActivity implements View.OnCli
             return;
         }
 
-        ZipChatApi.INSTANCE.leaveRoom(UserManager.getAuthToken(this), mRoomId, UserManager.getId(this), new Callback<Response>() {
+        ZipChatApi.INSTANCE.leaveRoom(UserManager.getAuthToken(this), mPrivateRoom.getRoomId(), UserManager.getId(this), new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
                 BusProvider.getInstance().post(new LeaveRoomEvent());
@@ -128,7 +126,7 @@ public class PrivateRoomActivity extends AppCompatActivity implements View.OnCli
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.other_user_pic:
-                Intent userDetails = UserDetailsActivity.getIntent(this, mUser);
+                Intent userDetails = UserDetailsActivity.getIntent(this, mOtherUser);
                 startActivity(userDetails);
                 break;
         }

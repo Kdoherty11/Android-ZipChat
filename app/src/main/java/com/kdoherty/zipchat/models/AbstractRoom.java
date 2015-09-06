@@ -20,7 +20,7 @@ public abstract class AbstractRoom implements Parcelable {
     protected long createdAt;
     protected long lastActivity;
     protected List<Message> messages;
-    public RoomType type;
+    private RoomType type;
 
     AbstractRoom(RoomType type) {
         this.type = type;
@@ -29,13 +29,6 @@ public abstract class AbstractRoom implements Parcelable {
     protected AbstractRoom(RoomType roomType, long roomId) {
         this(roomType);
         this.roomId = roomId;
-    }
-
-    protected AbstractRoom(Parcel in) {
-        this.roomId = in.readLong();
-        this.createdAt = in.readLong();
-        this.lastActivity = in.readLong();
-        this.messages = in.createTypedArrayList(Message.CREATOR);
     }
 
     public static long getId(AbstractRoom room) {
@@ -58,8 +51,8 @@ public abstract class AbstractRoom implements Parcelable {
         return type == RoomType.PRIVATE;
     }
 
-    public List<Message> getMessages() {
-        return messages;
+    public RoomType getType() {
+        return type;
     }
 
     // http://www.artima.com/lejava/articles/equality.html
@@ -82,14 +75,6 @@ public abstract class AbstractRoom implements Parcelable {
         return MyObjects.hash(createdAt, lastActivity);
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(this.roomId);
-        dest.writeLong(this.createdAt);
-        dest.writeLong(this.lastActivity);
-        dest.writeTypedList(messages);
-    }
-
     public enum RoomType {
         PUBLIC, PRIVATE
     }
@@ -100,5 +85,23 @@ public abstract class AbstractRoom implements Parcelable {
             registerSubtype(PublicRoom.class, RoomType.PUBLIC.toString());
             registerSubtype(PrivateRoom.class, RoomType.PRIVATE.toString());
         }
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(this.roomId);
+        dest.writeLong(this.createdAt);
+        dest.writeLong(this.lastActivity);
+        dest.writeTypedList(messages);
+        dest.writeInt(this.type == null ? -1 : this.type.ordinal());
+    }
+
+    protected AbstractRoom(Parcel in) {
+        this.roomId = in.readLong();
+        this.createdAt = in.readLong();
+        this.lastActivity = in.readLong();
+        this.messages = in.createTypedArrayList(Message.CREATOR);
+        int tmpType = in.readInt();
+        this.type = tmpType == -1 ? null : RoomType.values()[tmpType];
     }
 }

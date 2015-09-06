@@ -29,7 +29,10 @@ import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.adapters.MessageAdapter;
 import com.kdoherty.zipchat.fragments.ChatRoomFragment;
 import com.kdoherty.zipchat.fragments.MessageFavoritesFragment;
+import com.kdoherty.zipchat.models.AbstractRoom;
 import com.kdoherty.zipchat.models.Message;
+import com.kdoherty.zipchat.models.PrivateRoom;
+import com.kdoherty.zipchat.models.PublicRoom;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.notifications.AbstractNotification;
 import com.kdoherty.zipchat.services.MyGcmListenerService;
@@ -55,6 +58,7 @@ public class MessageDetailsActivity extends AppCompatActivity {
     private static final String TAG = MessageDetailsActivity.class.getSimpleName();
     private static final String EXTRA_MESSAGE = "activities.MessageDetailsActivity.extra.MESSAGE";
     private static final String EXTRA_ANON_USER_ID = "activities.MessageDetailsActivity.extra.ANON_USER_ID";
+    private static final String EXTRA_ROOM = "activities.MessageDetailsActivity.extra.ROOM";
     private static final String GCM_RECEIVER_NAME = "fragments.MessageFavoritesFragment.GCM_RECEIVER";
 
     private MessageFavoritesFragment mMessageFavoritesFragment;
@@ -98,14 +102,15 @@ public class MessageDetailsActivity extends AppCompatActivity {
         }
     };
 
-    public static Intent getIntent(Context context, Message message) {
+    public static Intent getIntent(Context context, Message message, AbstractRoom room) {
         Intent messageDetail = new Intent(context, MessageDetailsActivity.class);
         messageDetail.putExtra(EXTRA_MESSAGE, message);
+        messageDetail.putExtra(EXTRA_ROOM, room);
         return messageDetail;
     }
 
-    public static Intent getIntent(Context context, Message message, long anonUserId) {
-        Intent messageDetail = getIntent(context, message);
+    public static Intent getIntent(Context context, Message message, AbstractRoom room, long anonUserId) {
+        Intent messageDetail = getIntent(context, message, room);
         messageDetail.putExtra(EXTRA_ANON_USER_ID, anonUserId);
         return messageDetail;
     }
@@ -120,11 +125,23 @@ public class MessageDetailsActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.message_detail_app_bar);
         setSupportActionBar(toolbar);
 
+        AbstractRoom room = getIntent().getParcelableExtra(EXTRA_ROOM);
+        String activityTitle;
+        if (room != null) {
+            if (room.isPublic()) {
+                activityTitle = ((PublicRoom) room).getName();
+            } else {
+                activityTitle = ((PrivateRoom) room).getAndSetOther(UserManager.getId(this)).getName();
+            }
+        } else {
+            activityTitle = getResources().getString(R.string.message);
+        }
+
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
-            actionBar.setTitle("Message");
+            actionBar.setTitle(activityTitle);
         }
 
         mMessage = getIntent().getParcelableExtra(EXTRA_MESSAGE);

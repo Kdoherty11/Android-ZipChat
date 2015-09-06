@@ -3,6 +3,7 @@ package com.kdoherty.zipchat.models;
 import android.os.Parcel;
 
 import com.kdoherty.zipchat.utils.MyObjects;
+import com.kdoherty.zipchat.utils.UserManager;
 
 /**
  * Created by kdoherty on 12/14/14.
@@ -26,6 +27,12 @@ public class PrivateRoom extends AbstractRoom {
 
     public PrivateRoom() {
         super(RoomType.PRIVATE);
+    }
+
+    public PrivateRoom(long roomId, User sender, User receiver) {
+        super(RoomType.PRIVATE, roomId);
+        this.sender = sender;
+        this.receiver = receiver;
     }
 
     public PrivateRoom(long roomId, User other, long lastActivity) {
