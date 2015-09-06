@@ -90,7 +90,7 @@ public class RequestsFragment extends Fragment implements SwipeRefreshLayout.OnR
             @Override
             public void failure(RetrofitError error) {
                 mSwipeRefreshLayout.setRefreshing(false);
-                NetworkManager.logErrorResponse(TAG, "Getting chat requests for a user with ID: " + userId, error);
+                NetworkManager.handleErrorResponse(TAG, "Getting chat requests for a user with ID: " + userId, error, getActivity());
             }
         });
     }

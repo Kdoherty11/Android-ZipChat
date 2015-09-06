@@ -161,7 +161,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
             @Override
             public void failure(RetrofitError error) {
-                NetworkManager.logErrorResponse(TAG, "Getting request status", error);
+                NetworkManager.handleErrorResponse(TAG, "Getting request status", error, UserDetailsActivity.this);
                 stopLoading();
             }
         });
@@ -197,7 +197,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
             @Override
             public void failure(RetrofitError error) {
-                NetworkManager.logErrorResponse(TAG, "Sending a chat request", error);
+                NetworkManager.handleErrorResponse(TAG, "Sending a chat request", error, UserDetailsActivity.this);
             }
         });
     }

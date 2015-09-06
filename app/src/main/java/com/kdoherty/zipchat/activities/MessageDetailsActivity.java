@@ -342,7 +342,7 @@ public class MessageDetailsActivity extends AppCompatActivity {
                 if (response.getStatus() == 400 && NetworkManager.responseToString(response).contains("already flagged")) {
                     Toast.makeText(MessageDetailsActivity.this, getString(R.string.message_reported_failed_toast), Toast.LENGTH_SHORT).show();
                 } else {
-                    NetworkManager.logErrorResponse(TAG, "Reporting a message", error);
+                    NetworkManager.handleErrorResponse(TAG, "Reporting a message", error, MessageDetailsActivity.this);
                 }
 
             }
@@ -412,7 +412,7 @@ public class MessageDetailsActivity extends AppCompatActivity {
                             @Override
                             public void failure(RetrofitError error) {
                                 stopFavoriteLoading();
-                                NetworkManager.logErrorResponse(TAG, "Removing a favorite from MessageDetails", error);
+                                NetworkManager.handleErrorResponse(TAG, "Removing a favorite from MessageDetails", error, MessageDetailsActivity.this);
                                 Toast.makeText(MessageDetailsActivity.this, getResources().getString(R.string.msg_favorite_failed_toast), Toast.LENGTH_SHORT).show();
                             }
                         });
@@ -428,7 +428,7 @@ public class MessageDetailsActivity extends AppCompatActivity {
                             @Override
                             public void failure(RetrofitError error) {
                                 stopFavoriteLoading();
-                                NetworkManager.logErrorResponse(TAG, "Removing a favorite from MessageDetails", error);
+                                NetworkManager.handleErrorResponse(TAG, "Removing a favorite from MessageDetails", error, MessageDetailsActivity.this);
                                 Toast.makeText(MessageDetailsActivity.this, getResources().getString(R.string.remove_msg_favorite_failed_toast), Toast.LENGTH_SHORT).show();
                             }
                         });

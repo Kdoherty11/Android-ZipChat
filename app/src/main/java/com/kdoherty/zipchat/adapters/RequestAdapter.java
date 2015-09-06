@@ -141,7 +141,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
                 @Override
                 public void failure(RetrofitError error) {
-                    NetworkManager.logErrorResponse(TAG, "Responding to request with id: " + requestId, error);
+                    NetworkManager.handleErrorResponse(TAG, "Responding to request with id: " + requestId, error, mContext);
                 }
             });
 

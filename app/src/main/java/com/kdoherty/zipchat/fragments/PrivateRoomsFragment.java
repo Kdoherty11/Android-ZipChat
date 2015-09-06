@@ -97,7 +97,7 @@ public class PrivateRoomsFragment extends Fragment implements Filterable, SwipeR
             @Override
             public void failure(RetrofitError error) {
                 mSwipeRefreshLayout.setRefreshing(false);
-                NetworkManager.logErrorResponse(TAG, "Getting private rooms by userId: " + userId, error);
+                NetworkManager.handleErrorResponse(TAG, "Getting private rooms by userId: " + userId, error, getActivity());
             }
         });
     }

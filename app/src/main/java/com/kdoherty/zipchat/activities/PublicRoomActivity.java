@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NavUtils;
@@ -186,7 +185,7 @@ public class PublicRoomActivity extends AbstractLocationActivity {
 
             @Override
             public void failure(RetrofitError error) {
-                NetworkManager.logErrorResponse(TAG, "Subscribing to room with id " + roomId, error);
+                NetworkManager.handleErrorResponse(TAG, "Subscribing to room with id " + roomId, error, PublicRoomActivity.this);
             }
         });
     }
@@ -204,7 +203,7 @@ public class PublicRoomActivity extends AbstractLocationActivity {
 
             @Override
             public void failure(RetrofitError error) {
-                NetworkManager.logErrorResponse(TAG, "Removing subscription from room with id " + roomId, error);
+                NetworkManager.handleErrorResponse(TAG, "Removing subscription from room with id " + roomId, error, PublicRoomActivity.this);
             }
         });
     }

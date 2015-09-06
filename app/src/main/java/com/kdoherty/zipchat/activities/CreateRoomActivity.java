@@ -231,7 +231,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
 
                     @Override
                     public void failure(RetrofitError error) {
-                        NetworkManager.logErrorResponse(TAG, "Creating a chat room", error);
+                        NetworkManager.handleErrorResponse(TAG, "Creating a chat room", error, CreateRoomActivity.this);
                     }
                 });
             }

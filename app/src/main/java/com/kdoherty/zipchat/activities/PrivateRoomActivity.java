@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.events.LeaveRoomEvent;
@@ -55,6 +56,10 @@ public class PrivateRoomActivity extends AppCompatActivity implements View.OnCli
         final Intent intent = getIntent();
         mPrivateRoom = intent.getParcelableExtra(EXTRA_ROOM);
         mOtherUser = mPrivateRoom.getAndSetOther(UserManager.getId(this));
+
+        if (!mPrivateRoom.isOtherInRoom()) {
+            Toast.makeText(this, mOtherUser.getName() + getResources().getString(R.string.user_left_room_toast), Toast.LENGTH_SHORT).show();
+        }
 
         ZipChatApplication.initImageLoader(this);
 
@@ -114,7 +119,7 @@ public class PrivateRoomActivity extends AppCompatActivity implements View.OnCli
 
             @Override
             public void failure(RetrofitError error) {
-                NetworkManager.logErrorResponse(TAG, "Leaving a private room", error);
+                NetworkManager.handleErrorResponse(TAG, "Leaving a private room", error, PrivateRoomActivity.this);
             }
         });
 

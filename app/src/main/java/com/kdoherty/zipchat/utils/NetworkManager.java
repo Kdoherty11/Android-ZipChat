@@ -1,6 +1,8 @@
 package com.kdoherty.zipchat.utils;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.text.TextUtils;
@@ -8,12 +10,16 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.facebook.AccessToken;
 import com.kdoherty.zipchat.R;
+import com.kdoherty.zipchat.activities.LoginActivity;
+import com.kdoherty.zipchat.services.ZipChatApi;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
@@ -73,20 +79,21 @@ public final class NetworkManager {
         return sb.toString();
     }
 
-    public static void logErrorResponse(String tag, String scenario, RetrofitError error) {
+    public static void handleErrorResponse(String tag, String scenario, RetrofitError error, Context context) {
         StringBuilder sb = new StringBuilder();
         if (!TextUtils.isEmpty(scenario)) {
             sb.append("Scenario: ");
             sb.append(scenario);
         }
-
+        int status = 0;
         if (error != null) {
             sb.append("\nURL: ");
             sb.append(error.getUrl());
 
             if (error.getResponse() != null) {
+                status = error.getResponse().getStatus();
                 sb.append("\nStatus: ");
-                sb.append(error.getResponse().getStatus());
+                sb.append(status);
             }
 
             sb.append("\nResponse: ");
@@ -99,5 +106,13 @@ public final class NetworkManager {
         String errorMessage = sb.toString();
 
         Crashlytics.log(Log.ERROR, tag, errorMessage);
+
+        if (status == 401) {
+            Intent loginIntent = new Intent(context, LoginActivity.class);
+            context.startActivity(loginIntent);
+            if (context instanceof Activity) {
+                ((Activity) context).finish();
+            }
+        }
     }
 }

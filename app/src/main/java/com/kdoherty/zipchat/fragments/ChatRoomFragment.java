@@ -109,7 +109,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
         @Override
         public void failure(RetrofitError error) {
             hideMessageLoadingPb();
-            NetworkManager.logErrorResponse(TAG, "Getting " + mRoom.getType() + " room chat messages", error);
+            NetworkManager.handleErrorResponse(TAG, "Getting " + mRoom.getType() + " room chat messages", error, getActivity());
             mMessagesLoading = true;
         }
     };

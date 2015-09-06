@@ -72,6 +72,8 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
         if (currentAccessToken != null && !TextUtils.isEmpty(currentAccessToken.getToken()) && !currentAccessToken.isExpired()) {
             authUser(currentAccessToken.getToken());
             mSentAuthRequest = true;
+        } else {
+            AccessToken.refreshCurrentAccessTokenAsync();
         }
     }
 
@@ -94,7 +96,7 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
 
             @Override
             public void failure(RetrofitError error) {
-                NetworkManager.logErrorResponse(TAG, "Sending fb access token", error);
+                NetworkManager.handleErrorResponse(TAG, "Sending fb access token", error, getActivity());
                 // Retry button?
                 mAuthPb.setVisibility(View.GONE);
                 mLoginButton.setVisibility(View.VISIBLE);
@@ -167,7 +169,7 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
 
                 @Override
                 public void failure(RetrofitError error) {
-                    NetworkManager.logErrorResponse(TAG, "Creating a user", error);
+                    NetworkManager.handleErrorResponse(TAG, "Creating a user", error, getActivity());
                     mLoginButton.setVisibility(View.VISIBLE);
                     mAuthPb.setVisibility(View.GONE);
 

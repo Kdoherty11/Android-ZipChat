@@ -1,5 +1,6 @@
 package com.kdoherty.zipchat.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -7,6 +8,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.facebook.AccessToken;
 import com.kdoherty.zipchat.R;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -70,14 +72,9 @@ public class FacebookManager {
         ImageLoader.getInstance().displayImage(getProfilePicUrl(userId), imageView, displayProfPicOpts);
     }
 
-    public static void displayProfilePicture(String userId, ImageView imageView, String type) {
-        ImageLoader.getInstance().displayImage(getProfilePicUrl(userId, type), imageView, displayProfPicOpts);
-    }
-
     public static void displayProfilePicture(String userId, ImageView imageView, int width, int height) {
         ImageLoader.getInstance().displayImage(getProfilePicUrl(userId, width, height), imageView, displayProfPicOpts);
     }
-
 
     public static Bitmap getFacebookProfilePicture(Context context, String userId) {
         if (TextUtils.isEmpty(userId)) {

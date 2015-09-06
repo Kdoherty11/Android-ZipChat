@@ -3,6 +3,15 @@ package com.kdoherty.zipchat.utils;
 import android.content.Context;
 
 import com.kdoherty.zipchat.models.User;
+import com.kdoherty.zipchat.services.ZipChatApi;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.Future;
+
+import retrofit.Callback;
 
 public class UserManager {
 
@@ -12,6 +21,7 @@ public class UserManager {
 
     private static final String PREFS_USER_ID = "utils.UserManager.prefs.USER_ID";
     private static final String PREFS_AUTH_TOKEN = "utils.UserManager.prefs.AUTH_TOKEN";
+    private static final String PREFS_AUTH_TOKEN_TIMESTAMP = "utils.UserManager.prefs.AUTH_TOKEN_TIMESTAMP";
     private static final String PREFS_DEVICE_ID = "utils.UserManager.prefs.DEVICE_ID";
 
     private static final long DEFAULT_USER_ID = -1;
@@ -30,7 +40,16 @@ public class UserManager {
         return PrefsHelper.readFromPreferences(context, PREFS_FILE, PREFS_USER_ID, DEFAULT_USER_ID);
     }
 
+//    public static boolean isAuthTokenExpired(Context context) {
+//        long defaultTimeStamp = -1;
+//        long authTokenTimeStamp = PrefsHelper.readFromPreferences(context, PREFS_FILE, PREFS_AUTH_TOKEN_TIMESTAMP, defaultTimeStamp);
+//        long now = new Date().getTime();
+//        long expirationTimeMillis = 24 * 60 * 60 * 1000;
+//        return authTokenTimeStamp == defaultTimeStamp || authTokenTimeStamp + expirationTimeMillis >= now;
+//    }
+
     public static void storeAuthToken(Context context, String authToken) {
+        PrefsHelper.saveToPreferences(context, PREFS_FILE, PREFS_AUTH_TOKEN_TIMESTAMP, authToken);
         PrefsHelper.saveToPreferences(context, PREFS_FILE, PREFS_AUTH_TOKEN, authToken);
     }
 

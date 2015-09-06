@@ -67,7 +67,7 @@ public class RegistrationIntentService extends IntentService {
 
             @Override
             public void failure(RetrofitError error) {
-                NetworkManager.logErrorResponse(TAG, "Replacing regId", error);
+                NetworkManager.handleErrorResponse(TAG, "Replacing regId", error, getApplicationContext());
             }
         });
     }
@@ -90,7 +90,7 @@ public class RegistrationIntentService extends IntentService {
 
             @Override
             public void failure(RetrofitError error) {
-                NetworkManager.logErrorResponse(TAG, "Registering device", error);
+                NetworkManager.handleErrorResponse(TAG, "Registering device", error, getApplicationContext());
             }
         });
     }

@@ -1,6 +1,7 @@
 package com.kdoherty.zipchat.models;
 
 import android.os.Parcel;
+import android.support.annotation.Nullable;
 
 import com.kdoherty.zipchat.utils.MyObjects;
 import com.kdoherty.zipchat.utils.UserManager;
@@ -66,7 +67,7 @@ public class PrivateRoom extends AbstractRoom {
         return receiverInRoom;
     }
 
-    public User getOther() {
+    public @Nullable User getOther() {
         return other;
     }
 
@@ -77,6 +78,14 @@ public class PrivateRoom extends AbstractRoom {
             other = sender;
         }
         return other;
+    }
+
+    public boolean isOtherInRoom() {
+        if (other == null) {
+            throw new RuntimeException("other must be set before calling this method");
+        }
+
+        return other.equals(sender) ? senderInRoom : receiverInRoom;
     }
 
     @Override
