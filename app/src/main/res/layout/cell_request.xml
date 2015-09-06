@@ -44,8 +44,7 @@
         android:layout_marginBottom="@dimen/private_chat_picture_margins"
         android:layout_marginLeft="4dp"
         android:layout_marginRight="@dimen/private_chat_picture_margins"
-        android:layout_marginTop="@dimen/private_chat_picture_margins"
-        android:src="@drawable/profile_pic" />
+        android:layout_marginTop="@dimen/private_chat_picture_margins" />
 
     <TextView
         android:id="@+id/chat_request_sender_name"
