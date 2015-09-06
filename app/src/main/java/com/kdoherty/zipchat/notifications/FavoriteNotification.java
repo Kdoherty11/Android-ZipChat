@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
+import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.models.AbstractRoom;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.PublicRoom;
@@ -30,17 +31,15 @@ public class FavoriteNotification extends AbstractNotification {
     public void handleNotification() {
         boolean addRoomToBackStack = !room.isPublic() || userInArea((PublicRoom) room);
         PendingIntent contentIntent = getMessageDetailsPendingIntent(message, room, addRoomToBackStack);
-        notifyMessageFavorited(contentIntent, mMessageFavoritor.getName(), message.getMessage());
+        notifyMessageFavorited(contentIntent);
     }
 
-    private void notifyMessageFavorited(PendingIntent contentIntent, String userName, String message) {
+    private void notifyMessageFavorited(PendingIntent contentIntent) {
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(mContext)
-                        .setContentTitle("Favorite")
-                        .setStyle(new NotificationCompat.BigTextStyle()
-                                .bigText(message))
+                        .setContentTitle(mContext.getString(R.string.message_favorited))
                         .setContentIntent(contentIntent)
-                        .setContentText(userName + " has favorited your message");
+                        .setContentText(mMessageFavoritor.getName() + " " + mContext.getString(R.string.has_favorited_your_message));
 
         setNotificationDefaults(builder);
 

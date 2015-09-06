@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
+import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.HomeActivity;
 import com.kdoherty.zipchat.events.ReceivedRequestEvent;
 import com.kdoherty.zipchat.models.User;
@@ -34,13 +35,11 @@ public class ChatRequestNotification extends AbstractNotification {
 
         PendingIntent contentIntent = PendingIntent.getActivity(mContext, 0, intent, 0);
 
-        String message = mRequestSender.getName() + " sent you a chat request!";
+        String message = mRequestSender.getName() + " " + mContext.getString(R.string.send_you_a_chat_request);
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(mContext)
-                        .setContentTitle("Chat Request")
-                        .setStyle(new NotificationCompat.BigTextStyle()
-                                .bigText(message))
+                        .setContentTitle(mContext.getString(R.string.chat_request))
                         .setContentIntent(contentIntent)
                         .setContentText(message);
 

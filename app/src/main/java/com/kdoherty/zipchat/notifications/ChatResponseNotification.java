@@ -46,9 +46,6 @@ public class ChatResponseNotification extends AbstractNotification {
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(mContext)
-                        .setContentTitle("Response")
-                        .setStyle(new NotificationCompat.BigTextStyle()
-                                .bigText(message))
                         .setContentIntent(contentIntent)
                         .setContentText(message);
 

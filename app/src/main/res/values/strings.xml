@@ -28,6 +28,12 @@
     <string name="btn_text_send_request">Send Chat Request</string>
     <string name="btn_text_already_chatting">"Already chatting"</string>
 
+    <!-- ***** Notifications ***** -->
+    <string name="message_favorited">Message Favorited!</string>
+    <string name="has_favorited_your_message">has favorited your message</string>
+    <string name="send_you_a_chat_request">sent you a chat request!</string>
+    <string name="chat_request">Chat Request</string>
+
     <!-- ***** App IDs ***** -->
     <string name="facebook_app_id">1512980755633097</string>
 
