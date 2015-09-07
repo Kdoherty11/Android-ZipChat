@@ -69,15 +69,24 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         AccessToken currentAccessToken = AccessToken.getCurrentAccessToken();
+
         if (currentAccessToken != null && !TextUtils.isEmpty(currentAccessToken.getToken()) && !currentAccessToken.isExpired()) {
-            authUser(currentAccessToken.getToken());
-            mSentAuthRequest = true;
+            if (UserManager.didCreateUser(activity)) {
+                if (!mSentAuthRequest) {
+                    authUser(currentAccessToken.getToken());
+                    mSentAuthRequest = true;
+                }
+            } else {
+                createUser(currentAccessToken.getToken());
+            }
         } else {
             AccessToken.refreshCurrentAccessTokenAsync();
         }
     }
 
     private void authUser(String accessToken) {
+        Log.i(TAG, "Sending auth request");
+
         ZipChatApi.INSTANCE.auth(accessToken, new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
@@ -127,58 +136,60 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
 
     @Override
     public void onSuccess(LoginResult loginResult) {
-        if (UserManager.didCreateUser(getActivity()) && !mSentAuthRequest) {
-            authUser(loginResult.getAccessToken().getToken());
+        if (UserManager.didCreateUser(getActivity())) {
+            if (!mSentAuthRequest) {
+                authUser(loginResult.getAccessToken().getToken());
+            }
         } else {
-            Log.i(TAG, "Creating user");
-
-            showLoading();
-
-            ZipChatApi.INSTANCE.createUser(loginResult.getAccessToken().getToken(), null, "android", new Callback<Response>() {
-                @Override
-                public void success(Response response, Response response2) {
-                    try {
-                        JSONObject respJson = new JSONObject(NetworkManager.responseToString(response));
-                        long userId = respJson.getLong("userId");
-                        String authToken = respJson.getString("authToken");
-                        String fbId = respJson.getString("facebookId");
-                        String fbName = respJson.getString("name");
-
-                        Log.i(TAG, "onCreate userId: " + userId);
-                        Log.i(TAG, "OnCreate auth: " + authToken);
-                        Log.i(TAG, "OnCreate fbId: " + fbId);
-                        Log.i(TAG, "OnCreate fbName: " + fbName);
-
-                        Activity activity = getActivity();
-                        UserManager.storeId(activity, userId);
-                        UserManager.storeAuthToken(activity, authToken);
-                        FacebookManager.saveFacebookInformation(activity, fbName, fbId);
-                    } catch (JSONException e) {
-                        Log.e(TAG, "Parsing the createUser json response " + e);
-                        return;
-                    }
-
-                    // Start service which will register the device
-                    Intent intent = new Intent(getActivity(), RegistrationIntentService.class);
-                    getActivity().startService(intent);
-
-                    mAuthPb.setVisibility(View.GONE);
-
-                    continueToApp();
-                }
-
-                @Override
-                public void failure(RetrofitError error) {
-                    NetworkManager.handleErrorResponse(TAG, "Creating a user", error, getActivity());
-                    mLoginButton.setVisibility(View.VISIBLE);
-                    mAuthPb.setVisibility(View.GONE);
-
-                    Toast.makeText(getActivity(), getString(R.string.toast_login_failure), Toast.LENGTH_SHORT).show();
-                }
-            });
+            createUser(loginResult.getAccessToken().getToken());
         }
+    }
 
+    private void createUser(String accessToken) {
+        Log.i(TAG, "Creating user");
+        showLoading();
+        ZipChatApi.INSTANCE.createUser(accessToken, null, "android", new Callback<Response>() {
+            @Override
+            public void success(Response response, Response response2) {
+                try {
+                    JSONObject respJson = new JSONObject(NetworkManager.responseToString(response));
+                    long userId = respJson.getLong("userId");
+                    String authToken = respJson.getString("authToken");
+                    String fbId = respJson.getString("facebookId");
+                    String fbName = respJson.getString("name");
 
+                    Log.i(TAG, "onCreate userId: " + userId);
+                    Log.i(TAG, "OnCreate auth: " + authToken);
+                    Log.i(TAG, "OnCreate fbId: " + fbId);
+                    Log.i(TAG, "OnCreate fbName: " + fbName);
+
+                    Activity activity = getActivity();
+                    UserManager.storeId(activity, userId);
+                    UserManager.storeAuthToken(activity, authToken);
+                    FacebookManager.saveFacebookInformation(activity, fbName, fbId);
+                } catch (JSONException e) {
+                    Log.e(TAG, "Parsing the createUser json response " + e);
+                    return;
+                }
+
+                // Start service which will register the device
+                Intent intent = new Intent(getActivity(), RegistrationIntentService.class);
+                getActivity().startService(intent);
+
+                mAuthPb.setVisibility(View.GONE);
+
+                continueToApp();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                NetworkManager.handleErrorResponse(TAG, "Creating a user", error, getActivity());
+                mLoginButton.setVisibility(View.VISIBLE);
+                mAuthPb.setVisibility(View.GONE);
+
+                Toast.makeText(getActivity(), getString(R.string.toast_login_failure), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -189,5 +200,6 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
     @Override
     public void onError(FacebookException e) {
         Log.e(TAG, "Error logging into facebook " + e.getMessage());
+        Toast.makeText(getActivity(), getString(R.string.toast_login_failure), Toast.LENGTH_SHORT).show();
     }
 }
