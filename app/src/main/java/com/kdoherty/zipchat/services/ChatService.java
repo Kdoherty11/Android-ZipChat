@@ -14,7 +14,6 @@ public class ChatService extends Thread {
     private static final String WEBSOCKET_ENDPOINT = "ws://zipchatapp.herokuapp.com/";
     private AsyncHttpClient.WebSocketConnectCallback mCallback;
     private String mUrl;
-
     private Future<WebSocket> mWebSocketFuture;
 
     ChatService(ChatService other) {

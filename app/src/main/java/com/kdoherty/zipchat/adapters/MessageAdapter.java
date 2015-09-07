@@ -22,7 +22,6 @@ import android.widget.TextView;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.UserDetailsActivity;
 import com.kdoherty.zipchat.activities.ZipChatApplication;
-import com.kdoherty.zipchat.models.AbstractRoom;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.FacebookManager;
@@ -118,7 +117,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
             messageCellViewHolder.profilePicture.setImageDrawable(mActivity.getResources().getDrawable(R.drawable.com_facebook_profile_picture_blank_square));
         } else {
             ImageLoader.getInstance().displayImage(FacebookManager.getProfilePicUrl(sender.getFacebookId()), messageCellViewHolder.profilePicture,
-                    FacebookManager.displayProfPicOpts, mAnimateFirstListener);
+                    FacebookManager.DISPLAY_PROF_PIC_OPTS, mAnimateFirstListener);
         }
 
         if (sender.getUserId() == mSelfUserId || sender.getUserId() == mAnonUserId) {
@@ -145,7 +144,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
             messageCellViewHolder.failedMsgLayout.setVisibility(View.GONE);
 
             messageCellViewHolder.favoriteLayout.setVisibility(View.VISIBLE);
-            messageCellViewHolder.favorite.setOnClickListener(new FavoriteClickListener(message, userId));
+            messageCellViewHolder.favoriteLayout.setOnClickListener(new FavoriteClickListener(message, userId));
 
             Message.FavoriteState favoriteState = message.getFavoriteState(userId);
 
@@ -321,7 +320,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
 
     public interface MessageCellClickListener {
         void onFavoriteClick(long messageId, boolean isFavorite);
+
         void onResendMessageClick(Message message);
+
         void onMessageClick(Message message);
     }
 

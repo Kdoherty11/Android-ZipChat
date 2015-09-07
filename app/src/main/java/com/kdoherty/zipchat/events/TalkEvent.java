@@ -7,13 +7,13 @@ import com.kdoherty.zipchat.models.Message;
  */
 public class TalkEvent {
 
-    private Message message;
+    private Message mMessage;
 
     public TalkEvent(Message message) {
-        this.message = message;
+        this.mMessage = message;
     }
 
     public Message getMessage() {
-        return message;
+        return mMessage;
     }
 }

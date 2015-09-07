@@ -28,7 +28,6 @@ import com.kdoherty.zipchat.utils.UserManager;
 import com.kdoherty.zipchat.views.DividerItemDecoration;
 import com.squareup.otto.Subscribe;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 

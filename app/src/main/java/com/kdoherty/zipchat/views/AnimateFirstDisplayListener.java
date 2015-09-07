@@ -13,20 +13,20 @@ import java.util.List;
 
 public class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
 
-    static final List<String> displayedImages = Collections.synchronizedList(new LinkedList<String>());
+    static final List<String> sDisplayedImages = Collections.synchronizedList(new LinkedList<String>());
 
     public static void clearImages() {
-        displayedImages.clear();
+        sDisplayedImages.clear();
     }
 
     @Override
     public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
         if (loadedImage != null) {
             ImageView imageView = (ImageView) view;
-            boolean firstDisplay = !displayedImages.contains(imageUri);
+            boolean firstDisplay = !sDisplayedImages.contains(imageUri);
             if (firstDisplay) {
                 FadeInBitmapDisplayer.animate(imageView, 500);
-                displayedImages.add(imageUri);
+                sDisplayedImages.add(imageUri);
             }
         }
     }

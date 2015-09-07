@@ -5,13 +5,13 @@ package com.kdoherty.zipchat.events;
  */
 public class IsSubscribedEvent {
 
-    private boolean isSubscribed;
+    private boolean mIsSubscribed;
 
     public IsSubscribedEvent(boolean isSubscribed) {
-        this.isSubscribed = isSubscribed;
+        this.mIsSubscribed = isSubscribed;
     }
 
     public boolean isSubscribed() {
-        return isSubscribed;
+        return mIsSubscribed;
     }
 }

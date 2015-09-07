@@ -16,21 +16,21 @@ import com.kdoherty.zipchat.models.User;
  */
 public class FavoriteNotification extends AbstractNotification {
 
-    private Message message;
+    private Message mMessage;
     private User mMessageFavoritor;
-    private AbstractRoom room;
+    private AbstractRoom mRoom;
 
     public FavoriteNotification(Context context, Bundle data) {
         super(context);
-        message = mGson.fromJson(data.getString(Key.MESSAGE), Message.class);
+        mMessage = mGson.fromJson(data.getString(Key.MESSAGE), Message.class);
         mMessageFavoritor = mGson.fromJson(data.getString(Key.USER), User.class);
-        room = mGson.fromJson(data.getString(Key.ROOM), AbstractRoom.class);
+        mRoom = mGson.fromJson(data.getString(Key.ROOM), AbstractRoom.class);
     }
 
     @Override
     public void handleNotification() {
-        boolean addRoomToBackStack = !room.isPublic() || userInArea((PublicRoom) room);
-        PendingIntent contentIntent = getMessageDetailsPendingIntent(message, room, addRoomToBackStack);
+        boolean addRoomToBackStack = !mRoom.isPublic() || userInArea((PublicRoom) mRoom);
+        PendingIntent contentIntent = getMessageDetailsPendingIntent(mMessage, mRoom, addRoomToBackStack);
         notifyMessageFavorited(contentIntent);
     }
 

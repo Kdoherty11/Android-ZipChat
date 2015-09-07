@@ -23,7 +23,7 @@ public class MessageFavoritesFragment extends Fragment {
     private static final String TAG = MessageFavoritesFragment.class.getSimpleName();
     private static final String ARG_MESSAGE_FAVORITES = "fragments.MessageFavoritesFragment.arg.MESSAGE_FAVORITES";
     private static final int NUM_COLS = 4;
-    private List<User> mMessageFavoritors = new ArrayList<>();
+    private List<User> mMessageFavorites = new ArrayList<>();
     private UserAdapter mFavoriteAdapter;
 
     public MessageFavoritesFragment() {
@@ -41,7 +41,7 @@ public class MessageFavoritesFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mMessageFavoritors = getArguments().getParcelableArrayList(ARG_MESSAGE_FAVORITES);
+        mMessageFavorites = getArguments().getParcelableArrayList(ARG_MESSAGE_FAVORITES);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class MessageFavoritesFragment extends Fragment {
         messageFavoritesRv.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity(), NUM_COLS);
         messageFavoritesRv.setLayoutManager(layoutManager);
-        mFavoriteAdapter = new UserAdapter(getActivity(), R.layout.cell_msg_favoritor, mMessageFavoritors);
+        mFavoriteAdapter = new UserAdapter(getActivity(), R.layout.cell_msg_favoritor, mMessageFavorites);
         messageFavoritesRv.setAdapter(mFavoriteAdapter);
     }
 

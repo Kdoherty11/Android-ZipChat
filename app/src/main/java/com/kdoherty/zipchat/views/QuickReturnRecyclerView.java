@@ -14,7 +14,7 @@ import android.widget.FrameLayout;
 /**
  * Add view with BottomToolBarRecyclerView.setReturningView to be used as a QuickReturnView
  * when the user scrolls down the content.
- * <p/>
+ * <p>
  * Created by johnen on 14-11-11.
  * https://gist.github.com/JohNan/df776dc4926a1676cc05
  */

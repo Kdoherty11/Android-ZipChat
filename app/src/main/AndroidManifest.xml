@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.kdoherty.zipchat" >
+    package="com.kdoherty.zipchat">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -29,16 +29,16 @@
         android:required="false" />
 
     <application
+        android:name=".activities.ZipChatApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_zipchat"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:name=".activities.ZipChatApplication">
+        android:theme="@style/AppTheme">
 
         <activity
             android:name=".activities.HomeActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTop" >
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -50,15 +50,15 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-        <activity android:name="com.facebook.FacebookActivity"
-            android:configChanges=
-                "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            android:label="@string/app_name" />
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
             android:name=".activities.CreateRoomActivity"
             android:label="@string/title_activity_create_room"
-            android:parentActivityName=".activities.HomeActivity" >
+            android:parentActivityName=".activities.HomeActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.HomeActivity" />
@@ -68,7 +68,7 @@
             android:label="@string/title_activity_chat_room"
             android:launchMode="singleTop"
             android:parentActivityName=".activities.HomeActivity"
-            android:windowSoftInputMode="stateHidden" >
+            android:windowSoftInputMode="stateHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.HomeActivity" />
@@ -78,14 +78,14 @@
             android:label="@string/title_activity_chat_room"
             android:launchMode="singleTop"
             android:parentActivityName=".activities.HomeActivity"
-            android:windowSoftInputMode="stateHidden" >
+            android:windowSoftInputMode="stateHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.HomeActivity" />
         </activity>
         <activity
             android:name=".activities.LoginActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -96,17 +96,18 @@
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
             android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND" >
+            android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
                 <category android:name="com.kdoherty.zipchat" />
             </intent-filter>
         </receiver>
 
         <service
             android:name=".services.MyGcmListenerService"
-            android:exported="false" >
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
@@ -116,14 +117,13 @@
             android:name="com.kdoherty.zipchat.services.MyInstanceIDListenerService"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.google.android.gms.iid.InstanceID"/>
+                <action android:name="com.google.android.gms.iid.InstanceID" />
             </intent-filter>
         </service>
 
         <service
             android:name="com.kdoherty.zipchat.services.RegistrationIntentService"
-            android:exported="false">
-        </service>
+            android:exported="false"></service>
 
         <uses-feature
             android:glEsVersion="0x00020000"
@@ -141,12 +141,11 @@
 
         <activity
             android:name=".activities.UserDetailsActivity"
-            android:label="@string/title_activity_request" >
-        </activity>
+            android:label="@string/title_activity_request"></activity>
         <activity
             android:name=".activities.MessageDetailsActivity"
-            android:label="@string/title_activity_message_detail" >
-        </activity>
+            android:label="@string/title_activity_message_detail"></activity>
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="db48d17eabb4c3bf5044e2ee7c913f07b8723695" />

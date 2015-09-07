@@ -15,7 +15,8 @@ import com.nostra13.universalimageloader.core.ImageLoader;
  */
 public class FacebookManager {
 
-    public static final DisplayImageOptions displayProfPicOpts = new DisplayImageOptions.Builder()
+
+    public static final DisplayImageOptions DISPLAY_PROF_PIC_OPTS = new DisplayImageOptions.Builder()
             .showImageOnLoading(R.drawable.com_facebook_profile_picture_blank_portrait)
             .showImageForEmptyUri(R.drawable.com_facebook_profile_picture_blank_portrait)
             .showImageOnFail(R.drawable.com_facebook_profile_picture_blank_portrait)
@@ -63,17 +64,17 @@ public class FacebookManager {
     }
 
     public static void displayProfilePicture(String userId, ImageView imageView) {
-        ImageLoader.getInstance().displayImage(getProfilePicUrl(userId), imageView, displayProfPicOpts);
+        ImageLoader.getInstance().displayImage(getProfilePicUrl(userId), imageView, DISPLAY_PROF_PIC_OPTS);
     }
 
     public static void displayProfilePicture(String userId, ImageView imageView, int width, int height) {
-        ImageLoader.getInstance().displayImage(getProfilePicUrl(userId, width, height), imageView, displayProfPicOpts);
+        ImageLoader.getInstance().displayImage(getProfilePicUrl(userId, width, height), imageView, DISPLAY_PROF_PIC_OPTS);
     }
 
     public static Bitmap getFacebookProfilePicture(Context context, String userId) {
         if (TextUtils.isEmpty(userId)) {
             return BitmapFactory.decodeResource(context.getResources(), R.drawable.com_facebook_profile_picture_blank_square);
         }
-        return ImageLoader.getInstance().loadImageSync(getProfilePicUrl(userId), displayProfPicOpts);
+        return ImageLoader.getInstance().loadImageSync(getProfilePicUrl(userId), DISPLAY_PROF_PIC_OPTS);
     }
 }

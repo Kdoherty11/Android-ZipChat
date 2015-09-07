@@ -47,7 +47,7 @@ public interface ZipChatApi {
     @FormUrlEncoded
     @POST("/publicRooms")
     void createPublicRoom(@Header(AUTH_TOKEN_KEY) String authToken, @Field("name") String roomName, @Field("radius") int radius,
-                          @Field("latitude") double latitude, @Field("longitude") double longitude,
+                          @Field("latitude") double latitude, @Field("longitude") double longitude, @Field("creatorId") long creatorId,
                           Callback<Response> response);
 
     @GET("/test")

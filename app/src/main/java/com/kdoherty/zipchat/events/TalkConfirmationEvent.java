@@ -7,19 +7,19 @@ import com.kdoherty.zipchat.models.Message;
  */
 public class TalkConfirmationEvent {
 
-    private String uuid;
-    private Message message;
+    private String mUuid;
+    private Message mMessage;
 
     public TalkConfirmationEvent(String uuid, Message message) {
-        this.uuid = uuid;
-        this.message = message;
+        this.mUuid = uuid;
+        this.mMessage = message;
     }
 
     public String getUuid() {
-        return uuid;
+        return mUuid;
     }
 
     public Message getMessage() {
-        return message;
+        return mMessage;
     }
 }

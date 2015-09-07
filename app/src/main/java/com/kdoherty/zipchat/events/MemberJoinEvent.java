@@ -7,13 +7,13 @@ import com.kdoherty.zipchat.models.User;
  */
 public class MemberJoinEvent {
 
-    private User user;
+    private User mUser;
 
     public MemberJoinEvent(User user) {
-        this.user = user;
+        this.mUser = user;
     }
 
     public User getUser() {
-        return user;
+        return mUser;
     }
 }

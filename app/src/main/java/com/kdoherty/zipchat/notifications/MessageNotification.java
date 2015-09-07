@@ -19,21 +19,21 @@ import com.kdoherty.zipchat.utils.FacebookManager;
 public class MessageNotification extends AbstractNotification {
 
     private static final String TAG = MessageNotification.class.getSimpleName();
-    private Message message;
-    private AbstractRoom room;
+    private Message mMessage;
+    private AbstractRoom mRoom;
 
     public MessageNotification(Context context, Bundle data) {
         super(context);
-        this.message = mGson.fromJson(data.getString(Key.MESSAGE), Message.class);
-        this.room = mGson.fromJson(data.getString(Key.ROOM), AbstractRoom.class);
+        this.mMessage = mGson.fromJson(data.getString(Key.MESSAGE), Message.class);
+        this.mRoom = mGson.fromJson(data.getString(Key.ROOM), AbstractRoom.class);
     }
 
     @Override
     public void handleNotification() {
-        if (room.isPublic()) {
-            receivePublicChatMessage((PublicRoom) room);
+        if (mRoom.isPublic()) {
+            receivePublicChatMessage((PublicRoom) mRoom);
         } else {
-            receivePrivateChatMessage((PrivateRoom) room);
+            receivePrivateChatMessage((PrivateRoom) mRoom);
         }
     }
 
@@ -50,18 +50,18 @@ public class MessageNotification extends AbstractNotification {
                 new NotificationCompat.Builder(mContext)
                         .setContentTitle(publicRoom.getName())
                         .setStyle(new NotificationCompat.BigTextStyle()
-                                .bigText(message.getMessage()))
+                                .bigText(mMessage.getMessage()))
                         .setContentIntent(contentIntent)
-                        .setContentText(message.getSender().getName() + ": " + message.getMessage());
+                        .setContentText(mMessage.getSender().getName() + ": " + mMessage.getMessage());
 
         setNotificationDefaults(builder);
 
-        Bitmap senderFbPicBm = FacebookManager.getFacebookProfilePicture(mContext, message.getSender().getFacebookId());
+        Bitmap senderFbPicBm = FacebookManager.getFacebookProfilePicture(mContext, mMessage.getSender().getFacebookId());
         builder.setLargeIcon(senderFbPicBm);
 
         notify(builder.build());
 
-        Log.d(TAG, "Success receiving public room chat message");
+        Log.d(TAG, "Success receiving public mRoom chat message");
     }
 
     private void receivePrivateChatMessage(PrivateRoom room) {
@@ -69,15 +69,15 @@ public class MessageNotification extends AbstractNotification {
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(mContext)
-                        .setContentTitle(message.getSender().getName())
+                        .setContentTitle(mMessage.getSender().getName())
                         .setStyle(new NotificationCompat.BigTextStyle()
-                                .bigText(message.getMessage()))
+                                .bigText(mMessage.getMessage()))
                         .setContentIntent(contentIntent)
-                        .setContentText(message.getMessage());
+                        .setContentText(mMessage.getMessage());
 
         setNotificationDefaults(builder);
 
-        Bitmap senderFbPicBm = FacebookManager.getFacebookProfilePicture(mContext, message.getSender().getFacebookId());
+        Bitmap senderFbPicBm = FacebookManager.getFacebookProfilePicture(mContext, mMessage.getSender().getFacebookId());
         builder.setLargeIcon(senderFbPicBm);
 
         notify(builder.build());

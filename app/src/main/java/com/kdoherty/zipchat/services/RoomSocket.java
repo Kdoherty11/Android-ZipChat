@@ -41,7 +41,7 @@ public class RoomSocket {
     private static final String TAG = RoomSocket.class.getSimpleName();
     private static final long BACKOFF_MILLIS = 2000;
     private static final int MAX_NUM_RETRY_ATTEMPTS = 4;
-    private final long userId;
+    private final long mUserId;
     private Queue<JSONObject> mSocketEventQueue = new ArrayDeque<>();
     private boolean mIsReconnecting = false;
     private ChatService mChatService;
@@ -72,13 +72,13 @@ public class RoomSocket {
                         break;
                     case "join":
                         User joinedUser = gson.fromJson(stringJson.getString("user"), User.class);
-                        if (joinedUser.getUserId() != userId) {
+                        if (joinedUser.getUserId() != mUserId) {
                             BusProvider.getInstance().post(new MemberJoinEvent(joinedUser));
                         }
                         break;
                     case "quit":
                         User quitUser = gson.fromJson(stringJson.getString("user"), User.class);
-                        if (quitUser.getUserId() != userId) {
+                        if (quitUser.getUserId() != mUserId) {
                             BusProvider.getInstance().post(new MemberLeaveEvent(quitUser));
                         }
                         break;
@@ -97,13 +97,13 @@ public class RoomSocket {
                         break;
                     case "favorite":
                         User msgFavoritor = gson.fromJson(stringJson.getString("user"), User.class);
-                        if (msgFavoritor.getUserId() != userId) {
+                        if (msgFavoritor.getUserId() != mUserId) {
                             BusProvider.getInstance().post(new AddFavoriteEvent(msgFavoritor, Long.parseLong(stringJson.getString("message"))));
                         }
                         break;
                     case "removeFavorite":
                         User msgUnfavoritor = gson.fromJson(stringJson.getString("user"), User.class);
-                        if (msgUnfavoritor.getUserId() != userId) {
+                        if (msgUnfavoritor.getUserId() != mUserId) {
                             BusProvider.getInstance().post(new RemoveFavoriteEvent(msgUnfavoritor, Long.parseLong(stringJson.getString("message"))));
                         }
                         break;
@@ -139,7 +139,7 @@ public class RoomSocket {
             }
         }
     };
-    private final CompletedCallback closedCallback = new CompletedCallback() {
+    private final CompletedCallback mClosedCallback = new CompletedCallback() {
         @Override
         public void onCompleted(Exception ex) {
             if (ex != null) {
@@ -153,7 +153,7 @@ public class RoomSocket {
 
     public RoomSocket(Context context, ChatService chatService) {
         this.mContext = context;
-        this.userId = UserManager.getId(context);
+        this.mUserId = UserManager.getId(context);
         this.mChatService = chatService;
     }
 
@@ -161,7 +161,7 @@ public class RoomSocket {
         this.mWebSocket = webSocket;
         if (webSocket != null) {
             this.mWebSocket.setStringCallback(mEventCallback);
-            this.mWebSocket.setClosedCallback(closedCallback);
+            this.mWebSocket.setClosedCallback(mClosedCallback);
             sendQueuedEvents();
         }
     }

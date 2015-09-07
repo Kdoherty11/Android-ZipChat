@@ -191,7 +191,7 @@ public class MessageDetailsActivity extends AppCompatActivity {
         });
 
         mFavoriteIv.setImageDrawable(MessageAdapter.getMessageDrawable(this, mMessage.getFavoriteState()));
-        mFavoriteIv.setOnClickListener(new OnFavoriteClickListener());
+        mFavoriteContainer.setOnClickListener(new OnFavoriteClickListener());
         mSenderNameTv.setText(sender.getName());
         mMsgContentTv.setText(mMessage.getMessage());
 

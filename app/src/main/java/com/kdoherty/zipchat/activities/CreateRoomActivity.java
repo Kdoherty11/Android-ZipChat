@@ -46,7 +46,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
     private boolean mDisableButton = false;
 
     // Name of the room that was created before we had a location
-    private String waitListRoom;
+    private String mWaitListRoomName;
 
     private Location mLocation;
     private GoogleMap mGoogleMap;
@@ -119,10 +119,10 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
     @Override
     public void onConnected(Bundle bundle) {
         mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if (waitListRoom != null) {
-            Log.d(TAG, "Creating room using waitListRoom");
-            Utils.debugToast(this, "Creating room using waitListRoom");
-            new CreateRoomTask(waitListRoom).execute();
+        if (mWaitListRoomName != null) {
+            Log.d(TAG, "Creating room using mWaitListRoomName");
+            Utils.debugToast(this, "Creating room using mWaitListRoomName");
+            new CreateRoomTask(mWaitListRoomName).execute();
         }
 
         if (mLocation != null) {
@@ -160,7 +160,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
     }
 
     private void addToWaitList(String roomName) {
-        waitListRoom = roomName;
+        mWaitListRoomName = roomName;
     }
 
     private void showRoom() {
@@ -219,7 +219,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
                 Log.w(TAG, "Null location found in create room. Not creating room");
             } else if (NetworkManager.checkOnline(CreateRoomActivity.this)) {
 
-                ZipChatApi.INSTANCE.createPublicRoom(UserManager.getAuthToken(CreateRoomActivity.this), name, mRadius, location.getLatitude(), location.getLongitude(), new Callback<Response>() {
+                ZipChatApi.INSTANCE.createPublicRoom(UserManager.getAuthToken(CreateRoomActivity.this), name, mRadius, location.getLatitude(), location.getLongitude(), UserManager.getId(CreateRoomActivity.this), new Callback<Response>() {
                     @Override
                     public void success(Response response, Response response2) {
                         Log.i(TAG, "Successfully created chat room");

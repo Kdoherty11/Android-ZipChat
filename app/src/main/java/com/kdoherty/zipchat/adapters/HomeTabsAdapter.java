@@ -25,10 +25,10 @@ public class HomeTabsAdapter extends FragmentPagerAdapter {
     private static final String TAG = HomeTabsAdapter.class.getSimpleName();
 
     private PublicRoomsFragment mPublicRoomsFragment = new PublicRoomsFragment();
-    private final Fragment[] tabFragments = {mPublicRoomsFragment, new PrivateRoomsFragment(),
+    private final Fragment[] mTabFragments = {mPublicRoomsFragment, new PrivateRoomsFragment(),
             new RequestsFragment()};
     private Resources mResources;
-    private int[] imageResId = {
+    private int[] mImageResId = {
             R.drawable.ic_pin_drop_grey600_36dp,
             R.drawable.ic_chat_grey600_36dp,
             R.drawable.ic_people_grey600_36dp
@@ -41,17 +41,17 @@ public class HomeTabsAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return tabFragments.length;
+        return mTabFragments.length;
     }
 
     @Override
     public Fragment getItem(int position) {
-        return tabFragments[position];
+        return mTabFragments[position];
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        Drawable image = mResources.getDrawable(imageResId[position]);
+        Drawable image = mResources.getDrawable(mImageResId[position]);
         image.setBounds(0, 0, image.getIntrinsicWidth(), image.getIntrinsicHeight());
         SpannableString sb = new SpannableString(" ");
         ImageSpan imageSpan = new ImageSpan(image, ImageSpan.ALIGN_BOTTOM);
