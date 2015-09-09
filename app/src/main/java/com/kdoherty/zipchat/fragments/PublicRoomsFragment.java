@@ -26,7 +26,6 @@ import android.widget.TextView;
 
 import com.etiennelawlor.quickreturn.library.enums.QuickReturnViewType;
 import com.etiennelawlor.quickreturn.library.listeners.QuickReturnRecyclerViewOnScrollListener;
-import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.AbstractLocationActivity;
 import com.kdoherty.zipchat.activities.CreateRoomActivity;
@@ -39,8 +38,9 @@ import com.kdoherty.zipchat.utils.BusProvider;
 import com.kdoherty.zipchat.utils.LocationManager;
 import com.kdoherty.zipchat.utils.NetworkManager;
 import com.kdoherty.zipchat.utils.UserManager;
+import com.kdoherty.zipchat.utils.Utils;
 import com.kdoherty.zipchat.views.DividerItemDecoration;
-import com.kdoherty.zipchat.views.QuickReturnRecyclerView;
+import com.melnykov.fab.FloatingActionButton;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
@@ -64,6 +64,7 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
     private TabHost mTabHost;
     private TabWidget mSortingTabs;
     private TextView mNoRoomsInAreaTv;
+    private FloatingActionButton mCreateRoomFab;
 
     private Map<String, ImageView> mDotIndicatorMap = new HashMap<>();
 
@@ -94,6 +95,7 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
         View rootView = inflater.inflate(R.layout.fragment_public_rooms, container, false);
 
         mChatRoomsRv = (RecyclerView) rootView.findViewById(R.id.public_rooms_rv);
+        mCreateRoomFab = (FloatingActionButton) rootView.findViewById(R.id.create_room_fab);
         mNoRoomsInAreaTv = (TextView) rootView.findViewById(R.id.no_rooms_in_area_tv);
 
         return rootView;
@@ -101,9 +103,12 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
 
-        fab.setOnClickListener(new View.OnClickListener() {
+        mChatRoomsRv.setItemAnimator(new DefaultItemAnimator());
+        mChatRoomsRv.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mChatRoomsRv.addItemDecoration(new DividerItemDecoration(getResources().getDrawable(R.drawable.message_list_divider), true, true));
+
+        mCreateRoomFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent createRoom = new Intent(getActivity(), CreateRoomActivity.class);
@@ -111,9 +116,7 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
             }
         });
 
-        mChatRoomsRv.setItemAnimator(new DefaultItemAnimator());
-        mChatRoomsRv.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mChatRoomsRv.addItemDecoration(new DividerItemDecoration(getResources().getDrawable(R.drawable.message_list_divider), true, true));
+        mCreateRoomFab.attachToRecyclerView(mChatRoomsRv);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.orange);
@@ -204,7 +207,6 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
         QuickReturnRecyclerViewOnScrollListener scrollListener = new QuickReturnRecyclerViewOnScrollListener.Builder(QuickReturnViewType.FOOTER)
                 .footer(mSortingTabs)
                 .minFooterTranslation(footerHeight)
-                .isSnappable(true)
                 .build();
 
         mChatRoomsRv.addOnScrollListener(scrollListener);

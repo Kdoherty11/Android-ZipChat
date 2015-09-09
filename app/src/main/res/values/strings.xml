@@ -24,7 +24,6 @@
     <string name="toast_login_failure">"Could not login… Please try again later"</string>
 
     <!-- ***** Button Texts ***** -->
-    <string name="btn_text_floating_create">+</string>
     <string name="btn_text_flat_create">CREATE</string>
     <string name="btn_text_send_request">SEND CHAT REQUEST</string>
     <string name="btn_text_already_chatting">"ALREADY CHATTING"</string>
