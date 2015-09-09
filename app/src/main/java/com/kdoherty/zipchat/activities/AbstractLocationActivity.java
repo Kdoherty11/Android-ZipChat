@@ -124,6 +124,8 @@ public abstract class AbstractLocationActivity extends AppCompatActivity impleme
         if (location.hasAccuracy() && location.getAccuracy() <= ACCEPTABLE_LOC_ACCURACY_THRESH) {
             stopLocationUpdates();
         }
+
+        BusProvider.getInstance().post(new LocationAvailableEvent());
     }
 
     protected void startLocationUpdates() {

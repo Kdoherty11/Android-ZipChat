@@ -8,7 +8,9 @@ import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,6 +57,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
     private SendFavoriteEventRunnable mSendFavoriteEvent;
     private Message.FavoriteState mInitialFavoriteState;
     private long mSelfUserId;
+    private int mTimestampConfirmedStartMargin;
+    private int mTimestampPendingStartMargin;
 
     private ImageLoadingListener mAnimateFirstListener = new AnimateFirstDisplayListener();
     private Activity mActivity;
@@ -82,6 +86,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         mSelfUserId = UserManager.getId(mActivity);
         mSelfBorderColorId = mActivity.getResources().getColor(R.color.orange);
         mOtherBoarderColor = mActivity.getResources().getColor(R.color.zipchat_blue);
+        DisplayMetrics displayMetrics = mActivity.getResources().getDisplayMetrics();
+        mTimestampConfirmedStartMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, displayMetrics);
+        mTimestampPendingStartMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, displayMetrics);
     }
 
     public static int getMessageDrawableId(Message.FavoriteState state) {
@@ -114,21 +121,21 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         final boolean isAnon = TextUtils.isEmpty(sender.getFacebookId());
 
         if (isAnon) {
-            messageCellViewHolder.profilePicture.setImageDrawable(mActivity.getResources().getDrawable(R.drawable.com_facebook_profile_picture_blank_square));
+            messageCellViewHolder.profilePictureCiv.setImageDrawable(mActivity.getResources().getDrawable(R.drawable.com_facebook_profile_picture_blank_square));
         } else {
-            ImageLoader.getInstance().displayImage(FacebookManager.getProfilePicUrl(sender.getFacebookId()), messageCellViewHolder.profilePicture,
+            ImageLoader.getInstance().displayImage(FacebookManager.getProfilePicUrl(sender.getFacebookId()), messageCellViewHolder.profilePictureCiv,
                     FacebookManager.DISPLAY_PROF_PIC_OPTS, mAnimateFirstListener);
         }
 
         if (sender.getUserId() == mSelfUserId || sender.getUserId() == mAnonUserId) {
-            messageCellViewHolder.profilePicture.setBorderColor(mSelfBorderColorId);
+            messageCellViewHolder.profilePictureCiv.setBorderColor(mSelfBorderColorId);
         } else {
-            messageCellViewHolder.profilePicture.setBorderColor(mOtherBoarderColor);
+            messageCellViewHolder.profilePictureCiv.setBorderColor(mOtherBoarderColor);
         }
 
-        messageCellViewHolder.name.setText(sender.getName());
+        messageCellViewHolder.nameTv.setText(sender.getName());
 
-        messageCellViewHolder.profilePicture.setOnClickListener(new View.OnClickListener() {
+        messageCellViewHolder.profilePictureCiv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = UserDetailsActivity.getIntent(mActivity, sender, mAnonUserId);
@@ -136,7 +143,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
             }
         });
 
-        messageCellViewHolder.message.setText(message.getMessage());
+        messageCellViewHolder.messageTv.setText(message.getMessage());
 
         long userId = UserManager.getId(mActivity);
         if (message.isConfirmed()) {
@@ -149,19 +156,19 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
             Message.FavoriteState favoriteState = message.getFavoriteState(userId);
 
             Drawable favoriteDrawable = getMessageDrawable(mActivity, favoriteState);
-            messageCellViewHolder.favorite.setImageDrawable(favoriteDrawable);
+            messageCellViewHolder.favoriteIv.setImageDrawable(favoriteDrawable);
 
             int favoriteCount = message.getFavoriteCount();
 
             if (favoriteCount > 0) {
-                messageCellViewHolder.favoriteCount.setVisibility(View.VISIBLE);
-            } else if (messageCellViewHolder.favoriteCount.getVisibility() == View.VISIBLE) {
-                messageCellViewHolder.favoriteCount.setVisibility(View.GONE);
+                messageCellViewHolder.favoriteCountTv.setVisibility(View.VISIBLE);
+            } else if (messageCellViewHolder.favoriteCountTv.getVisibility() == View.VISIBLE) {
+                messageCellViewHolder.favoriteCountTv.setVisibility(View.GONE);
             }
 
-            messageCellViewHolder.favoriteCount.setText(String.valueOf(message.getFavoriteCount()));
+            messageCellViewHolder.favoriteCountTv.setText(String.valueOf(message.getFavoriteCount()));
 
-            messageCellViewHolder.layout.setOnClickListener(new View.OnClickListener() {
+            messageCellViewHolder.cellLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     mClickCallbacks.onMessageClick(message);
@@ -186,18 +193,28 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
                     removeMessage(position);
                 }
             });
-            messageCellViewHolder.timestamp.setText(mActivity.getResources().getString(R.string.pending));
         } else {
             // not yet confirmed
             messageCellViewHolder.failedMsgLayout.setVisibility(View.GONE);
             messageCellViewHolder.favoriteLayout.setVisibility(View.GONE);
             messageCellViewHolder.unconfirmedMsgPb.setVisibility(View.VISIBLE);
-            messageCellViewHolder.timestamp.setText(mActivity.getResources().getString(R.string.pending));
+        }
+        displayTimestamp(message, messageCellViewHolder);
+    }
+
+    private void displayTimestamp(Message message, MessageCellViewHolder viewHolder) {
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) viewHolder.timestampTv.getLayoutParams();
+        if (message.isConfirmed()) {
+            CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(
+                    message.getCreatedAt() * 1000);
+            viewHolder.timestampTv.setText(timeAgo);
+            layoutParams.setMarginStart(mTimestampConfirmedStartMargin);
+        } else {
+            viewHolder.timestampTv.setText(mActivity.getResources().getString(R.string.pending));
+            layoutParams.setMarginStart(mTimestampPendingStartMargin);
         }
 
-        CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(
-                message.getCreatedAt() * 1000);
-        messageCellViewHolder.timestamp.setText(timeAgo);
+        viewHolder.timestampTv.setLayoutParams(layoutParams);
     }
 
     private void removeMessage(int position) {
@@ -341,11 +358,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
             try {
                 boolean lockAquired = sendFavoriteLock.tryAcquire(SEND_FAVORITE_LOCK_TIMEOUT_SECONDS, TimeUnit.SECONDS);
                 if (!lockAquired) {
-                    Log.d(TAG, "Timed out while aquiring send favorite lock in runnable");
+                    Log.d(TAG, "Timed out while acquiring send favorite lock in runnable");
                     return;
                 }
             } catch (InterruptedException e) {
-                Log.e(TAG, "Interrupted while aquiring the send favorite lock in runnable: " + e);
+                Log.e(TAG, "Interrupted while acquiring the send favorite lock in runnable: " + e);
                 return;
             }
 
@@ -374,11 +391,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
             try {
                 boolean lockAquired = sendFavoriteLock.tryAcquire(SEND_FAVORITE_LOCK_TIMEOUT_SECONDS, TimeUnit.SECONDS);
                 if (!lockAquired) {
-                    Log.d(TAG, "Timed out while aquiring send favorite lock on click");
+                    Log.d(TAG, "Timed out while aquiring send favoriteIv lock on click");
                     return;
                 }
             } catch (InterruptedException e) {
-                Log.e(TAG, "Interrupted while aquiring the send favorite lock in on click: " + e);
+                Log.e(TAG, "Interrupted while aquiring the send favoriteIv lock in on click: " + e);
                 return;
             }
 
@@ -408,13 +425,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
 
     public class MessageCellViewHolder extends RecyclerView.ViewHolder {
 
-        private RelativeLayout layout;
-        private CircleImageView profilePicture;
-        private TextView name;
-        private TextView message;
-        private ImageView favorite;
-        private TextView favoriteCount;
-        private TextView timestamp;
+        private RelativeLayout cellLayout;
+        private CircleImageView profilePictureCiv;
+        private TextView nameTv;
+        private TextView messageTv;
+        private ImageView favoriteIv;
+        private TextView favoriteCountTv;
+        private TextView timestampTv;
         private LinearLayout favoriteLayout;
         private ProgressBar unconfirmedMsgPb;
         private LinearLayout failedMsgLayout;
@@ -423,14 +440,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
 
         public MessageCellViewHolder(View itemView) {
             super(itemView);
-            layout = (RelativeLayout) itemView;
-            profilePicture = (CircleImageView) itemView.findViewById(R.id.message_picture_civ);
-            name = (TextView) itemView.findViewById(R.id.message_sender_tv);
-            message = (TextView) itemView.findViewById(R.id.message_text_tv);
+            cellLayout = (RelativeLayout) itemView;
+            profilePictureCiv = (CircleImageView) itemView.findViewById(R.id.message_picture_civ);
+            nameTv = (TextView) itemView.findViewById(R.id.message_sender_tv);
+            messageTv = (TextView) itemView.findViewById(R.id.message_text_tv);
             favoriteLayout = (LinearLayout) itemView.findViewById(R.id.favorite_container);
-            favorite = (ImageView) favoriteLayout.findViewById(R.id.message_favorite_iv);
-            favoriteCount = (TextView) favoriteLayout.findViewById(R.id.message_favorite_count_tv);
-            timestamp = (TextView) itemView.findViewById(R.id.message_timestamp_tv);
+            favoriteIv = (ImageView) favoriteLayout.findViewById(R.id.message_favorite_iv);
+            favoriteCountTv = (TextView) favoriteLayout.findViewById(R.id.message_favorite_count_tv);
+            timestampTv = (TextView) itemView.findViewById(R.id.message_timestamp_tv);
             unconfirmedMsgPb = (ProgressBar) itemView.findViewById(R.id.unconfirmed_msg_pb);
             failedMsgLayout = (LinearLayout) itemView.findViewById(R.id.message_timeout_layout);
             retrySendMsgBtn = (Button) failedMsgLayout.findViewById(R.id.retry_send_msg_btn);

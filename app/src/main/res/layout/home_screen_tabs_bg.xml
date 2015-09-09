@@ -19,7 +19,6 @@
         android:id="@+id/tab_indicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_marginBottom="@dimen/home_screen_space_between_dot_and_bottom"
         android:layout_marginTop="@dimen/home_screen_space_between_tab_text_and_dot"
         android:src="@drawable/tab_dot_indicator"

@@ -137,6 +137,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
             return;
         }
 
+
         ZipChatApi.INSTANCE.getStatus(UserManager.getAuthToken(this), UserManager.getId(this), mUser.getUserId(), new Callback<Response>() {
             @Override
             public void success(Response result, Response response) {

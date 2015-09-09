@@ -33,7 +33,7 @@
                 android:id="@+id/create_room_name_et"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/create_room_name_left_margin"
+                android:layout_marginStart="@dimen/create_room_name_left_margin"
                 android:background="@drawable/create_room_name_et_background"
                 android:hint="@string/create_room_name_hint"
                 android:maxLength="28"
@@ -59,7 +59,7 @@
                 android:id="@+id/radius_seek_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/create_room_radius_left_margin"
+                android:layout_marginStart="@dimen/create_room_radius_left_margin"
                 android:max="500" />
         </LinearLayout>
 

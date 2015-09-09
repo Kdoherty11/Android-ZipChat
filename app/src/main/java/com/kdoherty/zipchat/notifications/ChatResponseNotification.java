@@ -7,8 +7,9 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
+import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.HomeActivity;
-import com.kdoherty.zipchat.events.RequestAcceptedEvent;
+import com.kdoherty.zipchat.events.RequestResponseEvent;
 import com.kdoherty.zipchat.models.Request;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.BusProvider;
@@ -35,10 +36,11 @@ public class ChatResponseNotification extends AbstractNotification {
         Intent intent = new Intent(mContext, HomeActivity.class);
 
         boolean isAccepted = Request.Status.accepted.toString().equals(mResponse);
+        Request.Status status = isAccepted ? Request.Status.accepted : Request.Status.denied;
 
         if (isAccepted) {
             intent.setAction(HomeActivity.ACTION_OPEN_PRIVATE_ROOMS_TAB);
-            BusProvider.getInstance().post(new RequestAcceptedEvent());
+            BusProvider.getInstance().post(new RequestResponseEvent(status));
         }
 
         PendingIntent contentIntent = PendingIntent.getActivity(mContext, 0,
@@ -54,6 +56,9 @@ public class ChatResponseNotification extends AbstractNotification {
         if (isAccepted) {
             Bitmap senderFbPicBm = FacebookManager.getFacebookProfilePicture(mContext, mRequestReceiver.getFacebookId());
             builder.setLargeIcon(senderFbPicBm);
+            builder.setContentTitle(mContext.getString(R.string.chat_response_accepted));
+        } else {
+            builder.setContentTitle(mContext.getString(R.string.chat_response_denied));
         }
 
         notify(builder.build());

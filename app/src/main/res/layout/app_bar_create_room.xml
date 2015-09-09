@@ -12,7 +12,7 @@
         android:layout_gravity="end|center_vertical"
         android:background="@android:color/transparent"
         android:padding="@dimen/create_room_create_button_padding"
-        android:text="@string/create"
+        android:text="@string/btn_text_flat_create"
         android:textColor="@color/white"
         android:textSize="@dimen/create_room_create_button_text"
         android:textStyle="bold" />

@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.adapters.RequestAdapter;
 import com.kdoherty.zipchat.events.ReceivedRequestEvent;
+import com.kdoherty.zipchat.events.RequestResponseEvent;
 import com.kdoherty.zipchat.models.Request;
 import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.BusProvider;
@@ -116,6 +117,14 @@ public class RequestsFragment extends Fragment implements SwipeRefreshLayout.OnR
     public void receivedRequestEvent(ReceivedRequestEvent event) {
         Log.d(TAG, "Received request received event");
         populateList();
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onRequestResponse(RequestResponseEvent event) {
+        if (mAdapter != null && mAdapter.isEmpty()) {
+            displayNoRequestsNotice();
+        }
     }
 
     @Override

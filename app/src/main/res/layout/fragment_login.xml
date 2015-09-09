@@ -21,6 +21,18 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="48dp" />
 
+    <Button
+        android:id="@+id/retry_auth_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/zip_chat_logo_iv"
+        android:layout_centerHorizontal="true"
+        android:text="@string/btn_text_login_retry"
+        android:textColor="@color/white"
+        android:background="@drawable/login_retry_btn"
+        android:visibility="gone"
+        android:layout_marginTop="48dp" />
+
     <ProgressBar
         android:id="@+id/auth_pb"
         android:layout_width="wrap_content"

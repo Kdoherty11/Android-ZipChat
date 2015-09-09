@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -25,6 +26,7 @@ import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.FacebookManager;
 import com.kdoherty.zipchat.utils.NetworkManager;
 import com.kdoherty.zipchat.utils.UserManager;
+import com.kdoherty.zipchat.utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,7 +42,9 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
     private CallbackManager mCallbackManager;
     private boolean mSentAuthRequest = false;
     private LoginButton mLoginButton;
+    private Button mRetryAuthBtn;
     private ProgressBar mAuthPb;
+    private String mFacebookAccessToken = null;
 
     @Override
     public View onCreateView(
@@ -52,6 +56,13 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
         mCallbackManager = CallbackManager.Factory.create();
 
         mLoginButton = (LoginButton) view.findViewById(R.id.login_btn);
+        mRetryAuthBtn = (Button) view.findViewById(R.id.retry_auth_btn);
+        mRetryAuthBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createOrAuthUser(mFacebookAccessToken);
+            }
+        });
         mAuthPb = (ProgressBar) view.findViewById(R.id.auth_pb);
 
         if (mSentAuthRequest) {
@@ -69,16 +80,8 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         AccessToken currentAccessToken = AccessToken.getCurrentAccessToken();
-
         if (currentAccessToken != null && !TextUtils.isEmpty(currentAccessToken.getToken()) && !currentAccessToken.isExpired()) {
-            if (UserManager.didCreateUser(activity)) {
-                if (!mSentAuthRequest) {
-                    authUser(currentAccessToken.getToken());
-                    mSentAuthRequest = true;
-                }
-            } else {
-                createUser(currentAccessToken.getToken());
-            }
+            createOrAuthUser(currentAccessToken.getToken());
         } else {
             AccessToken.refreshCurrentAccessTokenAsync();
         }
@@ -90,14 +93,15 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
         }
         Log.i(TAG, "Sending auth request");
 
+        showLoading();
         ZipChatApi.INSTANCE.auth(accessToken, new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
+                hideButtons();
                 try {
                     JSONObject respJson = new JSONObject(NetworkManager.responseToString(response));
                     String authToken = respJson.getString("authToken");
                     UserManager.storeAuthToken(getActivity(), authToken);
-                    mAuthPb.setVisibility(View.GONE);
                 } catch (JSONException e) {
                     Log.e(TAG, "Problem parsing the auth json response");
                     return;
@@ -108,11 +112,8 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
 
             @Override
             public void failure(RetrofitError error) {
-                NetworkManager.handleErrorResponse(TAG, "Sending fb access token", error, getActivity());
-                // Retry button?
-                mAuthPb.setVisibility(View.GONE);
-                mLoginButton.setVisibility(View.VISIBLE);
-
+                NetworkManager.handleErrorResponse(TAG, "Sending fb access token to zipchat /auth", error, getActivity());
+                showRetryLoginBtn();
                 Toast.makeText(getActivity(), getString(R.string.toast_login_failure),
                         Toast.LENGTH_SHORT).show();
             }
@@ -132,34 +133,26 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void showLoading() {
-        if (mLoginButton != null) {
-            mLoginButton.setVisibility(View.GONE);
+    private void createOrAuthUser(String facebookToken) {
+        if (TextUtils.isEmpty(facebookToken)) {
+            Log.w(TAG, "Facebook token is null or empty in createOrAuthUser");
+            return;
         }
-        if (mAuthPb != null) {
-            mAuthPb.setVisibility(View.VISIBLE);
+        mFacebookAccessToken = facebookToken;
+        if (UserManager.didCreateUser(getActivity())) {
+            if (!mSentAuthRequest) {
+                authUser(facebookToken);
+                mSentAuthRequest = true;
+            }
+        } else {
+            createUser(facebookToken);
         }
     }
 
     @Override
     public void onSuccess(LoginResult loginResult) {
-        if (UserManager.didCreateUser(getActivity())) {
-            if (!mSentAuthRequest) {
-                authUser(loginResult.getAccessToken().getToken());
-            }
-        } else {
-            createUser(loginResult.getAccessToken().getToken());
-        }
-    }
-
-    private void hideLoading() {
-        if (mAuthPb != null) {
-            mAuthPb.setVisibility(View.GONE);
-        }
-
-        if (mLoginButton != null) {
-            mLoginButton.setVisibility(View.VISIBLE);
-        }
+        Log.i(TAG, "Success logging into facebook");
+        createOrAuthUser(loginResult.getAccessToken().getToken());
     }
 
     private void createUser(String accessToken) {
@@ -171,7 +164,7 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
         ZipChatApi.INSTANCE.createUser(accessToken, null, "android", new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
-                hideLoading();
+                hideButtons();
                 try {
                     JSONObject respJson = new JSONObject(NetworkManager.responseToString(response));
                     long userId = respJson.getLong("userId");
@@ -202,13 +195,38 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
 
             @Override
             public void failure(RetrofitError error) {
-                hideLoading();
+                showRetryLoginBtn();
                 NetworkManager.handleErrorResponse(TAG, "Creating a user", error, getActivity());
 
                 Toast.makeText(getActivity(), getString(R.string.toast_login_failure), Toast.LENGTH_SHORT).show();
             }
         });
     }
+
+    private void showLoading() {
+        Utils.nullSafeSetVisibility(mLoginButton, View.GONE);
+        Utils.nullSafeSetVisibility(mRetryAuthBtn, View.GONE);
+        Utils.nullSafeSetVisibility(mAuthPb, View.VISIBLE);
+    }
+
+    private void showFacebookButton() {
+        Utils.nullSafeSetVisibility(mAuthPb, View.GONE);
+        Utils.nullSafeSetVisibility(mRetryAuthBtn, View.GONE);
+        Utils.nullSafeSetVisibility(mLoginButton, View.VISIBLE);
+    }
+
+    private void showRetryLoginBtn() {
+        Utils.nullSafeSetVisibility(mAuthPb, View.GONE);
+        Utils.nullSafeSetVisibility(mLoginButton, View.GONE);
+        Utils.nullSafeSetVisibility(mRetryAuthBtn, View.VISIBLE);
+    }
+
+    private void hideButtons() {
+        Utils.nullSafeSetVisibility(mAuthPb, View.GONE);
+        Utils.nullSafeSetVisibility(mRetryAuthBtn, View.GONE);
+        Utils.nullSafeSetVisibility(mLoginButton, View.GONE);
+    }
+
 
     @Override
     public void onCancel() {
@@ -218,7 +236,7 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
     @Override
     public void onError(FacebookException e) {
         Log.e(TAG, "Error logging into facebook " + e.getMessage());
-        hideLoading();
+        showFacebookButton();
         Toast.makeText(getActivity(), getString(R.string.toast_login_failure), Toast.LENGTH_SHORT).show();
     }
 }

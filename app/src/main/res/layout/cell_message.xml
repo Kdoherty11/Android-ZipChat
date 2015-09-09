@@ -11,10 +11,10 @@
         android:id="@+id/message_picture_civ"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         app:border_color="@color/zipchat_blue"
         app:border_width="1dp" />
@@ -24,9 +24,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_marginBottom="4dp"
-        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
         android:textColor="@color/zipchat_blue"
         android:textSize="8sp" />
 
@@ -34,8 +34,8 @@
         android:id="@+id/message_timeout_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="12dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="7dp"
         android:orientation="vertical"
         android:visibility="gone">
@@ -57,8 +57,8 @@
         android:id="@+id/unconfirmed_msg_pb"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="16dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="16dp"
         android:layout_marginTop="16dp"
         android:visibility="gone" />
 
@@ -66,8 +66,8 @@
         android:id="@+id/favorite_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="16dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="16dp"
         android:layout_marginTop="16dp"
         android:orientation="vertical">
 
@@ -81,7 +81,7 @@
             android:id="@+id/message_favorite_count_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="9dp"
+            android:layout_marginStart="9dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
             android:textColor="@color/black"
             android:textSize="10sp"
@@ -97,8 +97,8 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:layout_toLeftOf="@id/favorite_container"
-        android:layout_toRightOf="@id/message_picture_civ"
+        android:layout_toStartOf="@id/favorite_container"
+        android:layout_toEndOf="@id/message_picture_civ"
         android:orientation="vertical"
         android:paddingBottom="16dp"
         android:paddingTop="16dp">

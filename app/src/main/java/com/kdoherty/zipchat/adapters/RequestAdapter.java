@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.UserDetailsActivity;
-import com.kdoherty.zipchat.events.RequestAcceptedEvent;
+import com.kdoherty.zipchat.events.RequestResponseEvent;
 import com.kdoherty.zipchat.models.Request;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.ZipChatApi;
@@ -87,6 +87,10 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         });
     }
 
+    public boolean isEmpty() {
+        return mFilteredRequests.isEmpty();
+    }
+
     @Override
     public int getItemCount() {
         return mFilteredRequests.size();
@@ -134,9 +138,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             ZipChatApi.INSTANCE.respondToRequest(UserManager.getAuthToken(mContext), requestId, status.toString(), new Callback<Response>() {
                 @Override
                 public void success(Response result, Response response) {
-                    if (status == Request.Status.accepted) {
-                        BusProvider.getInstance().post(new RequestAcceptedEvent());
-                    }
+                    BusProvider.getInstance().post(new RequestResponseEvent(status));
                 }
 
                 @Override

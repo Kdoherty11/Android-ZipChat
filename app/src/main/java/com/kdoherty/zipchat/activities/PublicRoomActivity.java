@@ -233,13 +233,21 @@ public class PublicRoomActivity extends AbstractLocationActivity {
     @Override
     public void onConnected(Bundle bundle) {
         super.onConnected(bundle);
-        mDrawerFragment.displayUserMarker(getLastLocation());
+        if (mDrawerFragment != null) {
+            mDrawerFragment.displayUserMarker(getLastLocation());
+        } else {
+            Log.w(TAG, "mDrawerFragment is null when location is first available");
+        }
     }
 
     @Override
     public void onLocationChanged(Location location) {
         super.onLocationChanged(location);
-        mDrawerFragment.displayUserMarker(location);
+        if (mDrawerFragment != null) {
+            mDrawerFragment.displayUserMarker(location);
+        } else {
+            Log.w(TAG, "mDrawerFragment is null when location changed");
+        }
     }
 
     @Override
