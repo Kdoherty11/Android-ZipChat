@@ -24,6 +24,8 @@ import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.TextView;
 
+import com.etiennelawlor.quickreturn.library.enums.QuickReturnViewType;
+import com.etiennelawlor.quickreturn.library.listeners.QuickReturnRecyclerViewOnScrollListener;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.AbstractLocationActivity;
@@ -91,7 +93,7 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_public_rooms, container, false);
 
-        mChatRoomsRv = (QuickReturnRecyclerView) rootView.findViewById(R.id.public_rooms_rv);
+        mChatRoomsRv = (RecyclerView) rootView.findViewById(R.id.public_rooms_rv);
         mNoRoomsInAreaTv = (TextView) rootView.findViewById(R.id.no_rooms_in_area_tv);
 
         return rootView;
@@ -112,7 +114,6 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
         mChatRoomsRv.setItemAnimator(new DefaultItemAnimator());
         mChatRoomsRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         mChatRoomsRv.addItemDecoration(new DividerItemDecoration(getResources().getDrawable(R.drawable.message_list_divider), true, true));
-        registerForContextMenu(mChatRoomsRv);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.orange);
@@ -197,6 +198,16 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
                 sortRooms();
             }
         });
+
+        int footerHeight = getActivity().getResources().getDimensionPixelSize(R.dimen.sorting_tab_height);
+
+        QuickReturnRecyclerViewOnScrollListener scrollListener = new QuickReturnRecyclerViewOnScrollListener.Builder(QuickReturnViewType.FOOTER)
+                .footer(mSortingTabs)
+                .minFooterTranslation(footerHeight)
+                .isSnappable(true)
+                .build();
+
+        mChatRoomsRv.addOnScrollListener(scrollListener);
     }
 
     private void sortRooms() {

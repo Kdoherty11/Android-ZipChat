@@ -90,5 +90,6 @@
     <dimen name="private_chat_room_pic_side">48dp</dimen>
     <dimen name="private_chat_room_pic_margins">6dp</dimen>
 
+    <dimen name="sorting_tab_height">100dp</dimen>
 
 </resources>
