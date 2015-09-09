@@ -31,6 +31,7 @@
         android:layout_margin="6dp"
         android:background="@drawable/chat_request_buttons_background"
         android:padding="6dp"
+        android:textColor="@color/white"
         android:text="@string/btn_text_send_request"
         android:textSize="14sp"
         android:visibility="gone" />

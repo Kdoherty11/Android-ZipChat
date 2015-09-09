@@ -25,8 +25,10 @@
 
     <!-- ***** Button Texts ***** -->
     <string name="btn_text_create">+</string>
-    <string name="btn_text_send_request">Send Chat Request</string>
-    <string name="btn_text_already_chatting">"Already chatting"</string>
+    <string name="btn_text_send_request">SEND CHAT REQUEST</string>
+    <string name="btn_text_already_chatting">"ALREADY CHATTING"</string>
+    <string name="btn_text_request_pending">REQUEST PENDING</string>
+    <string name="btn_text_request_denied">REQUEST DENIED</string>
 
     <!-- ***** Notifications ***** -->
     <string name="message_favorited">Message Favorited!</string>

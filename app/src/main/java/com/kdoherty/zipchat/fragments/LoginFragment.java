@@ -85,6 +85,9 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
     }
 
     private void authUser(String accessToken) {
+        if (!NetworkManager.checkOnline(getActivity())) {
+            return;
+        }
         Log.i(TAG, "Sending auth request");
 
         ZipChatApi.INSTANCE.auth(accessToken, new Callback<Response>() {
@@ -130,8 +133,12 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
     }
 
     private void showLoading() {
-        mLoginButton.setVisibility(View.GONE);
-        mAuthPb.setVisibility(View.VISIBLE);
+        if (mLoginButton != null) {
+            mLoginButton.setVisibility(View.GONE);
+        }
+        if (mAuthPb != null) {
+            mAuthPb.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -145,12 +152,26 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
         }
     }
 
+    private void hideLoading() {
+        if (mAuthPb != null) {
+            mAuthPb.setVisibility(View.GONE);
+        }
+
+        if (mLoginButton != null) {
+            mLoginButton.setVisibility(View.VISIBLE);
+        }
+    }
+
     private void createUser(String accessToken) {
+        if (!NetworkManager.checkOnline(getActivity())) {
+            return;
+        }
         Log.i(TAG, "Creating user");
         showLoading();
         ZipChatApi.INSTANCE.createUser(accessToken, null, "android", new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
+                hideLoading();
                 try {
                     JSONObject respJson = new JSONObject(NetworkManager.responseToString(response));
                     long userId = respJson.getLong("userId");
@@ -176,16 +197,13 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
                 Intent intent = new Intent(getActivity(), RegistrationIntentService.class);
                 getActivity().startService(intent);
 
-                mAuthPb.setVisibility(View.GONE);
-
                 continueToApp();
             }
 
             @Override
             public void failure(RetrofitError error) {
+                hideLoading();
                 NetworkManager.handleErrorResponse(TAG, "Creating a user", error, getActivity());
-                mLoginButton.setVisibility(View.VISIBLE);
-                mAuthPb.setVisibility(View.GONE);
 
                 Toast.makeText(getActivity(), getString(R.string.toast_login_failure), Toast.LENGTH_SHORT).show();
             }
@@ -200,6 +218,7 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
     @Override
     public void onError(FacebookException e) {
         Log.e(TAG, "Error logging into facebook " + e.getMessage());
+        hideLoading();
         Toast.makeText(getActivity(), getString(R.string.toast_login_failure), Toast.LENGTH_SHORT).show();
     }
 }

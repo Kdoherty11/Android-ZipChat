@@ -1,7 +1,9 @@
 package com.kdoherty.zipchat.utils;
 
 import android.content.Context;
+import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.kdoherty.zipchat.models.User;
 
 public class UserManager {
@@ -28,7 +30,15 @@ public class UserManager {
     }
 
     public static long getId(Context context) {
-        return PrefsHelper.readFromPreferences(context, PREFS_FILE, PREFS_USER_ID, DEFAULT_USER_ID);
+        return getId(context, true);
+    }
+
+    private static long getId(Context context, boolean checkDefault) {
+        long userId = PrefsHelper.readFromPreferences(context, PREFS_FILE, PREFS_USER_ID, DEFAULT_USER_ID);
+        if (userId == DEFAULT_USER_ID && checkDefault) {
+            Crashlytics.log(Log.ERROR, TAG, "getId produced DEFAULT_USER_ID");
+        }
+        return userId;
     }
 
 //    public static boolean isAuthTokenExpired(Context context) {
@@ -57,7 +67,7 @@ public class UserManager {
     }
 
     public static boolean didCreateUser(Context context) {
-        return getId(context) != DEFAULT_USER_ID;
+        return getId(context, false) != DEFAULT_USER_ID;
     }
 
     public static boolean didRegisterDevice(Context context) {

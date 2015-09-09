@@ -59,6 +59,9 @@ public class RegistrationIntentService extends IntentService {
     }
 
     private void updateRegId(String token) {
+        if (!NetworkManager.checkOnline(this)) {
+            return;
+        }
         ZipChatApi.INSTANCE.replaceRegId(UserManager.getAuthToken(getApplicationContext()), UserManager.getDeviceId(getApplicationContext()), token, new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
@@ -73,6 +76,9 @@ public class RegistrationIntentService extends IntentService {
     }
 
     private void registerDevice(String token) {
+        if (!NetworkManager.checkOnline(this)) {
+            return;
+        }
         ZipChatApi.INSTANCE.registerDevice(UserManager.getAuthToken(getApplicationContext()), UserManager.getId(getApplicationContext()), token, "android", new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {

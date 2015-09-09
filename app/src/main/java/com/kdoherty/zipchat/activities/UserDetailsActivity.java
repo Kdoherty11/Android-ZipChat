@@ -16,12 +16,14 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.models.PrivateRoom;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.FacebookManager;
+import com.kdoherty.zipchat.utils.GsonProvider;
 import com.kdoherty.zipchat.utils.NetworkManager;
 import com.kdoherty.zipchat.utils.UserManager;
 import com.kdoherty.zipchat.utils.Utils;
@@ -139,21 +141,27 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void success(Response result, Response response) {
                 String status = NetworkManager.responseToString(result);
+                String statusCmpStr = status.trim().toLowerCase();
 
-                final Long privateRoomId = Utils.tryParse(status);
-
-                if (privateRoomId != null) {
+                if (statusCmpStr.equalsIgnoreCase("none") || statusCmpStr.equalsIgnoreCase("accepted")) {
+                    mRequestButton.setText(getString(R.string.btn_text_send_request));
+                    mRequestButton.setOnClickListener(UserDetailsActivity.this);
+                } else if (statusCmpStr.equalsIgnoreCase("pending")) {
+                    mRequestButton.setText(getString(R.string.btn_text_request_pending));
+                    mRequestButton.setOnClickListener(null);
+                } else if (statusCmpStr.equalsIgnoreCase("denied")) {
+                    mRequestButton.setText(getString(R.string.btn_text_request_denied));
+                    mRequestButton.setOnClickListener(null);
+                } else {
+                    final PrivateRoom existingRoom = GsonProvider.getInstance().fromJson(status, PrivateRoom.class);
                     mRequestButton.setText(getString(R.string.btn_text_already_chatting));
                     mRequestButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent intent = PrivateRoomActivity.getIntent(UserDetailsActivity.this, new PrivateRoom(privateRoomId, UserManager.getSelf(UserDetailsActivity.this), mUser));
+                            Intent intent = PrivateRoomActivity.getIntent(UserDetailsActivity.this, existingRoom);
                             startActivity(intent);
                         }
                     });
-                } else if (!"none".equals(status)) {
-                    mRequestButton.setText(status);
-                    mRequestButton.setEnabled(false);
                 }
 
                 stopLoading();
@@ -161,8 +169,9 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
             @Override
             public void failure(RetrofitError error) {
+                mRequestStatusLoadingPb.setVisibility(View.GONE);
+                Toast.makeText(UserDetailsActivity.this, getString(R.string.toast_no_internet), Toast.LENGTH_SHORT).show();
                 NetworkManager.handleErrorResponse(TAG, "Getting request status", error, UserDetailsActivity.this);
-                stopLoading();
             }
         });
     }

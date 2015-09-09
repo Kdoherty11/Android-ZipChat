@@ -61,7 +61,7 @@ public class PrivateRoomActivity extends AppCompatActivity implements View.OnCli
         mOtherUser = mPrivateRoom.getAndSetOther(UserManager.getId(this));
 
         if (!mPrivateRoom.isOtherInRoom()) {
-            Toast.makeText(this, mOtherUser.getName() + getResources().getString(R.string.toast_user_left_room), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, mOtherUser.getName() + " " + getResources().getString(R.string.toast_user_left_room), Toast.LENGTH_SHORT).show();
         }
 
         ZipChatApplication.initImageLoader(this);
