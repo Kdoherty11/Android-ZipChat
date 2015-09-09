@@ -83,7 +83,6 @@ public class RoomSocket {
                         }
                         break;
                     case "joinSuccess":
-                        Utils.debugToast(mContext, "Received join sucess: " + stringJson);
                         if (stringJson.has("message")) {
                             JSONObject joinJson = new JSONObject(stringJson.getString("message"));
 
@@ -109,10 +108,10 @@ public class RoomSocket {
                         break;
                     case "error":
                         Log.e(TAG, "Error: " + stringJson.getString("message"));
-                        Utils.debugToast(mContext, "Error: " + stringJson.getString("message"));
+//                        Utils.debugToast(mContext, "Error: " + stringJson.getString("message"));
                         break;
                     default:
-                        Utils.debugToast(mContext, "Default socket event " + s);
+//                        Utils.debugToast(mContext, "Default socket event " + s);
                         Log.w(TAG, "DEFAULT RECEIVED: " + s);
                 }
             } catch (JSONException e) {
@@ -218,7 +217,7 @@ public class RoomSocket {
     private void sendEventSocketNotAvailable(JSONObject event, boolean addToQueue) {
         String err = "WebSocket is closed when trying to send "
                 + event.toString() + "... Adding event to queue";
-        Utils.debugToast(mContext, err);
+//        Utils.debugToast(mContext, err);
         Log.w(TAG, err);
 
         if (addToQueue) {
@@ -230,7 +229,7 @@ public class RoomSocket {
 
     private synchronized void reconnect() {
         if (!mIsReconnecting) {
-            Utils.debugToast(mContext, "ChatService is not currently connecting... Attempting to reconnect");
+//            Utils.debugToast(mContext, "ChatService is not currently connecting... Attempting to reconnect");
             mIsReconnecting = true;
             reconnectWithRetry();
         }
@@ -241,7 +240,7 @@ public class RoomSocket {
         mChatService.cancel();
         mChatService = new ChatService(mChatService);
 
-        Utils.debugToast(mContext, "Reconnect attempt number " + mNumRetryAttempts, Toast.LENGTH_SHORT);
+//        Utils.debugToast(mContext, "Reconnect attempt number " + mNumRetryAttempts, Toast.LENGTH_SHORT);
 
         mHandler.postDelayed(mReconnectRunnable, BACKOFF_MILLIS);
     }
@@ -249,8 +248,8 @@ public class RoomSocket {
     private void sendQueuedEvents() {
         while (!mSocketEventQueue.isEmpty()) {
             JSONObject event = mSocketEventQueue.poll();
-            Utils.debugToast(mContext, "Sending message from mSocketEventQueue: " + event);
-            Log.w(TAG, "Sending message from mSocketEventQueue: " + event);
+//            Utils.debugToast(mContext, "Sending message from mSocketEventQueue: " + event);
+            Log.i(TAG, "Sending message from mSocketEventQueue: " + event);
             send(event);
         }
     }
@@ -258,7 +257,7 @@ public class RoomSocket {
     public void onPause() {
         if (socketIsAvailable()) {
             Log.i(TAG, "Pausing socket!");
-            Utils.debugToast(mContext, "Pausing socket in on pause", Toast.LENGTH_SHORT);
+//            Utils.debugToast(mContext, "Pausing socket in on pause", Toast.LENGTH_SHORT);
             mWebSocket.pause();
             mHandler.removeCallbacksAndMessages(null);
         }
@@ -268,7 +267,7 @@ public class RoomSocket {
         if (mWebSocket != null && mWebSocket.isPaused()) {
             Log.i(TAG, "Resuming socket!");
             mWebSocket.resume();
-            Utils.debugToast(mContext, "Resuming socket in on resume", Toast.LENGTH_SHORT);
+//            Utils.debugToast(mContext, "Resuming socket in on resume", Toast.LENGTH_SHORT);
         }
     }
 

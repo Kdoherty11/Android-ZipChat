@@ -121,7 +121,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
         mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (mWaitListRoomName != null) {
             Log.d(TAG, "Creating room using mWaitListRoomName");
-            Utils.debugToast(this, "Creating room using mWaitListRoomName");
+            //Utils.debugToast(this, "Creating room using mWaitListRoomName");
             new CreateRoomTask(mWaitListRoomName).execute();
         }
 
@@ -215,7 +215,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
         @Override
         protected void onPostExecute(Location location) {
             if (location == null) {
-                Utils.debugToast(getApplicationContext(), "Could not find location... not creating room");
+                //Utils.debugToast(getApplicationContext(), "Could not find location... not creating room");
                 Log.w(TAG, "Null location found in create room. Not creating room");
             } else if (NetworkManager.checkOnline(CreateRoomActivity.this)) {
 

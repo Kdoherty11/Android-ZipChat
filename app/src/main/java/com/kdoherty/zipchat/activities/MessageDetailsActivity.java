@@ -93,7 +93,7 @@ public class MessageDetailsActivity extends AppCompatActivity {
                     if (isThisMessage) {
                         User user = gson.fromJson(extras.getString(AbstractNotification.Key.USER), User.class);
                         addFavorite(user);
-                        Utils.debugToast(context, "Success intercepting gcm and fromJson on message and user");
+                        //Utils.debugToast(context, "Success intercepting gcm and fromJson on message and user");
                         abortBroadcast();
                     }
 

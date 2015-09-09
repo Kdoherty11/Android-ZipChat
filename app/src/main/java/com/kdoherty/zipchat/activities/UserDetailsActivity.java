@@ -118,25 +118,22 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
     }
 
-    private void startLoading() {
-        Utils.debugToast(this, "Starting loading");
-        mRequestButton.setVisibility(View.GONE);
-        mRequestStatusLoadingPb.setVisibility(View.VISIBLE);
+    private void showLoading() {
+        Utils.nullSafeSetVisibility(mRequestButton, View.GONE);
+        Utils.nullSafeSetVisibility(mRequestStatusLoadingPb, View.VISIBLE);
     }
 
-    private void stopLoading() {
-        mRequestStatusLoadingPb.setVisibility(View.GONE);
-        mRequestButton.setVisibility(View.VISIBLE);
-        Utils.debugToast(this, "Stopped loading");
+    private void hideLoading() {
+        Utils.nullSafeSetVisibility(mRequestStatusLoadingPb, View.GONE);
+        Utils.nullSafeSetVisibility(mRequestButton, View.VISIBLE);
     }
 
     private void setButtonText() {
-        startLoading();
+        showLoading();
         if (!NetworkManager.checkOnline(this)) {
-            stopLoading();
+            hideLoading();
             return;
         }
-
 
         ZipChatApi.INSTANCE.getStatus(UserManager.getAuthToken(this), UserManager.getId(this), mUser.getUserId(), new Callback<Response>() {
             @Override
@@ -165,7 +162,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
                     });
                 }
 
-                stopLoading();
+                hideLoading();
             }
 
             @Override
@@ -185,7 +182,6 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
-            Utils.debugToast(this, "Finishing UserDetailsActivity because home was clicked");
             finish();
             return true;
         }
@@ -199,9 +195,11 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         }
         Log.d(TAG, "Sending chat request to user " + mUser.getUserId());
         long userId = UserManager.getId(this);
+        showLoading();
         ZipChatApi.INSTANCE.sendChatRequest(UserManager.getAuthToken(this), userId, mUser.getUserId(), new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
+                Utils.nullSafeSetVisibility(mRequestStatusLoadingPb, View.INVISIBLE);
                 finish();
             }
 

@@ -385,7 +385,7 @@ public class ChatRoomFragment extends Fragment implements AsyncHttpClient.WebSoc
             Log.e(TAG, "Problem connecting to the web socket: " + exception.getMessage());
             return;
         }
-        Utils.debugToast(getActivity(), "Connected to the socket!");
+//        Utils.debugToast(getActivity(), "Connected to the socket!");
         mRoomSocket.setWebSocket(webSocket);
     }
 

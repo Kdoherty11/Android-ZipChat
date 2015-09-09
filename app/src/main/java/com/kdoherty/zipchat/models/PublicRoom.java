@@ -23,7 +23,7 @@ public class PublicRoom extends AbstractRoom {
     private double longitude;
     private int radius;
     private int position;
-    private int distance = -1;
+    private int distance;
 
     public PublicRoom() {
         super(RoomType.PUBLIC);

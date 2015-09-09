@@ -154,7 +154,7 @@ public class PublicRoomActivity extends AbstractLocationActivity {
         if (mNotificationsToggle != null) {
             mNotificationsToggle.setIcon(iconId);
         } else {
-            Utils.debugToast(getApplicationContext(), "mNotificationsToggle is null in set notification icon");
+            //Utils.debugToast(getApplicationContext(), "mNotificationsToggle is null in set notification icon");
             Log.e(TAG, "mNotificationsToggle is null in set notification icon");
         }
     }
@@ -162,7 +162,6 @@ public class PublicRoomActivity extends AbstractLocationActivity {
     @Subscribe
     @SuppressWarnings("unused")
     public void onJoinSuccess(PublicRoomJoinEvent event) {
-        Utils.debugToast(this, "Join success in public room activity subscribe method");
         mNotificationsOn = event.isSubscribed();
         setNotificationsIcon();
         if (mDrawerFragment != null) {

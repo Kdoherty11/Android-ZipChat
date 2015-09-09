@@ -20,8 +20,8 @@
         android:id="@+id/request_status_loading_pb"
         android:layout_width="42dp"
         android:layout_height="42dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="25dp" />
+        android:layout_gravity="center"
+        android:layout_margin="6dp" />
 
     <Button
         android:id="@+id/chat_request_btn"

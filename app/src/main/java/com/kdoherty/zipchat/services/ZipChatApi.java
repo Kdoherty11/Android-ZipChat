@@ -50,7 +50,7 @@ public interface ZipChatApi {
                           @Field("latitude") double latitude, @Field("longitude") double longitude, @Field("creatorId") long creatorId,
                           Callback<Response> response);
 
-    @GET("/test")
+    @GET("/publicRooms")
     void getPublicRooms(@Header(AUTH_TOKEN_KEY) String authToken, @Query("lat") double latitude,
                         @Query("lon") double longitude,
                         Callback<List<PublicRoom>> response);

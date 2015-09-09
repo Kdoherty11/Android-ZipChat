@@ -254,7 +254,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
         } else {
             Log.w(TAG, "Message " + msg + " couldn't be found to be confirmed." +
                     " uuid=" + uuid + " messages= " + mMessages);
-            Utils.debugToast(mActivity, "Message: " + msg + " couldn't be found to be confirmed");
+            //Utils.debugToast(mActivity, "Message: " + msg + " couldn't be found to be confirmed");
         }
     }
 
