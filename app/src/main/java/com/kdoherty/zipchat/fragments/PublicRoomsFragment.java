@@ -256,13 +256,7 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
 
         Location location = mLocationCallback.getLastLocation();
 
-        if (location == null) {
-            Log.w(TAG, "Null location when refreshing public rooms");
-            mSwipeRefreshLayout.setRefreshing(false);
-            return;
-        }
-
-        if (!NetworkManager.checkOnline(getActivity())) {
+        if (location == null || !NetworkManager.checkOnline(getActivity())) {
             mSwipeRefreshLayout.setRefreshing(false);
             return;
         }
@@ -330,32 +324,7 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
     @Subscribe
     @SuppressWarnings("unused")
     public void onLocationAvailable(LocationAvailableEvent event) {
-        Log.d(TAG, "Location available event");
-        Location location = mLocationCallback.getLastLocation();
-        if (location != null) {
-            Log.d(TAG, "Sending location with accuracy " + location.getAccuracy() + " to server in getPublicRooms request");
-
-            if (!NetworkManager.checkOnline(getActivity())) {
-                return;
-            }
-
-            ZipChatApi.INSTANCE.getPublicRooms(UserManager.getAuthToken(getActivity()),
-                    location.getLatitude(), location.getLongitude(), new Callback<List<PublicRoom>>() {
-                        @Override
-                        public void success(List<PublicRoom> publicRooms, Response response) {
-                            populateList(publicRooms);
-                        }
-
-                        @Override
-                        public void failure(RetrofitError error) {
-                            NetworkManager.handleErrorResponse(TAG, "Getting public rooms", error, getActivity());
-                            mSwipeRefreshLayout.setRefreshing(false);
-                        }
-                    });
-        } else {
-            mAdapter = new PublicRoomAdapter(getActivity(), new ArrayList<PublicRoom>());
-            Log.w(TAG, "Last location is null");
-        }
+        refreshFeed();
     }
 
     @Override
