@@ -38,7 +38,6 @@ import com.kdoherty.zipchat.utils.BusProvider;
 import com.kdoherty.zipchat.utils.LocationManager;
 import com.kdoherty.zipchat.utils.NetworkManager;
 import com.kdoherty.zipchat.utils.UserManager;
-import com.kdoherty.zipchat.utils.Utils;
 import com.kdoherty.zipchat.views.DividerItemDecoration;
 import com.melnykov.fab.FloatingActionButton;
 import com.squareup.otto.Subscribe;
@@ -83,6 +82,7 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
 
         try {
             mLocationCallback = (AbstractLocationActivity) activity;
+
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must be an AbstractLocationActivity");
@@ -263,6 +263,7 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
         }
 
         if (!NetworkManager.checkOnline(getActivity())) {
+            mSwipeRefreshLayout.setRefreshing(false);
             return;
         }
 

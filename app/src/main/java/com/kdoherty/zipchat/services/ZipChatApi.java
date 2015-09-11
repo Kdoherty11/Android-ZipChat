@@ -2,7 +2,6 @@ package com.kdoherty.zipchat.services;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.kdoherty.zipchat.BuildConfig;
 import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.PrivateRoom;
 import com.kdoherty.zipchat.models.PublicRoom;

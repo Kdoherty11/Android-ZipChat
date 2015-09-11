@@ -28,7 +28,6 @@ import com.kdoherty.zipchat.models.PublicRoom;
 import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.NetworkManager;
 import com.kdoherty.zipchat.utils.UserManager;
-import com.kdoherty.zipchat.utils.Utils;
 import com.squareup.otto.Subscribe;
 
 import retrofit.Callback;

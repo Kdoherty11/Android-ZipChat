@@ -40,7 +40,6 @@ import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.FacebookManager;
 import com.kdoherty.zipchat.utils.NetworkManager;
 import com.kdoherty.zipchat.utils.UserManager;
-import com.kdoherty.zipchat.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.kdoherty.zipchat.events.AddFavoriteEvent;
@@ -19,7 +18,6 @@ import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.BusProvider;
 import com.kdoherty.zipchat.utils.UserManager;
-import com.kdoherty.zipchat.utils.Utils;
 import com.koushikdutta.async.callback.CompletedCallback;
 import com.koushikdutta.async.http.WebSocket;
 
@@ -42,10 +40,6 @@ public class RoomSocket {
     private static final long BACKOFF_MILLIS = 2000;
     private static final int MAX_NUM_RETRY_ATTEMPTS = 4;
     private final long mUserId;
-    private Queue<JSONObject> mSocketEventQueue = new ArrayDeque<>();
-    private boolean mIsReconnecting = false;
-    private ChatService mChatService;
-    private Context mContext;
     private final WebSocket.StringCallback mEventCallback = new WebSocket.StringCallback() {
         @Override
         public void onStringAvailable(String s) {
@@ -119,6 +113,10 @@ public class RoomSocket {
             }
         }
     };
+    private Queue<JSONObject> mSocketEventQueue = new ArrayDeque<>();
+    private boolean mIsReconnecting = false;
+    private ChatService mChatService;
+    private Context mContext;
     private WebSocket mWebSocket;
     private Handler mHandler = new Handler();
     private int mNumRetryAttempts = 0;
