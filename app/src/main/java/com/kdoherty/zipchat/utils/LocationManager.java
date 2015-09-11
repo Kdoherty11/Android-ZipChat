@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.kdoherty.zipchat.R;
+import com.kdoherty.zipchat.events.DismissLocationDialogEvent;
 
 /**
  * Created by kevin on 6/8/15.
@@ -44,6 +45,7 @@ public final class LocationManager {
                 @Override
                 public void onClick(DialogInterface paramDialogInterface, int paramInt) {
                     // Do nothing if user cancels
+                    BusProvider.getInstance().post(new DismissLocationDialogEvent());
                 }
             });
 

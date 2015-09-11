@@ -78,9 +78,9 @@ public abstract class AbstractLocationActivity extends AppCompatActivity impleme
     @Override
     protected void onResume() {
         super.onResume();
+        BusProvider.getInstance().register(this);
         Utils.checkServices(this);
         LocationManager.checkLocation(this);
-        BusProvider.getInstance().register(this);
     }
 
     @Override

@@ -30,6 +30,7 @@ import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.AbstractLocationActivity;
 import com.kdoherty.zipchat.activities.CreateRoomActivity;
 import com.kdoherty.zipchat.adapters.PublicRoomAdapter;
+import com.kdoherty.zipchat.events.DismissLocationDialogEvent;
 import com.kdoherty.zipchat.events.LocationAvailableEvent;
 import com.kdoherty.zipchat.events.RoomCreatedEvent;
 import com.kdoherty.zipchat.models.PublicRoom;
@@ -163,6 +164,10 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
         }
     }
 
+    private void displayEmptyList() {
+        populateList(new ArrayList<PublicRoom>());
+    }
+
     private void displayNoRoomsFoundMessage() {
         mNoRoomsInAreaTv.setVisibility(View.VISIBLE);
     }
@@ -269,7 +274,7 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
 
             @Override
             public void failure(RetrofitError error) {
-                populateList(new ArrayList<PublicRoom>());
+                displayEmptyList();
                 NetworkManager.handleErrorResponse(TAG, "Getting public rooms", error, getActivity());
             }
         });
@@ -325,6 +330,12 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
     @SuppressWarnings("unused")
     public void onLocationAvailable(LocationAvailableEvent event) {
         refreshFeed();
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onLocationDialogDismissed(DismissLocationDialogEvent event) {
+        displayEmptyList();
     }
 
     @Override
