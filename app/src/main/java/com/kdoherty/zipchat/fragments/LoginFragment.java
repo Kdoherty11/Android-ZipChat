@@ -135,6 +135,7 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
 
     private void createOrAuthUser(String facebookToken) {
         if (TextUtils.isEmpty(facebookToken)) {
+            showFacebookButton();
             Log.w(TAG, "Facebook token is null or empty in createOrAuthUser");
             return;
         }

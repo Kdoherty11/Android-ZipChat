@@ -1,9 +1,7 @@
 package com.kdoherty.zipchat.activities;
 
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -23,7 +21,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.events.RoomCreatedEvent;
-import com.kdoherty.zipchat.fragments.PublicRoomsFragment;
 import com.kdoherty.zipchat.services.ZipChatApi;
 import com.kdoherty.zipchat.utils.BusProvider;
 import com.kdoherty.zipchat.utils.LocationManager;
@@ -105,11 +102,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
                     mDisableButton = false;
                     break;
                 }
-                if (NetworkManager.checkOnline(this)) {
-                    new CreateRoomTask(roomName).execute();
-                    finish();
-                }
-
+                createRoom(roomName);
                 break;
             default:
                 Log.e(TAG, "Default case in onClick");
@@ -122,7 +115,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
         if (mWaitListRoomName != null) {
             Log.d(TAG, "Creating room using mWaitListRoomName");
             //Utils.debugToast(this, "Creating room using mWaitListRoomName");
-            new CreateRoomTask(mWaitListRoomName).execute();
+            createRoom(mWaitListRoomName);
         }
 
         if (mLocation != null) {
@@ -163,6 +156,23 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
         mWaitListRoomName = roomName;
     }
 
+    private void displayRoomCircle(LatLng latLng) {
+        if (mMapCircle != null) {
+            mMapCircle.remove();
+        }
+
+        mMapCircle = LocationManager.setRoomCircle(this, mGoogleMap, latLng, mRadius);
+    }
+
+    private void displayMarker(LatLng latLng) {
+        if (mMarker != null) {
+            mMarker.remove();
+        }
+
+        mMarker = mGoogleMap.addMarker(new MarkerOptions().position(latLng)
+                .title(getResources().getString(R.string.my_location)));
+    }
+
     private void showRoom() {
         if (mLocation == null) {
             return;
@@ -172,60 +182,40 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
             return;
         }
 
-        if (mMapCircle != null) {
-            mMapCircle.remove();
-        }
-
-        if (mMarker != null) {
-            mMarker.remove();
-        }
+        mGoogleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                displayMarker(latLng);
+                displayRoomCircle(latLng);
+            }
+        });
 
         LatLng userLatLng = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
-
-        mMarker = mGoogleMap.addMarker(new MarkerOptions().position(userLatLng)
-                .title(getResources().getString(R.string.my_location)));
-
-        mMapCircle = LocationManager.setRoomCircle(this, mGoogleMap, userLatLng, mRadius);
+        displayMarker(userLatLng);
+        displayRoomCircle(userLatLng);
     }
 
-    private class CreateRoomTask extends AsyncTask<Void, Void, Location> {
 
-        private String name;
 
-        public CreateRoomTask(String name) {
-            this.name = name;
+    private void createRoom(String roomName) {
+        if (!NetworkManager.checkOnline(this)) {
+            return;
         }
 
-        @Override
-        protected Location doInBackground(Void... params) {
-            if (mLocation != null) {
-                return mLocation;
-            } else {
-                if (mGoogleApiClient.isConnected()) {
-                    // Try to get a location again
-                    return getLastLocation();
-                } else if (mGoogleApiClient.isConnecting()) {
-                    addToWaitList(name);
-                }
+        if (mMarker == null || mMarker.getPosition() == null) {
+            Log.w(TAG, "Null location found in create room. Not creating room");
+            if (mGoogleApiClient.isConnecting()) {
+                addToWaitList(roomName);
             }
-
-            return null;
         }
 
-        @Override
-        protected void onPostExecute(Location location) {
-            if (location == null) {
-                //Utils.debugToast(getApplicationContext(), "Could not find location... not creating room");
-                Log.w(TAG, "Null location found in create room. Not creating room");
-            } else if (NetworkManager.checkOnline(CreateRoomActivity.this)) {
+        LatLng roomCenter = mMarker.getPosition();
 
-                ZipChatApi.INSTANCE.createPublicRoom(UserManager.getAuthToken(CreateRoomActivity.this), name, mRadius, location.getLatitude(), location.getLongitude(), UserManager.getId(CreateRoomActivity.this), new Callback<Response>() {
+        ZipChatApi.INSTANCE.createPublicRoom(UserManager.getAuthToken(CreateRoomActivity.this),
+                roomName, mRadius, roomCenter.latitude, roomCenter.longitude,
+                UserManager.getId(CreateRoomActivity.this), new Callback<Response>() {
                     @Override
                     public void success(Response response, Response response2) {
-                        Log.i(TAG, "Successfully created chat room");
-                        Intent refreshIntent = new Intent();
-                        refreshIntent.setAction(PublicRoomsFragment.REFRESH_FEED_ACTION);
-                        sendBroadcast(refreshIntent);
                         BusProvider.getInstance().post(new RoomCreatedEvent());
                     }
 
@@ -234,8 +224,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
                         NetworkManager.handleErrorResponse(TAG, "Creating a chat room", error, CreateRoomActivity.this);
                     }
                 });
-            }
 
-        }
+        finish();
     }
 }
