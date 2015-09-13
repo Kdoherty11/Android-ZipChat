@@ -23,8 +23,8 @@ android {
         applicationId "com.kdoherty.zipchat"
         minSdkVersion 17
         targetSdkVersion 21
-        versionCode 8
-        versionName "1.0.7-beta"
+        versionCode 11
+        versionName "1.0.0"
     }
 
     compileOptions {

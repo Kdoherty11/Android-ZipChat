@@ -174,7 +174,7 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
     }
 
     private void showRoom() {
-        if (mLocation == null) {
+        if (mLocation == null && mMarker == null) {
             return;
         }
 
@@ -190,9 +190,14 @@ public class CreateRoomActivity extends AbstractLocationActivity implements Seek
             }
         });
 
-        LatLng userLatLng = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
-        displayMarker(userLatLng);
-        displayRoomCircle(userLatLng);
+        LatLng roomCenter;
+        if (mMarker != null) {
+            roomCenter = mMarker.getPosition();
+        } else {
+            roomCenter = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
+        }
+        displayMarker(roomCenter);
+        displayRoomCircle(roomCenter);
     }
 
 
