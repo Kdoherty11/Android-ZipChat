@@ -94,6 +94,7 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
         Log.i(TAG, "Sending auth request");
 
         showLoading();
+        mSentAuthRequest = true;
         ZipChatApi.INSTANCE.auth(accessToken, new Callback<Response>() {
             @Override
             public void success(Response response, Response response2) {
@@ -143,7 +144,6 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
         if (UserManager.didCreateUser(getActivity())) {
             if (!mSentAuthRequest) {
                 authUser(facebookToken);
-                mSentAuthRequest = true;
             }
         } else {
             createUser(facebookToken);
@@ -217,6 +217,7 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
     }
 
     private void showRetryLoginBtn() {
+        mSentAuthRequest = false;
         Utils.nullSafeSetVisibility(mAuthPb, View.GONE);
         Utils.nullSafeSetVisibility(mLoginButton, View.GONE);
         Utils.nullSafeSetVisibility(mRetryAuthBtn, View.VISIBLE);
