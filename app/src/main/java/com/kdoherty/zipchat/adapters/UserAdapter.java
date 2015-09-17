@@ -13,6 +13,7 @@ import com.kdoherty.zipchat.R;
 import com.kdoherty.zipchat.activities.UserDetailsActivity;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.FacebookManager;
+import com.kdoherty.zipchat.utils.Utils;
 
 import java.util.List;
 
@@ -39,10 +40,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserCellViewHo
     }
 
     public UserAdapter(Context context, int cellLayoutId, List<User> roomMembers, int width, int height) {
-        mContext = context;
+        mContext = Utils.checkNotNull(context, "Context");
+        mRoomMembers = Utils.checkNotNull(roomMembers, "RoomMembers");
         mInflater = LayoutInflater.from(mContext);
         mCellLayoutId = cellLayoutId;
-        mRoomMembers = roomMembers;
         mWidth = width;
         mHeight = height;
     }

@@ -23,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.etiennelawlor.quickreturn.library.enums.QuickReturnViewType;
 import com.etiennelawlor.quickreturn.library.listeners.QuickReturnRecyclerViewOnScrollListener;
@@ -151,6 +152,10 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
     }
 
     public void populateList(List<PublicRoom> publicRooms) {
+        if (getActivity() == null) {
+            displayNoRoomsFoundMessage();
+            return;
+        }
         mSwipeRefreshLayout.setRefreshing(false);
         mAdapter = new PublicRoomAdapter(getActivity(), publicRooms);
         mChatRoomsRv.setAdapter(mAdapter);
@@ -258,6 +263,9 @@ public class PublicRoomsFragment extends Fragment implements SwipeRefreshLayout.
 
     private void refreshFeed() {
         Log.d(TAG, "Refreshing public rooms");
+        if (getActivity() == null) {
+            return;
+        }
 
         Location location = mLocationCallback.getLastLocation();
 

@@ -23,6 +23,7 @@ import com.kdoherty.zipchat.utils.BusProvider;
 import com.kdoherty.zipchat.utils.FacebookManager;
 import com.kdoherty.zipchat.utils.NetworkManager;
 import com.kdoherty.zipchat.utils.UserManager;
+import com.kdoherty.zipchat.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,9 +47,9 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     private List<Request> mFilteredRequests;
 
     public RequestAdapter(Context context, List<Request> requests) {
+        mContext = Utils.checkNotNull(context, "Context");
+        mRequests = Utils.checkNotNull(requests, "Requests");
         mInflater = LayoutInflater.from(context);
-        mContext = context;
-        mRequests = requests;
         mFilteredRequests = requests;
     }
 

@@ -20,6 +20,7 @@ import com.kdoherty.zipchat.activities.PublicRoomActivity;
 import com.kdoherty.zipchat.fragments.HomeTabsFragment;
 import com.kdoherty.zipchat.models.PublicRoom;
 import com.kdoherty.zipchat.models.PublicRoomComparators;
+import com.kdoherty.zipchat.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,9 +41,9 @@ public class PublicRoomAdapter extends RecyclerView.Adapter<PublicRoomAdapter.Ch
     private ChatRoomFilter mFilter = new ChatRoomFilter();
 
     public PublicRoomAdapter(Context context, List<PublicRoom> publicRooms) {
-        mContext = context;
+        mContext = Utils.checkNotNull(context, "Context");
+        mPublicRooms = Utils.checkNotNull(publicRooms, "PublicRooms");
         mInflater = LayoutInflater.from(mContext);
-        mPublicRooms = publicRooms;
         mFilteredPublicRooms = publicRooms;
     }
 

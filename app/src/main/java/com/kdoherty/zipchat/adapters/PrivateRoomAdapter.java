@@ -21,6 +21,7 @@ import com.kdoherty.zipchat.models.PrivateRoom;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.FacebookManager;
 import com.kdoherty.zipchat.utils.UserManager;
+import com.kdoherty.zipchat.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,12 +43,9 @@ public class PrivateRoomAdapter extends RecyclerView.Adapter<PrivateRoomAdapter.
     private PrivateChatFilter mFilter = new PrivateChatFilter();
 
     public PrivateRoomAdapter(Context context, List<PrivateRoom> privateRooms) {
-        if (context == null || privateRooms == null) {
-            throw new NullPointerException();
-        }
+        mContext = Utils.checkNotNull(context, "Context");
+        mPrivateRooms = Utils.checkNotNull(privateRooms, "PrivateRooms");
         mInflater = LayoutInflater.from(context);
-        mContext = context;
-        mPrivateRooms = privateRooms;
         mFilteredPrivateRooms = privateRooms;
         ZipChatApplication.initImageLoader(mContext);
     }

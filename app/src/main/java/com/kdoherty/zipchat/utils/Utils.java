@@ -2,6 +2,7 @@ package com.kdoherty.zipchat.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -94,6 +95,13 @@ public class Utils {
         } else {
             return -accum;
         }
+    }
+
+    public static <T> T checkNotNull(T reference, String errorMessage) {
+        if (reference == null) {
+            throw new NullPointerException(errorMessage);
+        }
+        return reference;
     }
 
 //    public static void debugToast(Context context, String message) {

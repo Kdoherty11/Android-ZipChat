@@ -28,6 +28,7 @@ import com.kdoherty.zipchat.models.Message;
 import com.kdoherty.zipchat.models.User;
 import com.kdoherty.zipchat.utils.FacebookManager;
 import com.kdoherty.zipchat.utils.UserManager;
+import com.kdoherty.zipchat.utils.Utils;
 import com.kdoherty.zipchat.views.AnimateFirstDisplayListener;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
@@ -70,14 +71,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageC
     }
 
     public MessageAdapter(Activity activity, List<Message> messages, long anonUserId, MessageCellClickListener messageCellClickListener) {
-        if (activity == null) {
-            throw new IllegalArgumentException("Context is null");
-        }
-        if (messages == null) {
-            throw new IllegalArgumentException("messages is null");
-        }
+        Utils.checkNotNull(activity, "Activity");
+        mMessages = Utils.checkNotNull(messages, "Messages");;
         mInflater = LayoutInflater.from(activity);
-        mMessages = messages;
         mActivity = activity;
         mAnonUserId = anonUserId;
         mClickCallbacks = messageCellClickListener;
