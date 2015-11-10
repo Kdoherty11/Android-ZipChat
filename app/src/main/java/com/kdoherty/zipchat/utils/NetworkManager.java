@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -76,7 +77,7 @@ public final class NetworkManager {
         return sb.toString();
     }
 
-    public static void handleErrorResponse(String tag, String scenario, RetrofitError error, Context context) {
+    public static void handleErrorResponse(String tag, String scenario, RetrofitError error, @Nullable Context context) {
         StringBuilder sb = new StringBuilder();
         if (!TextUtils.isEmpty(scenario)) {
             sb.append("Scenario: ");
@@ -104,7 +105,7 @@ public final class NetworkManager {
 
         Crashlytics.log(Log.ERROR, tag, errorMessage);
 
-        if (status == 401) {
+        if (status == 401 && context != null) {
             Log.w(TAG, "Status was 401 redirecting to LoginActivity");
             Intent loginIntent = new Intent(context, LoginActivity.class);
             context.startActivity(loginIntent);

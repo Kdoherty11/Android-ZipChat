@@ -113,10 +113,13 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
 
             @Override
             public void failure(RetrofitError error) {
-                NetworkManager.handleErrorResponse(TAG, "Sending fb access token to zipchat /auth", error, getActivity());
                 showRetryLoginBtn();
-                Toast.makeText(getActivity(), getString(R.string.toast_login_failure),
-                        Toast.LENGTH_SHORT).show();
+                Activity activity = getActivity();
+                NetworkManager.handleErrorResponse(TAG, "Sending fb access token to zipchat /auth", error, activity);
+                if (activity != null) {
+                    Toast.makeText(activity, getString(R.string.toast_login_failure),
+                            Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
