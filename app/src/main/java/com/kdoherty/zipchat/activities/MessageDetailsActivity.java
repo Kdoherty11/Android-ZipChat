@@ -261,7 +261,7 @@ public class MessageDetailsActivity extends AppCompatActivity {
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.hide(mMessageFavoritesFragment);
-            fragmentTransaction.commit();
+            fragmentTransaction.commitAllowingStateLoss();
         }
     }
 
@@ -279,7 +279,7 @@ public class MessageDetailsActivity extends AppCompatActivity {
             fragmentTransaction.show(mMessageFavoritesFragment);
         }
 
-        fragmentTransaction.commit();
+        fragmentTransaction.commitAllowingStateLoss();
     }
 
     @Override
