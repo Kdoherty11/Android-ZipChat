@@ -77,7 +77,7 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(final Activity activity) {
         super.onAttach(activity);
         AccessToken currentAccessToken = AccessToken.getCurrentAccessToken();
         if (currentAccessToken != null && !TextUtils.isEmpty(currentAccessToken.getToken()) && !currentAccessToken.isExpired()) {
@@ -88,7 +88,8 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
     }
 
     private void authUser(String accessToken) {
-        if (!NetworkManager.checkOnline(getActivity())) {
+        final Activity activity = getActivity();
+        if (activity == null || !NetworkManager.checkOnline(activity)) {
             return;
         }
         Log.i(TAG, "Sending auth request");
@@ -102,7 +103,7 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
                 try {
                     JSONObject respJson = new JSONObject(NetworkManager.responseToString(response));
                     String authToken = respJson.getString("authToken");
-                    UserManager.storeAuthToken(getActivity(), authToken);
+                    UserManager.storeAuthToken(activity, authToken);
                 } catch (JSONException e) {
                     Log.e(TAG, "Problem parsing the auth json response");
                     return;
@@ -114,12 +115,9 @@ public class LoginFragment extends Fragment implements FacebookCallback<LoginRes
             @Override
             public void failure(RetrofitError error) {
                 showRetryLoginBtn();
-                Activity activity = getActivity();
                 NetworkManager.handleErrorResponse(TAG, "Sending fb access token to zipchat /auth", error, activity);
-                if (activity != null) {
-                    Toast.makeText(activity, getString(R.string.toast_login_failure),
-                            Toast.LENGTH_SHORT).show();
-                }
+                Toast.makeText(activity, getString(R.string.toast_login_failure),
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
